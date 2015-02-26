@@ -161,7 +161,15 @@ function AppMainCycle()
 	end
 	
 	-- Sets controls triggering
-	if (Controls.check(pad,KEY_A)) and not (Controls.check(oldpad,KEY_A)) then
+	if (Controls.check(pad,KEY_Y)) and not (Controls.check(oldpad,KEY_Y) and not (not_started) then
+		Timer.reset(frame_succession)
+		not_started = true
+		if current_type == "JPGV" then
+			JPGV.stop(current_file)
+		else
+			BMPV.stop(current_file)
+		end
+	elseif (Controls.check(pad,KEY_A)) and not (Controls.check(oldpad,KEY_A)) then
 		if not_started then
 			not_started = false
 			if current_type == "JPGV" then
@@ -182,12 +190,18 @@ function AppMainCycle()
 				end
 			end	
 		else
-			Timer.reset(frame_succession)
-			not_started = true
 			if current_type == "JPGV" then
-				JPGV.stop(current_file)
+				if JPGV.isPlaying(current_file) then
+					JPGV.pause(current_file)
+				else
+					JPGV.resume(current_file)
+				end
 			else
-				BMPV.stop(current_file)
+				if BMPV.isPlaying(current_file) then
+					BMPV.pause(current_file)
+				else
+					BMPV.resume(current_file)
+				end
 			end
 		end
 	elseif Controls.check(pad,KEY_B) or Controls.check(pad,KEY_START) then
