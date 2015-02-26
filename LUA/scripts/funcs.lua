@@ -34,6 +34,16 @@ function CropPrint(x, y, text, color, screen)
 	end
 end
 
+-- * TopCropPrint
+-- Used to print long strings on TOP_SCREEN, it automatically crop too long strings
+function TopCropPrint(x, y, text, color, screen)
+	if string.len(text) > 42 then
+		Screen.debugPrint(x, y, string.sub(text,1,42) .. "...", color, screen)
+	else
+		Screen.debugPrint(x, y, text, color, screen)
+	end
+end
+
 -- * LastSpace
 -- Return index of last space for text argument
 function LastSpace(text)
