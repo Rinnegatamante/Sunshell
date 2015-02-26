@@ -23,93 +23,46 @@ b4 = Screen.loadImage(main_dir.."/images/4.jpg")
 b5 = Screen.loadImage(main_dir.."/images/5.jpg")
 
 -- Setting some system vars, funcs, etc...
-yellow = Color.new(255,242,0)
+Sound.init()
 black = Color.new(0,0,0)
 white = Color.new(255,255,255)
 selected = Color.new(255,0,0)
 selected_item = Color.new(237,28,36,128)
 version = "0.1"
+ui_enabled = true
 oldpad = KEY_A
 module = "Main Menu"
-function GarbageCollection()
-	Screen.freeImage(bg)
-	Screen.freeImage(b0)
-	Screen.freeImage(b1)
-	Screen.freeImage(b2)
-	Screen.freeImage(b3)
-	Screen.freeImage(b4)
-	Screen.freeImage(b5)
-	Screen.freeImage(charge)
-	for i,tool in pairs(tools) do
-		Screen.freeImage(tool[1])
-	end
+months = {"January", "February","March","April","May","June","July", "August", "September", "October", "November", "December"}
+days_table = {}
+dv,d,m,y = System.getDate()
+if (y % 400 == 0) or (y % 100 ~= 0 and y % 4 == 0) then
+	month_days = {31,29,31,30,31,30,31,31,30,31,30,31}
+else
+	month_days = {31,28,31,30,31,30,31,31,30,31,30,31}
 end
-function CropPrint(x, y, text, color, screen)
-	if string.len(text) > 25 then
-		Screen.debugPrint(x, y, string.sub(text,1,25) .. "...", color, screen)
+i = 1
+if i == d then
+	table.insert(days_table,dv)
+else
+	tmp = ((d - i) % 7)
+	if tmp > dv then
+		my_dv = 7 + dv - tmp 
 	else
-		Screen.debugPrint(x, y, text, color, screen)
+		my_dv = dv - tmp
 	end
+	table.insert(days_table,my_dv)
 end
-function LastSpace(text)
-	found = false
-	start = -1
-	while string.sub(text,start,start) ~= " " do
-		start = start - 1
+i = 2
+while i <= month_days[m] do
+	my_dv = days_table[i-1] + 1
+	if my_dv > 6 then
+		my_dv = 0
 	end
-	return start
+	table.insert(days_table,my_dv)
+	i=i+1
 end
-function ErrorGenerator(text)
-	y = 68
-	error_lines = {}
-	while string.len(text) > 30 do
-		endl = 31 + LastSpace(string.sub(text,1,30))
-		table.insert(error_lines,{string.sub(text,1,endl), y})
-		text = string.sub(text,endl+1,-1)
-		y = y + 15
-	end
-	if string.len(text) > 0 then
-		table.insert(error_lines,{text, y})
-	end
-end
-function LinesGenerator(text,y)
-	error_lines = {}
-	while string.len(text) > 40 do
-		endl = 41 + LastSpace(string.sub(text,1,40))
-		table.insert(error_lines,{string.sub(text,1,endl), y})
-		text = string.sub(text,endl+1,-1)
-		y = y + 15
-	end
-	if string.len(text) > 0 then
-		table.insert(error_lines,{text, y})
-	end
-	return error_lines
-end
-function ShowError(text)
-	confirm = false
-	ErrorGenerator(text)
-	max_y = error_lines[#error_lines][2] + 40
-	while not confirm do
-		Screen.refresh()
-		Screen.fillEmptyRect(5,315,50,max_y,black,BOTTOM_SCREEN)
-		Screen.fillRect(6,314,51,max_y-1,white,BOTTOM_SCREEN)
-		Screen.debugPrint(8,53,"Error",selected,BOTTOM_SCREEN)
-		for i,line in pairs(error_lines) do
-			Screen.debugPrint(8,line[2],line[1],black,BOTTOM_SCREEN)
-		end
-		Controls.init()
-		Screen.fillEmptyRect(147,176,max_y - 23, max_y - 8,black,BOTTOM_SCREEN)
-		Screen.debugPrint(150,max_y - 20,"OK",black,BOTTOM_SCREEN)
-		if (Controls.check(Controls.read(),KEY_TOUCH)) then
-			x,y = Controls.readTouch()
-			if x >= 147 and x <= 176 and y >= max_y - 23 and y <= max_y - 8 then
-				confirm = true
-			end
-		end
-		Screen.flip()
-		Screen.waitVblankStart()
-	end
-end
+-- Loading internal extra Sunshell functions
+dofile(main_dir.."/scripts/funcs.lua")
 
 -- Set detected build in use
 if string.len(System.currentDirectory()) > 1 then
@@ -141,12 +94,58 @@ while true do
 	pad = Controls.read()
 	
 	-- Blit background
-	Screen.drawPartialImage(0,0,0,0,400,240,bg,TOP_SCREEN)
-	Screen.drawPartialImage(0,0,40,240,320,240,bg,BOTTOM_SCREEN)
+	if ui_enabled then
+		Screen.drawPartialImage(0,0,0,0,400,240,bg,TOP_SCREEN)
+		Screen.drawPartialImage(0,0,40,240,320,240,bg,BOTTOM_SCREEN)
+	end
 	
 	-- Main menu
 	if mode == nil then
-	
+		if widget == nil then
+		
+			-- Blit clock
+			hours,minutes,seconds = System.getTime()
+			if minutes < 10 then
+				minutes = "0"..minutes
+			end
+			if seconds < 10 then
+				seconds = "0"..seconds
+			end
+			formatted_time = hours..":"..minutes..":"..seconds
+			Screen.fillEmptyRect(255,395,85,125,black,TOP_SCREEN)
+			Screen.fillRect(256,394,86,124,white,TOP_SCREEN)
+			Screen.debugPrint(259,89,"Digital Clock",selected,TOP_SCREEN)
+			Screen.debugPrint(259,109,formatted_time,black,TOP_SCREEN)
+			
+			-- Blit calendar
+			dv,d,m,ye = System.getDate()
+			i = 1
+			x = 10
+			y = 85
+			Screen.fillEmptyRect(x-5,x+240,y-45,y+115,black,TOP_SCREEN)
+			Screen.fillRect(x-4,x+239,y-44,y+114,white,TOP_SCREEN)
+			Screen.debugPrint(x+50,y-40,months[m].." "..ye,black,TOP_SCREEN)
+			Screen.debugPrint(x,y-20,"S",selected,TOP_SCREEN)
+			Screen.debugPrint(x+35,y-20,"M",selected,TOP_SCREEN)
+			Screen.debugPrint(x+70,y-20,"T",selected,TOP_SCREEN)
+			Screen.debugPrint(x+105,y-20,"W",selected,TOP_SCREEN)
+			Screen.debugPrint(x+140,y-20,"T",selected,TOP_SCREEN)
+			Screen.debugPrint(x+175,y-20,"F",selected,TOP_SCREEN)
+			Screen.debugPrint(x+210,y-20,"S",selected,TOP_SCREEN)
+			while i <= month_days[m] do
+				if i == d then
+					Screen.debugPrint(x + (days_table[i]) * 35,y,i,selected,TOP_SCREEN)
+				else
+					Screen.debugPrint(x + (days_table[i]) * 35,y,i,black,TOP_SCREEN)
+				end
+				if days_table[i] == 6 then
+					y = y + 20
+				end
+				i=i+1
+			end
+			
+		end
+		
 		-- Blit app icons and sets up controls triggering
 		x = 4
 		y = 10
@@ -182,29 +181,32 @@ while true do
 	end
 	
 	-- Blit topbar info
-	Screen.debugPrint(2,6,"Sunshell v."..version.." - "..module,yellow,TOP_SCREEN)
-	if  System.isBatteryCharging() then
-		Screen.drawImage(350,2,charge,TOP_SCREEN)
-	else
-		battery_lv = System.getBatteryLife()
-		if battery_lv == 0 then
-			Screen.drawImage(350,2,b0,TOP_SCREEN)
-		elseif battery_lv == 1 then
-			Screen.drawImage(350,2,b1,TOP_SCREEN)
-		elseif battery_lv == 2 then
-			Screen.drawImage(350,2,b2,TOP_SCREEN)
-		elseif battery_lv == 3 then
-			Screen.drawImage(350,2,b3,TOP_SCREEN)
-		elseif battery_lv == 4 then
-			Screen.drawImage(350,2,b4,TOP_SCREEN)
+	if ui_enabled then
+		Screen.debugPrint(2,6,"Sunshell v."..version.." - "..module,white,TOP_SCREEN)
+		if  System.isBatteryCharging() then
+			Screen.drawImage(350,2,charge,TOP_SCREEN)
 		else
-			Screen.drawImage(350,2,b5,TOP_SCREEN)
+			battery_lv = System.getBatteryLife()
+			if battery_lv == 0 then
+				Screen.drawImage(350,2,b0,TOP_SCREEN)
+			elseif battery_lv == 1 then
+				Screen.drawImage(350,2,b1,TOP_SCREEN)
+			elseif battery_lv == 2 then
+				Screen.drawImage(350,2,b2,TOP_SCREEN)
+			elseif battery_lv == 3 then
+				Screen.drawImage(350,2,b3,TOP_SCREEN)
+			elseif battery_lv == 4 then
+				Screen.drawImage(350,2,b4,TOP_SCREEN)
+			else
+				Screen.drawImage(350,2,b5,TOP_SCREEN)
+			end
 		end
 	end
 	
 	-- Sets up universal controls
 	if Controls.check(pad,KEY_START) then
 		GarbageCollection()
+		Sound.term()
 		System.exit()
 	elseif Controls.check(pad,KEY_L) and not Controls.check(oldpad,KEY_L) then
 		System.takeScreenshot("/DCIM/101NIN03/Sunshell.bmp")
