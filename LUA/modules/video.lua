@@ -161,7 +161,7 @@ function AppMainCycle()
 	end
 	
 	-- Sets controls triggering
-	if (Controls.check(pad,KEY_Y)) and not (Controls.check(oldpad,KEY_Y) and not (not_started) then
+	if (Controls.check(pad,KEY_Y)) and not (Controls.check(oldpad,KEY_Y)) and not (not_started) then
 		Timer.reset(frame_succession)
 		not_started = true
 		if current_type == "JPGV" then
