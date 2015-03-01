@@ -1,3 +1,7 @@
+-- Internal SunShell variables
+-- ui_enabled = true/false -- Sets Sunshell UI state (CallMainMenu force automatically ui_enabled to true value)
+-- screenshots = true/false -- Sets Sunshell screenshot function through L button state (CallMainMenu force automatically screenshots to true value)
+
 -- Internal SunShell extra functions
 
 -- * CallMainMenu
@@ -6,6 +10,27 @@ function CallMainMenu()
 	mode = nil
 	module = "Main Menu"
 	ui_enabled = true
+	screenshots = true
+end
+
+-- * FormatTime
+-- Format a number of seconds in a time-like string (Example: 123 seconds = 02:03)
+function FormatTime(seconds)
+	minute = math.floor(seconds/60)
+	seconds = seconds%60
+	hours = math.floor(minute/60)
+	minute = minute%60
+	if minute < 10 then
+		minute = "0"..minute
+	end
+	if seconds < 10 then
+		seconds = "0"..seconds
+	end
+	if hours == 0 then
+		return minute..":"..seconds
+	else
+		return hours..":"..minute..":"..seconds
+	end
 end
 
 -- * GarbageCollection
@@ -82,6 +107,34 @@ function ShowError(text)
 		Screen.fillEmptyRect(5,315,50,max_y,black,BOTTOM_SCREEN)
 		Screen.fillRect(6,314,51,max_y-1,white,BOTTOM_SCREEN)
 		Screen.debugPrint(8,53,"Error",selected,BOTTOM_SCREEN)
+		for i,line in pairs(error_lines) do
+			Screen.debugPrint(8,line[2],line[1],black,BOTTOM_SCREEN)
+		end
+		Controls.init()
+		Screen.fillEmptyRect(147,176,max_y - 23, max_y - 8,black,BOTTOM_SCREEN)
+		Screen.debugPrint(150,max_y - 20,"OK",black,BOTTOM_SCREEN)
+		if (Controls.check(Controls.read(),KEY_TOUCH)) then
+			x,y = Controls.readTouch()
+			if x >= 147 and x <= 176 and y >= max_y - 23 and y <= max_y - 8 then
+				confirm = true
+			end
+		end
+		Screen.flip()
+		Screen.waitVblankStart()
+	end
+end
+
+-- * ShowWarning
+-- Shows a SunShell warning with a customizable text
+function ShowWarning(text)
+	confirm = false
+	ErrorGenerator(text)
+	max_y = error_lines[#error_lines][2] + 40
+	while not confirm do
+		Screen.refresh()
+		Screen.fillEmptyRect(5,315,50,max_y,black,BOTTOM_SCREEN)
+		Screen.fillRect(6,314,51,max_y-1,white,BOTTOM_SCREEN)
+		Screen.debugPrint(8,53,"Warning",selected,BOTTOM_SCREEN)
 		for i,line in pairs(error_lines) do
 			Screen.debugPrint(8,line[2],line[1],black,BOTTOM_SCREEN)
 		end
