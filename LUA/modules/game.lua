@@ -2,12 +2,11 @@
 mode = "Game"
 
 -- Internal module settings
-master_index = 0
-p = 1
+master_index_g = 0
+p_g = 1
 if build == "3DS" then
 	ShowError("You're using 3DS build. 3DS build cannot start any type of 3DS executable.")
-	mode = nil
-	module = "Main Menu"
+	CallMainMenu()
 else
 	my_apps = {}
 	if build == "3DSX" then
@@ -47,8 +46,8 @@ function AppMainCycle()
 		if (base_y > 226) then
 			break
 		end
-		if (l >= master_index) then
-			if (l==p) then
+		if (l >= master_index_g) then
+			if (l==p_g) then
 				base_y2 = base_y
 				if (base_y) == 0 then
 					base_y = 2
@@ -82,8 +81,7 @@ function AppMainCycle()
 	
 	-- Sets controls triggering
 	if Controls.check(pad,KEY_B) or Controls.check(pad,KEY_START) then
-		mode = nil
-		module = "Main Menu"
+		CallMainMenu()
 		for l, file in pairs(my_apps) do
 			if file[6] ~= nil then
 				Screen.freeImage(file[6])
@@ -97,28 +95,38 @@ function AppMainCycle()
 			end
 		end
 		if my_apps[p][1] then
-			System.launch3DSX("/3ds/"..my_apps[p][2].."/"..my_apps[p][2]..".3dsx")
+			GarbageCollection()
+			for i,bg_apps_code in pairs(bg_apps) do
+				bg_apps_code[2]()
+			end
+			Sound.term()
+			System.launch3DSX("/3ds/"..my_apps[p_g][2].."/"..my_apps[p_g][2]..".3dsx")
 		else
-			System.launchCIA(my_apps[p][2],1)
+			GarbageCollection()
+			for i,bg_apps_code in pairs(bg_apps) do
+				bg_apps_code[2]()
+			end
+			Sound.term()
+			System.launchCIA(my_apps[p_g][2],1)
 		end
 	elseif (Controls.check(pad,KEY_DUP)) and not (Controls.check(oldpad,KEY_DUP)) then
-		p = p - 1
+		p_g = p_g - 1
 		if (p >= 16) then
-			master_index = p - 15
+			master_index_g = p_g - 15
 		end
 	elseif (Controls.check(pad,KEY_DDOWN)) and not (Controls.check(oldpad,KEY_DDOWN)) then
-		p = p + 1
-		if (p >= 17) then
-			master_index = p - 15
+		p_g = p_g + 1
+		if (p_g >= 17) then
+			master_index_g = p_g - 15
 		end
 	end
-	if (p < 1) then
-		p = #my_apps
-		if (p >= 17) then
-			master_index = p - 15
+	if (p_g < 1) then
+		p_g = #my_apps
+		if (p_g >= 17) then
+			master_index_g = p_g - 15
 		end
-	elseif (p > #my_apps) then
-		master_index = 0
+	elseif (p_g > #my_apps) then
+		master_index_g = 0
 		p = 1
 	end
 end
