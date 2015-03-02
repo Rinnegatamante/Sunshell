@@ -45,7 +45,6 @@ function AppMainCycle()
 	Screen.debugPrint(9,120,"MAC Address: "..mac_addr,black,TOP_SCREEN)
 	-- Sets controls triggering
 	if Controls.check(pad,KEY_B) or Controls.check(pad,KEY_START) then
-		mode = nil
-		module = "Main Menu"
+		CallMainMenu()
 	end
 end
