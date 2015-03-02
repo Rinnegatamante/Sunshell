@@ -14,6 +14,7 @@ photo = Screen.loadImage(main_dir.."/images/photo.jpg")
 cia = Screen.loadImage(main_dir.."/images/cia.jpg")
 calc = Screen.loadImage(main_dir.."/images/calc.jpg")
 mail = Screen.loadImage(main_dir.."/images/mail.jpg")
+clock = Screen.loadImage(main_dir.."/images/clock.jpg")
 charge = Screen.loadImage(main_dir.."/images/charge.jpg")
 b0 = Screen.loadImage(main_dir.."/images/0.jpg")
 b1 = Screen.loadImage(main_dir.."/images/1.jpg")
@@ -23,6 +24,7 @@ b4 = Screen.loadImage(main_dir.."/images/4.jpg")
 b5 = Screen.loadImage(main_dir.."/images/5.jpg")
 
 -- Setting some system vars, funcs, etc...
+bg_apps = {}
 Sound.init()
 black = Color.new(0,0,0)
 white = Color.new(255,255,255)
@@ -30,6 +32,7 @@ selected = Color.new(255,0,0)
 selected_item = Color.new(237,28,36,128)
 version = "0.1"
 ui_enabled = true
+screenshots = true
 oldpad = KEY_A
 module = "Main Menu"
 months = {"January", "February","March","April","May","June","July", "August", "September", "October", "November", "December"}
@@ -42,6 +45,9 @@ else
 end
 i = 1
 if i == d then
+	if dv == 7 then
+		dv = 0
+	end
 	table.insert(days_table,dv)
 else
 	tmp = ((d - i) % 7)
@@ -85,6 +91,7 @@ table.insert(tools,{video,"/modules/video.lua","Videos"})
 table.insert(tools,{fb,"/modules/fb.lua","Filebrowser"})
 table.insert(tools,{cia,"/modules/cia.lua","CIA Manager"})
 table.insert(tools,{calc,"/modules/calc.lua","Calc"})
+table.insert(tools,{clock,"/modules/clock.lua","Clock"})
 table.insert(tools,{mail,"/modules/mail.lua","Mail"})
 
 -- Main cycle
@@ -97,6 +104,11 @@ while true do
 	if ui_enabled then
 		Screen.drawPartialImage(0,0,0,0,400,240,bg,TOP_SCREEN)
 		Screen.drawPartialImage(0,0,40,240,320,240,bg,BOTTOM_SCREEN)
+	end
+	
+	-- Executing background apps
+	for i,bg_app_code in pairs(bg_apps) do
+		bg_app_code[1]()
 	end
 	
 	-- Main menu
@@ -206,9 +218,12 @@ while true do
 	-- Sets up universal controls
 	if Controls.check(pad,KEY_START) then
 		GarbageCollection()
+		for i,bg_apps_code in pairs(bg_apps) do
+			bg_apps_code[2]()
+		end
 		Sound.term()
 		System.exit()
-	elseif Controls.check(pad,KEY_L) and not Controls.check(oldpad,KEY_L) then
+	elseif Controls.check(pad,KEY_L) and not Controls.check(oldpad,KEY_L) and screenshots then
 		System.takeScreenshot("/DCIM/101NIN03/Sunshell.bmp")
 	end
 	
