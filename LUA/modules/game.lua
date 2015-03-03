@@ -24,9 +24,10 @@ else
 			end
 		end
 	else
+		table.insert(my_apps,{false,nil,"Game Cartridge","","0x0",nil})-- Insert Gamecard voice
 		dir = System.listCIA()
 		for i,file in pairs(dir) do
-			if file.mediatype == 1 then
+			if file.mediatype == SDMC then
 				table.insert(my_apps,{false,file.access_id,file.product_id,"","0x"..string.sub(string.format('%02X',file.unique_id),1,-3),nil})
 			end
 		end
@@ -55,7 +56,12 @@ function AppMainCycle()
 				Screen.fillRect(0,319,base_y-2,base_y2+12,selected_item,BOTTOM_SCREEN)
 				CropPrint(9,45,file[3],selected,TOP_SCREEN)
 				CropPrint(9,60,file[5],black,TOP_SCREEN)
-				desc = LinesGenerator(file[4],90)
+				gw_rom = System.getGWRomID()
+				if file[2] == nil and build == "CIA" and gw_rom ~= "" then -- GW roms support
+					desc = LinesGenerator("This is a 3DS rom probably loaded with a Gateway card. Product-ID: "..gw_rom,90)
+				else
+					desc = LinesGenerator(file[4],90)
+				end
 				for i,line in pairs(desc) do
 					Screen.debugPrint(9,line[2],line[1],black,TOP_SCREEN)
 				end
@@ -89,29 +95,28 @@ function AppMainCycle()
 		end
 	elseif Controls.check(pad,KEY_A) then
 		GarbageCollection()
+		for i,bg_apps_code in pairs(bg_apps) do
+			bg_apps_code[2]()
+		end
 		for l, file in pairs(my_apps) do
 			if file[6] ~= nil then
 				Screen.freeImage(file[6])
 			end
 		end
-		if my_apps[p][1] then
-			GarbageCollection()
-			for i,bg_apps_code in pairs(bg_apps) do
-				bg_apps_code[2]()
-			end
-			Sound.term()
+		Sound.term()
+		if my_apps[p_g][1] then
 			System.launch3DSX("/3ds/"..my_apps[p_g][2].."/"..my_apps[p_g][2]..".3dsx")
 		else
-			GarbageCollection()
-			for i,bg_apps_code in pairs(bg_apps) do
-				bg_apps_code[2]()
+			if my_apps[p_g][2] == nil then
+				ShowWarning("You will be redirected to sysNand and your gamecard will be launched.")
+				System.launchGamecard()
+			else
+				System.launchCIA(my_apps[p_g][2],SDMC)
 			end
-			Sound.term()
-			System.launchCIA(my_apps[p_g][2],1)
 		end
 	elseif (Controls.check(pad,KEY_DUP)) and not (Controls.check(oldpad,KEY_DUP)) then
 		p_g = p_g - 1
-		if (p >= 16) then
+		if (p_g >= 16) then
 			master_index_g = p_g - 15
 		end
 	elseif (Controls.check(pad,KEY_DDOWN)) and not (Controls.check(oldpad,KEY_DDOWN)) then
@@ -127,6 +132,6 @@ function AppMainCycle()
 		end
 	elseif (p_g > #my_apps) then
 		master_index_g = 0
-		p = 1
+		p_g = 1
 	end
 end
