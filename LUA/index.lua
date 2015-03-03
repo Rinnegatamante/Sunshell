@@ -71,14 +71,12 @@ end
 dofile(main_dir.."/scripts/funcs.lua")
 
 -- Set detected build in use
-if string.len(System.currentDirectory()) > 1 then
+if System.is3DSXMode() then
 	build = "3DSX"
+elseif System.isGWMode() then
+	build = "3DS"
 else
-	if System.isGWMode() then
-		build = "3DS"
-	else
-		build = "CIA"
-	end
+	build = "CIA"
 end
 
 -- Setting modules as apps
