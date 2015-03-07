@@ -4,6 +4,8 @@
 
 -- Internal SunShell extra functions
 
+start_dir = System.currentDirectory()
+
 -- * CallMainMenu
 -- Sets SunShell to Main Menu mode, usefull to exit from a module
 function CallMainMenu()
@@ -11,6 +13,19 @@ function CallMainMenu()
 	module = "Main Menu"
 	ui_enabled = true
 	screenshots = true
+	System.currentDirectory(start_dir)
+end
+
+-- * CloseBGApp
+-- Close a selected BG App
+function CloseBGApp(my_app)
+	for i, apps in pairs(bg_apps) do
+		if apps[3] == my_app then
+			apps[2]()
+			table.remove(bg_apps,i)
+			break
+		end
+	end
 end
 
 -- * FormatTime
