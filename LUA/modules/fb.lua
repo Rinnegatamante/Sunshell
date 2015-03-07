@@ -111,7 +111,7 @@ function CopyDir(input,output)
 end
 function ForceOpenFile(text, size, mode)
 	if mode == "SMDH" then
-		GarbageCollection()
+		FBGC()
 		current_type = "SMDH"
 		current_file = System.extractSMDH(System.currentDirectory()..text)
 		smdh_show = Console.new(TOP_SCREEN)
@@ -119,12 +119,12 @@ function ForceOpenFile(text, size, mode)
 		Console.append(smdh_show,"Description: "..current_file.desc.."\n\n")
 		Console.append(smdh_show,"Author: "..current_file.author)
 	elseif mode == "3DSX" and not System.isGWMode() then
-		GarbageCollection()
+		FBGC()
 		Screen.freeImage(bg)
 		Sound.term()
 		System.launch3DSX(System.currentDirectory()..text)
 	elseif mode == "BMPV" then
-		GarbageCollection()
+		FBGC()
 		current_file = io.open(System.currentDirectory()..text,FREAD)
 		magic = io.read(current_file,0,4)
 		io.close(current_file)
@@ -138,7 +138,7 @@ function ForceOpenFile(text, size, mode)
 			JPGV.start(current_file,NO_LOOP,0x08,0x09)
 		end
 	elseif mode == "WAV" then
-		GarbageCollection()
+		FBGC()
 		current_file = io.open(System.currentDirectory()..text,FREAD)
 		magic = io.read(current_file,8,4)
 		io.close(current_file)
@@ -162,7 +162,7 @@ function ForceOpenFile(text, size, mode)
 			Sound.play(current_file,NO_LOOP,0x08,0x09)
 		end
 	elseif mode == "IMG" then
-		GarbageCollection()
+		FBGC()
 		current_type = "IMG"
 		current_file = Screen.loadImage(System.currentDirectory()..text)
 		if Screen.getImageWidth(current_file) > 400 then
@@ -174,7 +174,7 @@ function ForceOpenFile(text, size, mode)
 			big_image = true
 		end
 	elseif mode == "LUA" then
-		GarbageCollection()
+		FBGC()
 		Screen.freeImage(bg)
 		Sound.term()
 		reset_dir = System.currentDirectory()
@@ -184,7 +184,7 @@ function ForceOpenFile(text, size, mode)
 		current_type = "LUA"
 		Sound.init()
 	elseif mode == "TXT" then
-		GarbageCollection()
+		FBGC()
 		current_file = io.open(System.currentDirectory()..text,FREAD)
 		text_console = Console.new(TOP_SCREEN)
 		current_type = "TXT"
@@ -192,13 +192,13 @@ function ForceOpenFile(text, size, mode)
 		txt_words = 0
 		updateTXT = true
 	elseif mode == "HEX" then
-		GarbageCollection()
+		FBGC()
 		current_file = io.open(System.currentDirectory()..text,FREAD)
 		current_type = "HEX"
 		txt_index = 0
 		updateTXT = true
 	elseif mode == "INFO" then
-		GarbageCollection()
+		FBGC()
 		current_file = io.open(System.currentDirectory()..text,FREAD)
 		current_type = "INFO"
 		f_size = io.size(current_file)
@@ -222,7 +222,7 @@ function ForceOpenFile(text, size, mode)
 		Console.append(text_console,"Format: "..string.upper(string.sub(text,i)).."\n")
 		Console.append(text_console,"Size: "..f_size.." "..f.."\n")
 	elseif mode == "ZIP" then
-		GarbageCollection()
+		FBGC()
 		pass = System.startKeyboard("")
 		System.extractZIP(System.currentDirectory()..text,System.currentDirectory()..string.sub(text,1,-5),pass)
 		files_table = System.listDirectory(System.currentDirectory())
@@ -235,7 +235,7 @@ function ForceOpenFile(text, size, mode)
 		end
 		files_table = SortDirectory(files_table)
 	elseif mode == "CIA" then
-		GarbageCollection()
+		FBGC()
 		sm_index = 1
 		cia_data = System.extractCIA(System.currentDirectory()..text)
 		oldpad = KEY_A
@@ -287,7 +287,7 @@ function DeleteDir(dir)
 end
 function OpenFile(text, size)
 	if string.sub(text,-5) == ".smdh" or string.sub(text,-5) == ".SMDH" then
-		GarbageCollection()
+		FBGC()
 		current_type = "SMDH"
 		current_file = System.extractSMDH(System.currentDirectory()..text)
 		smdh_show = Console.new(TOP_SCREEN)
@@ -295,7 +295,7 @@ function OpenFile(text, size)
 		Console.append(smdh_show,"Description: "..current_file.desc.."\n\n")
 		Console.append(smdh_show,"Author: "..current_file.author)
 	elseif string.sub(text,-4) == ".zip" or string.sub(text,-4) == ".ZIP" then
-		GarbageCollection()
+		FBGC()
 		pass = System.startKeyboard("")
 		System.extractZIP(System.currentDirectory()..text,System.currentDirectory()..string.sub(text,1,-5),pass)
 		files_table = System.listDirectory(System.currentDirectory())
@@ -308,22 +308,22 @@ function OpenFile(text, size)
 		end
 		files_table = SortDirectory(files_table)
 	elseif (string.sub(text,-5) == ".3dsx" or string.sub(text,-5) == ".3DSX") and not System.isGWMode() then
-		GarbageCollection()
+		FBGC()
 		Screen.freeImage(bg)
 		Sound.term()
 		System.launch3DSX(System.currentDirectory()..text)
 	elseif string.sub(text,-5) == ".bmpv" or string.sub(text,-5) == ".BMPV" then
-		GarbageCollection()
+		FBGC()
 		current_file = BMPV.load(System.currentDirectory()..text)
 		current_type = "BMPV"
 		BMPV.start(current_file,NO_LOOP,0x08,0x09)
 	elseif string.sub(text,-5) == ".jpgv" or string.sub(text,-5) == ".JPGV" then
-		GarbageCollection()
+		FBGC()
 		current_file = JPGV.load(System.currentDirectory()..text)
 		current_type = "JPGV"
 		JPGV.start(current_file,NO_LOOP,0x08,0x09)
 	elseif string.sub(text,-4) == ".wav" or string.sub(text,-4) == ".WAV" then
-		GarbageCollection()
+		FBGC()
 		mem_blocks = 2
 		while (size * 2) > MAX_RAM_ALLOCATION do
 			mem_blocks = mem_blocks + 2
@@ -333,7 +333,7 @@ function OpenFile(text, size)
 		current_type = "WAV"
 		Sound.play(current_file,NO_LOOP,0x08,0x09)
 	elseif string.sub(text,-4) == ".aif" or string.sub(text,-4) == ".AIF" or string.sub(text,-5) == ".aiff" or string.sub(text,-5) == ".AIFF" then
-		GarbageCollection()
+		FBGC()
 		mem_blocks = 2
 		while (size * 2) > MAX_RAM_ALLOCATION do
 			mem_blocks = mem_blocks + 2
@@ -343,7 +343,7 @@ function OpenFile(text, size)
 		current_type = "WAV"
 		Sound.play(current_file,NO_LOOP,0x08,0x09)
 	elseif string.sub(text,-4) == ".png" or string.sub(text,-4) == ".PNG" or string.sub(text,-4) == ".BMP" or string.sub(text,-4) == ".bmp" or string.sub(text,-4) == ".JPG" or string.sub(text,-4) == ".jpg" then
-		GarbageCollection()
+		FBGC()
 		current_type = "IMG"
 		current_file = Screen.loadImage(System.currentDirectory()..text)
 		width = Screen.getImageWidth(current_file)
@@ -357,7 +357,7 @@ function OpenFile(text, size)
 			big_image = true
 		end
 	elseif string.sub(text,-4) == ".lua" or string.sub(text,-4) == ".LUA" then
-		GarbageCollection()
+		FBGC()
 		Screen.freeImage(bg)
 		Sound.term()
 		reset_dir = System.currentDirectory()
@@ -367,7 +367,7 @@ function OpenFile(text, size)
 		current_type = "LUA"
 		Sound.init()
 	elseif string.sub(text,-4) == ".txt" or string.sub(text,-4) == ".TXT" then
-		GarbageCollection()
+		FBGC()
 		current_file = io.open(System.currentDirectory()..text,FREAD)
 		text_console = Console.new(TOP_SCREEN)
 		current_type = "TXT"
@@ -375,7 +375,7 @@ function OpenFile(text, size)
 		txt_words = 0
 		updateTXT = true
 	elseif string.sub(text,-4) == ".cia" or string.sub(text,-4) == ".CIA" then
-		GarbageCollection()
+		FBGC()
 		sm_index = 1
 		cia_data = System.extractCIA(System.currentDirectory()..text)
 		oldpad = KEY_A
@@ -435,7 +435,7 @@ function OpenDirectory(text,archive_id)
 	end
 	files_table = SortDirectory(files_table)
 end
-function GarbageCollection()
+function FBGC()
 	if current_type == "SMDH" then
 		Console.destroy(smdh_show)
 		Screen.freeImage(current_file.icon)
@@ -686,7 +686,7 @@ function AppMainCycle()
 			select_mode = false
 			update_bottom_screen = true
 		elseif (Controls.check(pad,KEY_START)) then
-			GarbageCollection()
+			FBGC()
 			Screen.freeImage(bg)
 			Sound.term()
 			System.exit()
@@ -1013,7 +1013,7 @@ function AppMainCycle()
 				end
 			end
 		elseif (Controls.check(pad,KEY_START)) or Controls.check(pad,KEY_SELECT) then
-			GarbageCollection()
+			FBGC()
 			CallMainMenu()
 		end
 	end	
