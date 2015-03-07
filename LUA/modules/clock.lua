@@ -30,13 +30,7 @@ function BackgroundClock()
 		if Timer.getTime(count_crono) / 1000 > my_alarm_time[3] then
 			Sound.play(alarm_sound,LOOP,0x08,0x09)
 			ShowWarning("Countdown ended.")
-			ClockGC()
-			for i, apps in pairs(bg_apps) do
-				if apps[3] == "Clock" then
-					table.remove(bg_apps,i)
-					break
-				end
-			end
+			CloseBGApp("Clock")
 		end
 	else -- Alarm
 	
@@ -51,13 +45,7 @@ function BackgroundClock()
 		if h == tonumber(my_alarm_time[1]) and m == tonumber(my_alarm_time[2]) and s == tonumber(my_alarm_time[3]) then
 			Sound.play(alarm_sound,LOOP,0x08,0x09)
 			ShowWarning("Alarm clock!")
-			ClockGC()
-			for i, apps in pairs(bg_apps) do
-				if apps[3] == "Clock" then
-					table.remove(bg_apps,i)
-					break
-				end
-			end
+			CloseBGApp("Clock")
 		end
 	end
 end
@@ -230,13 +218,7 @@ function AppMainCycle()
 	
 	-- Sets controls triggering
 	if Controls.check(pad,KEY_R) and not Controls.check(oldpad,KEY_R) and alarm_start ~= nil then
-		ClockGC()
-		for i, apps in pairs(bg_apps) do
-			if apps[3] == "Clock" then
-				table.remove(bg_apps,i)
-				break
-			end
-		end
+		CloseBGApp("Clock")
 	elseif Controls.check(pad,KEY_L) and not Controls.check(oldpad,KEY_L) and set_alarm ~= nil then
 		alarm_sound = Sound.openWav(main_dir.."/sounds/alarm.wav")
 		if set_alarm then
