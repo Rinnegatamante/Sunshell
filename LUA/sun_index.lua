@@ -1,6 +1,7 @@
 -- Create system folders if doesn't exist
 System.createDirectory("/VIDEO")
 System.createDirectory("/MUSIC")
+System.createDirectory("/DCIM")
 
 -- Open config file and system files
 dofile("/config.sun")
@@ -15,6 +16,7 @@ cia = Screen.loadImage(main_dir.."/images/cia.jpg")
 calc = Screen.loadImage(main_dir.."/images/calc.jpg")
 mail = Screen.loadImage(main_dir.."/images/mail.jpg")
 clock = Screen.loadImage(main_dir.."/images/clock.jpg")
+ftp = Screen.loadImage(main_dir.."/images/ftp.jpg")
 charge = Screen.loadImage(main_dir.."/images/charge.jpg")
 b0 = Screen.loadImage(main_dir.."/images/0.jpg")
 b1 = Screen.loadImage(main_dir.."/images/1.jpg")
@@ -90,6 +92,7 @@ table.insert(tools,{fb,"/modules/fb.lua","Filebrowser"})
 table.insert(tools,{cia,"/modules/cia.lua","CIA Manager"})
 table.insert(tools,{calc,"/modules/calc.lua","Calc"})
 table.insert(tools,{clock,"/modules/clock.lua","Clock"})
+table.insert(tools,{ftp,"/modules/ftp.lua","FTP Server"})
 table.insert(tools,{mail,"/modules/mail.lua","Mail"})
 
 -- Main cycle
@@ -222,7 +225,7 @@ while true do
 		Sound.term()
 		System.exit()
 	elseif Controls.check(pad,KEY_L) and not Controls.check(oldpad,KEY_L) and screenshots then
-		System.takeScreenshot("/DCIM/101NIN03/Sunshell.bmp")
+		System.takeScreenshot("/DCIM/Sunshell.bmp")
 	end
 	
 	Screen.waitVblankStart()
