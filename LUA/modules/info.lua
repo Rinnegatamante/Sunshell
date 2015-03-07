@@ -27,16 +27,16 @@ function AppMainCycle()
 	Screen.fillRect(6,394,41,219,white,TOP_SCREEN)
 	
 	-- Draw console info
-	if model == 0 then
-		Screen.debugPrint(9,45,"Model: 3DS",black,TOP_SCREEN)
-	elseif model == 1 then
+	if model == 1 then
 		Screen.debugPrint(9,45,"Model: 3DS XL",black,TOP_SCREEN)	
 	elseif model == 2 then
 		Screen.debugPrint(9,45,"Model: New 3DS",black,TOP_SCREEN)
 	elseif model == 3 then
 		Screen.debugPrint(9,45,"Model: 2DS",black,TOP_SCREEN)
-	else then
+	elseif model == 4 then
 		Screen.debugPrint(9,45,"Model: New 3DS XL",black,TOP_SCREEN)
+	else
+		Screen.debugPrint(9,45,"Model: 3DS",black,TOP_SCREEN)
 	end
 	if region == 1 then
 		Screen.debugPrint(9,60,"Region: USA",black,TOP_SCREEN)
@@ -49,7 +49,8 @@ function AppMainCycle()
 	Screen.debugPrint(9,90,"Kernel Version: " .. kernel,black,TOP_SCREEN)
 	Screen.debugPrint(9,105,"Free Space: "..free_space.." "..sorting,black,TOP_SCREEN)
 	Screen.debugPrint(9,120,"MAC Address: "..mac_addr,black,TOP_SCREEN)
-	Screen.debugPrint(9,135,"Build: "..build,black,TOP_SCREEN)
+	Screen.debugPrint(9,135,"IP Address: "..Network.getIPAddress(),black,TOP_SCREEN)
+	Screen.debugPrint(9,150,"Build: "..build,black,TOP_SCREEN)
 	-- Sets controls triggering
 	if Controls.check(pad,KEY_B) or Controls.check(pad,KEY_START) then
 		CallMainMenu()
