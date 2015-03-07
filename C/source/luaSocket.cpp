@@ -24,112 +24,64 @@
 #-----------------------------------------------------------------------------------------------------------------------#
 #- Credits : -----------------------------------------------------------------------------------------------------------#
 #-----------------------------------------------------------------------------------------------------------------------#
-#- Smealum for ctrulib -------------------------------------------------------------------------------------------------#
+#- Smealum for ctrulib and ftpony src ----------------------------------------------------------------------------------#
 #- StapleButter for debug font -----------------------------------------------------------------------------------------#
 #- Lode Vandevenne for lodepng -----------------------------------------------------------------------------------------#
 #- Jean-loup Gailly and Mark Adler for zlib ----------------------------------------------------------------------------#
 #- Special thanks to Aurelio for testing, bug-fixing and various help with codes and implementations -------------------#
 #-----------------------------------------------------------------------------------------------------------------------*/
 
-#include <ctype.h>
-#include <errno.h>
-#include <stdarg.h>
-#include <stdio.h>
 #include <stdlib.h>
-#include <unistd.h>
 #include <string.h>
+#include <unistd.h>
 #include <3ds.h>
 #include "include/luaplayer.h"
+#include "include/ftp/ftp.h"
 
-static lua_State *L;
-bool GW_MODE;
-bool isCSND;
+static int connfd;
 
-// Fake Sound Module for GW Mode to prevent interpreter error with generic scripts
-static int nil_func(lua_State *L){ return 0; }
-static const luaL_Reg Fake_Sound_functions[] = {
-  {"openWav",				nil_func},
-  {"openAiff",				nil_func},
-  {"close",					nil_func},
-  {"play",					nil_func},
-  {"init",					nil_func},
-  {"term",					nil_func},
-  {"pause",					nil_func},
-  {"getSrate",				nil_func},
-  {"getTime",				nil_func},
-  {"getTitle",				nil_func},
-  {"getAuthor",				nil_func},
-  {"getType",				nil_func},  
-  {"getTotalTime",			nil_func},
-  {"resume",				nil_func},
-  {"isPlaying",				nil_func},
-  {"updateStream",			nil_func},
-  {"register",				nil_func},
-  {"saveWav",				nil_func},
-  {0, 0}
-};
-void luaFakeSound_init(lua_State *L) {
-	lua_newtable(L);
-	luaL_setfuncs(L, Fake_Sound_functions, 0);
-	lua_setglobal(L, "Sound");
+static int lua_initFTP(lua_State *L) {
+    int argc = lua_gettop(L);
+    if (argc != 0) return luaL_error(L, "wrong number of arguments");
+    ftp_init();
+	sprintf(shared_ftp,"Waiting for connection...");
+	connfd = -1;
+    return 0;
 }
 
-const char *runScript(const char* script, bool isStringBuffer)
-{
-	L = luaL_newstate();
-	
-	// Standard libraries
-	luaL_openlibs(L);
-	
-	// Check if user is in GW mode
-	if (CSND_initialize(NULL)==0){
-	CSND_shutdown();
-	GW_MODE = false;
-	}else{
-	GW_MODE = true;
+static int lua_termFTP(lua_State *L) {
+    int argc = lua_gettop(L);
+    if (argc != 0) return luaL_error(L, "wrong number of arguments");
+    ftp_exit();
+    return 0;
+}
+
+static int lua_checkFTPcommand(lua_State *L){
+	int argc = lua_gettop(L);
+    if (argc != 0) return luaL_error(L, "wrong number of arguments");
+	if(connfd<0)connfd=ftp_getConnection();
+		else{
+			int ret=ftp_frame(connfd);
+			if(ret==1)
+			{
+				sprintf(shared_ftp,"Client has disconnected. Wait for next client...");
+				connfd=-1;
+			}
 	}
-	isCSND = false;
-	
-	// Modules
-	luaSystem_init(L);
-	luaScreen_init(L);
-	luaControls_init(L);
-	luaNetwork_init(L);
-	luaTimer_init(L);
-	if (!GW_MODE) luaSound_init(L);
-	else luaFakeSound_init(L);
-	luaVideo_init(L);
-	
-	int s = 0;
-	const char *errMsg = NULL;
-	
-	//Patching dofile function & I/O module
-	char* patch = "dofile = System.dofile\n\
-			 io.open = System.openFile\n\
-			 io.write = System.writeFile\n\
-			 io.close = System.closeFile\n\
-			 io.read = System.readFile\n\
-			 io.size = System.getFileSize";
-	luaL_loadbuffer(L, patch, strlen(patch), NULL); 
-	lua_KFunction dofilecont = (lua_KFunction)(lua_gettop(L) - 1);
-	lua_callk(L, 0, LUA_MULTRET, 0, dofilecont);
-	
-	if(!isStringBuffer) 
-		s = luaL_loadfile(L, script);
-	else 
-		s = luaL_loadbuffer(L, script, strlen(script), NULL);
-		
-	if (s == 0) 
-	{
-		s = lua_pcall(L, 0, LUA_MULTRET, 0);
-	}
-	if (s) 
-	{
-		errMsg = lua_tostring(L, -1);
-		printf("error: %s\n", lua_tostring(L, -1));
-		lua_pop(L, 1); // remove error message
-	}
-	lua_close(L);
-	
-	return errMsg;
+	lua_pushstring(L, shared_ftp);
+	return 1;
+}
+
+//Register our Socket Functions
+static const luaL_Reg Socket_functions[] = {
+  {"initFTP",						lua_initFTP},
+  {"termFTP",						lua_termFTP},
+  {"updateFTP",						lua_checkFTPcommand},
+  {0, 0}
+};
+
+void luaSocket_init(lua_State *L) {
+	lua_newtable(L);
+	luaL_setfuncs(L, Socket_functions, 0);
+	lua_setglobal(L, "Socket");
 }

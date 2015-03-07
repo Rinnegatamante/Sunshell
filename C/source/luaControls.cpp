@@ -38,9 +38,11 @@
 #include "include/luaplayer.h"
 #define stringify(str) #str
 #define VariableRegister(lua, value) do { lua_pushinteger(lua, value); lua_setglobal (lua, stringify(value)); } while(0)
+#define FILTER_SIZE 64
 
 int KEY_HOME = 0xFFFF;
 int KEY_POWER = 0xFFFE;
+float scale = 0.1f / FILTER_SIZE;
 
 static int lua_readInit(lua_State *L)
 {
@@ -122,6 +124,39 @@ static int lua_volume(lua_State *L)
 		return 1;
 }
 
+int array_pos = 0;
+u8 delay = 0;
+float gyro_x = 0, gyro_y = 0, gyro_z = 0;
+angularRate gyro[FILTER_SIZE];
+
+static int lua_enableGyro(lua_State *L)
+{
+        if (lua_gettop(L) != 0) return luaL_error(L, "wrong number of arguments.");
+		HIDUSER_EnableGyroscope();
+		memset(gyro, 0, sizeof(gyro));
+		return 0;
+}
+
+static int lua_readGyro(lua_State *L)
+{
+    if (lua_gettop(L) != 0) return luaL_error(L, "wrong number of arguments.");
+	hidGyroRead(&gyro[array_pos]);
+	array_pos = (array_pos + 1) % FILTER_SIZE;
+	if (!delay){
+		for (int i = 0; i < FILTER_SIZE; ++i) {
+			gyro_x += gyro[i].x * scale;
+			gyro_y += gyro[i].y * scale;
+			gyro_z += gyro[i].z * scale; 
+		}
+		delay = 8;
+	}
+	delay--;
+	lua_pushnumber(L,gyro_x);
+	lua_pushnumber(L,gyro_y);
+	lua_pushnumber(L,gyro_z);
+	return 3;
+}
+
 //Register our Controls Functions
 static const luaL_Reg Controls_functions[] = {
   {"init",                				lua_readInit},
@@ -132,6 +167,8 @@ static const luaL_Reg Controls_functions[] = {
   {"readCstickPad",						lua_cstickpad},	
   {"getVolume",							lua_volume},
   {"headsetStatus",						lua_headset},	  
+  {"enableGyro",						lua_enableGyro},
+  {"readGyro",							lua_readGyro},  
   {0, 0}
 };
 
