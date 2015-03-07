@@ -4,9 +4,40 @@ mode = "Game"
 -- Internal module settings
 master_index_g = 0
 p_g = 1
+function CheckDirectory(src,key)
+	tmp = System.listDirectory(src)
+	for i,file in pairs(tmp) do
+		if file.directory then
+			if file.name == key then
+				return true
+			end
+		end
+	end
+	return false
+end
 if build == "3DS" then
-	ShowError("You're using 3DS build. 3DS build cannot start any type of 3DS executable.")
-	CallMainMenu()
+	my_apps = {}
+	-- No access to AM service so manual CIA listing
+	tmp = System.listDirectory("/Nintendo 3DS/")
+	for i,file in pairs(tmp) do
+		if file.directory then
+			for z,subfile in pairs(System.listDirectory("/Nintendo 3DS/"..file.name.."/")) do
+				if subfile.directory then
+					my_path = "/Nintendo 3DS/"..file.name.."/"..subfile.name.."/"
+					if CheckDirectory(my_path,"title") then
+						my_path = my_path .. "title/"
+						if CheckDirectory(my_path,"00040000") then
+							for j,cia_file in pairs(System.listDirectory(my_path.."00040000/")) do
+								if cia_file.directory then
+									table.insert(my_apps,{false,tonumber(cia_file.name,16),"0x"..string.upper(string.sub(cia_file.name,1,-3)),"","0x"..string.upper(string.sub(cia_file.name,1,-3)),nil})
+								end
+							end
+						end
+					end
+				end
+			end
+		end
+	end
 else
 	my_apps = {}
 	if build == "3DSX" then
@@ -28,7 +59,7 @@ else
 		dir = System.listCIA()
 		for i,file in pairs(dir) do
 			if file.mediatype == SDMC then
-				table.insert(my_apps,{false,file.access_id,file.product_id,"","0x"..string.sub(string.format('%02X',file.unique_id),1,-3),nil})
+				table.insert(my_apps,{false,file.unique_id,file.product_id,"","0x"..string.sub(string.format('%02X',file.unique_id),1,-3),nil})
 			end
 		end
 	end
