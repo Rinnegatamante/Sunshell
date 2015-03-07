@@ -1,6 +1,7 @@
 -- Create system folders if doesn't exist
 System.createDirectory("/VIDEO")
 System.createDirectory("/MUSIC")
+System.createDirectory("/DCIM")
 
 -- Open config file and system files
 dofile("/config.sun")
@@ -218,7 +219,7 @@ while true do
 		Sound.term()
 		System.reboot()
 	elseif Controls.check(pad,KEY_L) and not Controls.check(oldpad,KEY_L) and screenshots then
-		System.takeScreenshot("/DCIM/101NIN03/Sunshell.bmp")
+		System.takeScreenshot("/DCIM/Sunshell.bmp")
 	end
 	
 	Screen.waitVblankStart()
