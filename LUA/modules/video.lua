@@ -21,16 +21,21 @@ for i,file in pairs(tmp) do
 		io.close(tmp_file)
 	end
 end
-current_type = my_videos[1][2]
-if current_type == "BMPV" then
-	current_file = BMPV.load("/VIDEO/"..my_videos[1][1])
-	current_size =  BMPV.getSize(current_file)
-elseif current_type == "JPGV" then
-	current_file = JPGV.load("/VIDEO/"..my_videos[1][1])
-	current_size =  JPGV.getSize(current_file)
+if #my_videos > 0 then
+	current_type = my_videos[1][2]
+	if current_type == "BMPV" then
+		current_file = BMPV.load("/VIDEO/"..my_videos[1][1])
+		current_size =  BMPV.getSize(current_file)
+	elseif current_type == "JPGV" then
+		current_file = JPGV.load("/VIDEO/"..my_videos[1][1])
+		current_size =  JPGV.getSize(current_file)
+	end
+	frame_succession = Timer.new()
+	current_frame = 60
+else
+	ShowError("VIDEO folder is empty.")
+	CallMainMenu()
 end
-frame_succession = Timer.new()
-current_frame = 60
 
 -- Module main cycle
 function AppMainCycle()
