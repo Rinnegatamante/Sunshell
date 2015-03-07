@@ -31,6 +31,10 @@ function AddSongsFromDir(dir,album)
 end
 AddSongsFromDir("/MUSIC",nil)
 MAX_RAM_ALLOCATION = 1048576
+if #my_songs < 1 then
+	ShowError("MUSIC folder is empty.")
+	CallMainMenu()
+end
 
 -- Module background code
 function BackgroundMusic()
