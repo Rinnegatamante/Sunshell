@@ -58,6 +58,9 @@ else
 	else
 		my_dv = dv - tmp
 	end
+	if my_dv > 6 then
+		my_dv = 0
+	end
 	table.insert(days_table,my_dv)
 end
 i = 2
@@ -73,9 +76,10 @@ end
 dofile(main_dir.."/scripts/funcs.lua")
 
 -- Set detected build in use
-if System.is3DSXMode() then
+build_idx = System.checkBuild()
+if build_idx == 0 then
 	build = "3DSX"
-elseif System.isGWMode() then
+elseif build_idx == 1 then
 	build = "3DS"
 else
 	build = "CIA"
@@ -223,9 +227,17 @@ while true do
 			bg_apps_code[2]()
 		end
 		Sound.term()
-		System.exit()
+		if start_dir == "/" and build == "3DSX" then -- boot.3dsx patch
+			System.reboot()
+		else
+			System.exit()
+		end
 	elseif Controls.check(pad,KEY_L) and not Controls.check(oldpad,KEY_L) and screenshots then
-		System.takeScreenshot("/DCIM/Sunshell.bmp")
+		screen_index = 0
+		while System.doesFileExist("/DCIM/Sunshell_"..screen_index..".bmp") do
+			screen_index = screen_index + 1
+		end
+		System.takeScreenshot("/DCIM/Sunshell_"..screen_index..".bmp")
 	end
 	
 	Screen.waitVblankStart()
