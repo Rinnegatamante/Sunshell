@@ -164,19 +164,13 @@ static int lua_checkexist(lua_State *L)
 	return 1;
 }
 
-static int lua_isGW(lua_State *L)
+static int lua_checkbuild(lua_State *L)
 {
     int argc = lua_gettop(L);
     if (argc != 0) return luaL_error(L, "wrong number of arguments");
-	lua_pushboolean(L,GW_MODE);
-	return 1;
-}
-
-static int lua_is3DSX(lua_State *L)
-{
-    int argc = lua_gettop(L);
-    if (argc != 0) return luaL_error(L, "wrong number of arguments");
-	lua_pushboolean(L,is3DSX);
+	if (GW_MODE) lua_pushinteger(L,1);
+	else if (CIA_MODE) lua_pushinteger(L,2);
+	else lua_pushinteger(L,0);
 	return 1;
 }
 
@@ -1425,11 +1419,10 @@ static const luaL_Reg System_functions[] = {
   {"exit",					lua_exit},
   {"getFirmware",			lua_getFW},
   {"getGWRomID",			lua_getcard},
-  {"isGWMode",				lua_isGW},
-  {"is3DSXMode",			lua_is3DSX},
   {"getKernel",				lua_getK},
   {"takeScreenshot",		lua_screenshot},
   {"currentDirectory",		lua_curdir},
+  {"checkBuild",			lua_checkbuild},
   {"renameDirectory",		lua_rendir},
   {"createDirectory",		lua_createdir},
   {"deleteDirectory",		lua_deldir},
