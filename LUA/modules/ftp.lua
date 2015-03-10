@@ -3,7 +3,7 @@ mode = "FTP"
 
 -- Module background code
 function BackgroundFTP()
-	last_shared = Socket.updateFTP()
+	last_shared = Network.updateFTP()
 	
 	-- Blit FTP alert on Main Menu
 		if module == "Main Menu" then
@@ -14,7 +14,7 @@ function BackgroundFTP()
 end
 
 function FTPGC()
-	Socket.termFTP()
+	Network.termFTP()
 	last_shared = nil
 end
 
@@ -22,7 +22,7 @@ end
 if Network.isWifiEnabled() then
 	if last_shared == nil then
 		last_shared = "Waiting for connection..."
-		Socket.initFTP()
+		Network.initFTP()
 		table.insert(bg_apps,{BackgroundFTP,FTPGC,"FTP Server"}) -- Adding FTP module to background apps
 	end
 else
