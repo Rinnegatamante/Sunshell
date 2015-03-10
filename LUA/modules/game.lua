@@ -38,6 +38,22 @@ if build == "3DS" then
 			end
 		end
 	end
+	
+	-- Game titles parsing
+	dofile(main_dir.."/scripts/title_list.lua")
+	assigned = 0
+	for i,title in pairs(title_list) do
+		if assigned >= (#my_apps - 1) then
+			break
+		end
+		for z,app in pairs(my_apps) do
+			if app[2] == title[3] then
+				app[3] = title[1]
+				assigned = assigned + 1
+			end
+		end
+	end
+	
 else
 	my_apps = {}
 	if build == "3DSX" then
@@ -62,6 +78,22 @@ else
 				table.insert(my_apps,{false,file.unique_id,file.product_id,"","0x"..string.sub(string.format('%02X',file.unique_id),1,-3),nil})
 			end
 		end
+		
+		-- Game titles parsing
+		dofile(main_dir.."/scripts/title_list.lua")
+		assigned = 0
+		for i,title in pairs(title_list) do
+			if assigned >= (#my_apps - 1) then
+				break
+			end
+			for z,app in pairs(my_apps) do
+				if app[2] == title[3] then
+					app[3] = title[1]
+					assigned = assigned + 1
+				end
+			end
+		end
+		
 	end
 end
 
@@ -85,8 +117,8 @@ function AppMainCycle()
 					base_y = 2
 				end
 				Screen.fillRect(0,319,base_y-2,base_y2+12,selected_item,BOTTOM_SCREEN)
-				CropPrint(9,45,file[3],selected,TOP_SCREEN)
-				CropPrint(9,60,file[5],black,TOP_SCREEN)
+				TopCropPrint(9,45,file[3],selected,TOP_SCREEN)
+				TopCropPrint(9,60,file[5],black,TOP_SCREEN)
 				gw_rom = System.getGWRomID()
 				if file[2] == nil and build == "CIA" and gw_rom ~= "" then -- GW roms support
 					desc = LinesGenerator("This is a 3DS rom probably loaded with a Gateway card. Product-ID: "..gw_rom,90)
