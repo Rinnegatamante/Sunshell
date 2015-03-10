@@ -30,6 +30,7 @@ bg_apps = {}
 Sound.init()
 black = Color.new(0,0,0)
 white = Color.new(255,255,255)
+green = Color.new(0,166,81)
 selected = Color.new(255,0,0)
 selected_item = Color.new(237,28,36,128)
 version = "0.1"
@@ -217,6 +218,11 @@ while true do
 			else
 				Screen.drawImage(350,2,b5,TOP_SCREEN)
 			end
+		end
+		if Network.isWifiEnabled() then
+			Screen.fillRect(340,345,2,18,green,TOP_SCREEN)
+			Screen.fillRect(333,338,8,18,green,TOP_SCREEN)
+			Screen.fillRect(326,331,14,18,green,TOP_SCREEN)
 		end
 	end
 	
