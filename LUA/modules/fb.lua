@@ -4,7 +4,6 @@ mode = "FB"
 -- Internal module settings
 update_bottom_screen = true
 ui_enabled = false
-screenshots = false
 red = Color.new(255,0,0)
 green = Color.new(0,255,0)
 menu_color = Color.new(255,255,255)
@@ -50,7 +49,7 @@ hex_text = {}
 updateTXT = false
 select_mode = false
 update_main_extdata = true
-delete_mode = false
+action_check = false
 move_base = nil
 copy_base = nil
 x_print = 0
@@ -608,6 +607,20 @@ function AppMainCycle()
 			end
 		end
 		Screen.debugPrint(0,225,"Offset: 0x" .. string.format('%X', old_indexes[#old_indexes]) .. " (" .. (old_indexes[#old_indexes]) .. ")",white,TOP_SCREEN)
+	else
+		Screen.debugPrint(0,0,"Basic Controls:",white,TOP_SCREEN)
+		Screen.debugPrint(0,15,"A = Open file/folder",white,TOP_SCREEN)
+		Screen.debugPrint(0,30,"SELECT = Open file with...",white,TOP_SCREEN)
+		Screen.debugPrint(0,45,"R = Create new folder",white,TOP_SCREEN)
+		Screen.debugPrint(0,60,"X = File operations",white,TOP_SCREEN)
+		Screen.debugPrint(0,75,"B = Return Main Menu",white,TOP_SCREEN)
+		Screen.debugPrint(0,90,"---------------------------------",white,TOP_SCREEN)
+		Screen.debugPrint(0,105,"Opened file Controls:",white,TOP_SCREEN)
+		Screen.debugPrint(0,120,"X = Cancel file copy/move",white,TOP_SCREEN)
+		Screen.debugPrint(0,135,"Y = Confirm file copy/move",white,TOP_SCREEN)
+		Screen.debugPrint(0,150,"Left/Right = Pause/Resume",white,TOP_SCREEN)
+		Screen.debugPrint(0,165,"Left/Right = Extract icon (SMDH)",white,TOP_SCREEN)
+		Screen.debugPrint(0,180,"Left/Right = Scroll file",white,TOP_SCREEN)
 	end
 	if update_bottom_screen then
 		Screen.clear(BOTTOM_SCREEN)
@@ -696,17 +709,29 @@ function AppMainCycle()
 		elseif (sm_index > 11) then
 			sm_index = 1
 		end
-	-- Security Deletion Check Screen
-	elseif (delete_mode) then
-		Screen.fillEmptyRect(60,260,50,82,black,BOTTOM_SCREEN)
-		Screen.fillRect(61,259,51,81,white,BOTTOM_SCREEN)
-		if (sm_index == 1) then
-			Screen.fillRect(61,259,51,66,green,BOTTOM_SCREEN)
-			Screen.debugPrint(63,53,"Confirm",red,BOTTOM_SCREEN)
-			Screen.debugPrint(63,68,"Cancel",black,BOTTOM_SCREEN)
-			if (Controls.check(pad,KEY_DDOWN)) and not (Controls.check(oldpad,KEY_DDOWN)) then
-				sm_index = 2
-			elseif (Controls.check(pad,KEY_A)) and not (Controls.check(oldpad,KEY_A)) then
+	-- Action Check
+	elseif (action_check) then
+		Screen.fillEmptyRect(60,260,50,127,black,BOTTOM_SCREEN)
+		Screen.fillRect(61,259,51,126,white,BOTTOM_SCREEN)
+		if sm_index > 5 then
+			sm_index = 1
+		elseif sm_index < 1 then
+			sm_index = 5
+		end
+		colors = {black,black,black,black,black}
+		colors[sm_index] = red
+		Screen.fillRect(61,259,36+sm_index*15,51+sm_index*15,green,BOTTOM_SCREEN)
+		Screen.debugPrint(63,53,"Delete",colors[1],BOTTOM_SCREEN)
+		Screen.debugPrint(63,68,"Rename",colors[2],BOTTOM_SCREEN)
+		Screen.debugPrint(63,83,"Copy",colors[3],BOTTOM_SCREEN)
+		Screen.debugPrint(63,98,"Move",colors[4],BOTTOM_SCREEN)
+		Screen.debugPrint(63,113,"Cancel",colors[5],BOTTOM_SCREEN)
+		if (Controls.check(pad,KEY_DDOWN)) and not (Controls.check(oldpad,KEY_DDOWN)) then
+			sm_index = sm_index + 1
+		elseif (Controls.check(pad,KEY_DUP)) and not (Controls.check(oldpad,KEY_DUP)) then
+			sm_index = sm_index - 1
+		elseif (Controls.check(pad,KEY_A)) and not (Controls.check(oldpad,KEY_A)) then
+			if sm_index == 1 then
 				update_bottom_screen = true
 				if (files_table[p].directory) then
 					if (files_table[p].name ~= "..") then
@@ -730,51 +755,31 @@ function AppMainCycle()
 				if (p > #files_table) then
 					p = p - 1
 				end
-				delete_mode = false
-			end
-		else
-			Screen.fillRect(61,259,66,81,green,BOTTOM_SCREEN)
-			Screen.debugPrint(63,53,"Confirm",black,BOTTOM_SCREEN)
-			Screen.debugPrint(63,68,"Cancel",red,BOTTOM_SCREEN)
-			if (Controls.check(pad,KEY_DUP)) and not (Controls.check(oldpad,KEY_DUP)) then
-				sm_index = 1
-			elseif (Controls.check(pad,KEY_A)) and not (Controls.check(oldpad,KEY_A)) then
+				action_check = false
+			elseif sm_index == 2 then
 				update_bottom_screen = true
-				sm_index = 1
-				delete_mode = false
-			end
-		end
-	-- Copy/Move selection
-	elseif (copy_or_move) then
-		Screen.fillEmptyRect(60,260,50,82,black,BOTTOM_SCREEN)
-		Screen.fillRect(61,259,51,81,white,BOTTOM_SCREEN)
-		if (sm_index == 1) then
-			Screen.fillRect(61,259,51,66,green,BOTTOM_SCREEN)
-			Screen.debugPrint(63,53,"Move",red,BOTTOM_SCREEN)
-			Screen.debugPrint(63,68,"Copy",black,BOTTOM_SCREEN)
-			if (Controls.check(pad,KEY_DDOWN)) and not (Controls.check(oldpad,KEY_DDOWN)) then
-				sm_index = 2
-			elseif (Controls.check(pad,KEY_A)) and not (Controls.check(oldpad,KEY_A)) then
 				if (files_table[p].name ~= "..") then
-					update_bottom_screen = true
-					move_base = System.currentDirectory() .. files_table[p].name
-					move_name = files_table[p].name
+					new_name = System.startKeyboard(files_table[p].name)
+					pad = KEY_A
+					oldpad = KEY_A
 					if (files_table[p].directory) then
-						move_type = 0
+						System.renameDirectory(System.currentDirectory() .. files_table[p].name,System.currentDirectory() .. new_name)
 					else
-						move_type = 1
+						System.renameFile(System.currentDirectory() .. files_table[p].name,System.currentDirectory() .. new_name)
 					end
+					files_table = System.listDirectory(System.currentDirectory())
+					if System.currentDirectory() ~= "/" then
+						local extra = {}
+						extra.name = ".."
+						extra.size = 0
+						extra.directory = true
+						table.insert(files_table,extra)
+					end
+					files_table = SortDirectory(files_table)
 				end
-				copy_or_move = false
+				action_check = false
 				sm_index = 1
-			end
-		else
-			Screen.fillRect(61,259,66,81,green,BOTTOM_SCREEN)
-			Screen.debugPrint(63,53,"Move",black,BOTTOM_SCREEN)
-			Screen.debugPrint(63,68,"Copy",red,BOTTOM_SCREEN)
-			if (Controls.check(pad,KEY_DUP)) and not (Controls.check(oldpad,KEY_DUP)) then
-				sm_index = 1
-			elseif (Controls.check(pad,KEY_A)) and not (Controls.check(oldpad,KEY_A)) then
+			elseif sm_index == 3 then
 				if (files_table[p].directory) then
 					if (files_table[p].name ~= "..") then
 						copy_name = files_table[p].name
@@ -786,8 +791,25 @@ function AppMainCycle()
 					copy_name = files_table[p].name
 					copy_base = System.currentDirectory() .. files_table[p].name
 				end
-				copy_or_move = false
+				action_check = false
 				sm_index = 1
+			elseif sm_index == 4 then
+				if (files_table[p].name ~= "..") then
+					update_bottom_screen = true
+					move_base = System.currentDirectory() .. files_table[p].name
+					move_name = files_table[p].name
+					if (files_table[p].directory) then
+						move_type = 0
+					else
+						move_type = 1
+					end
+				end
+				action_check = false
+				sm_index = 1
+			elseif sm_index == 5 then
+				update_bottom_screen = true
+				sm_index = 1
+				action_check = false
 			end
 		end
 	else
@@ -824,7 +846,7 @@ function AppMainCycle()
 			end
 		elseif (Controls.check(pad,KEY_X)) and not (Controls.check(oldpad,KEY_X)) then
 			if (move_base == nil) and (copy_base == nil) then
-				delete_mode = true
+				action_check = true
 			else
 				update_bottom_screen = true
 				move_base = nil
@@ -833,31 +855,25 @@ function AppMainCycle()
 				copy_name = nil
 			end			
 		elseif (Controls.check(pad,KEY_Y)) and not (Controls.check(oldpad,KEY_Y)) then
-			if (copy_base == nil) then
-				if (move_base == nil) then
-					if (files_table[p].name ~= "..") then
-						update_bottom_screen = true
-						copy_or_move = true
-					end
+			if (move_base ~= nil) then
+				update_bottom_screen = true
+				if (move_type == 0) then
+					System.renameDirectory(move_base,System.currentDirectory() .. move_name)
 				else
-					update_bottom_screen = true
-					if (move_type == 0) then
-						System.renameDirectory(move_base,System.currentDirectory() .. move_name)
-					else
-						System.renameFile(move_base,System.currentDirectory() .. move_name)
-					end
-					move_base = nil
-					files_table = System.listDirectory(System.currentDirectory())
-					if System.currentDirectory() ~= "/" then
-						local extra = {}
-						extra.name = ".."
-						extra.size = 0
-						extra.directory = true
-						table.insert(files_table,extra)
-					end
-					files_table = SortDirectory(files_table)
+					System.renameFile(move_base,System.currentDirectory() .. move_name)
 				end
-			else
+				move_base = nil
+				files_table = System.listDirectory(System.currentDirectory())
+				if System.currentDirectory() ~= "/" then
+					local extra = {}
+					extra.name = ".."
+					extra.size = 0
+					extra.directory = true
+					table.insert(files_table,extra)
+				end
+				files_table = SortDirectory(files_table)
+			end
+			if (copy_base ~= nil) then
 				copy_end = System.currentDirectory() .. copy_name
 				if copy_end == copy_base then
 					temp_copy = "Copy_" .. copy_name
@@ -887,25 +903,8 @@ function AppMainCycle()
 				copy_base = nil
 			end
 		elseif (Controls.check(pad,KEY_B)) and not (Controls.check(oldpad,KEY_B)) then
-			update_bottom_screen = true
-			if (files_table[p].name ~= "..") then
-				new_name = System.startKeyboard(files_table[p].name)
-				oldpad = KEY_A
-				if (files_table[p].directory) then
-					System.renameDirectory(System.currentDirectory() .. files_table[p].name,System.currentDirectory() .. new_name)
-				else
-					System.renameFile(System.currentDirectory() .. files_table[p].name,System.currentDirectory() .. new_name)
-				end
-				files_table = System.listDirectory(System.currentDirectory())
-				if System.currentDirectory() ~= "/" then
-					local extra = {}
-					extra.name = ".."
-					extra.size = 0
-					extra.directory = true
-					table.insert(files_table,extra)
-				end
-				files_table = SortDirectory(files_table)
-			end
+			FBGC()
+			CallMainMenu()
 		elseif (Controls.check(pad,KEY_DLEFT)) and not (Controls.check(oldpad,KEY_DLEFT)) then
 			if (current_type == "SMDH") then
 				update_bottom_screen = true
@@ -983,7 +982,7 @@ function AppMainCycle()
 					JPGV.resume(current_file)
 				end
 			end		
-		elseif (Controls.check(pad,KEY_L)) and not (Controls.check(oldpad,KEY_L)) then
+		elseif (Controls.check(pad,KEY_SELECT)) and not (Controls.check(oldpad,KEY_SELECT)) then
 			if (files_table[p].directory == false) then
 				select_mode = true
 			end
@@ -1011,10 +1010,7 @@ function AppMainCycle()
 				else
 					p = new_index
 				end
-			end
-		elseif (Controls.check(pad,KEY_START)) or Controls.check(pad,KEY_SELECT) then
-			FBGC()
-			CallMainMenu()
+			end	
 		end
 	end	
 	if not (Controls.check(pad,KEY_TOUCH)) then
