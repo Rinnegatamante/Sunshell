@@ -27,6 +27,7 @@ b5 = Screen.loadImage(main_dir.."/images/5.jpg")
 
 -- Setting some system vars, funcs, etc...
 bg_apps = {}
+in_game = false
 Sound.init()
 black = Color.new(0,0,0)
 white = Color.new(255,255,255)
@@ -223,11 +224,12 @@ while true do
 			Screen.fillRect(340,345,2,18,green,TOP_SCREEN)
 			Screen.fillRect(333,338,8,18,green,TOP_SCREEN)
 			Screen.fillRect(326,331,14,18,green,TOP_SCREEN)
+		else
 		end
 	end
 	
 	-- Sets up universal controls
-	if Controls.check(pad,KEY_START) then
+	if Controls.check(pad,KEY_START) and not in_game and not Controls.check(oldpad,KEY_START) then
 		GarbageCollection()
 		for i,bg_apps_code in pairs(bg_apps) do
 			bg_apps_code[2]()
@@ -240,13 +242,16 @@ while true do
 		end
 	elseif Controls.check(pad,KEY_L) and not Controls.check(oldpad,KEY_L) and screenshots then
 		screen_index = 0
-		while System.doesFileExist("/DCIM/Sunshell_"..screen_index..".bmp") do
+		while System.doesFileExist("/DCIM/Sunshell_"..screen_index..".jpg") do
 			screen_index = screen_index + 1
 		end
-		System.takeScreenshot("/DCIM/Sunshell_"..screen_index..".bmp")
+		System.takeScreenshot("/DCIM/Sunshell_"..screen_index..".jpg",true)
 	end
 	
 	Screen.waitVblankStart()
 	Screen.flip()
 	oldpad = pad
+	if in_game then
+		in_game = false
+	end
 end
