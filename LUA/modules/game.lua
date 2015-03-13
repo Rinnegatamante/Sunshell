@@ -15,8 +15,21 @@ function CheckDirectory(src,key)
 	end
 	return false
 end
+my_apps = {}
+function ExtCallMainMenu()
+	System.exit = my_exit
+	Sound.init()
+	CallMainMenu()
+end
+
+-- Adding preinstalled LUA homebrews
+for i,app in pairs(System.listDirectory(main_dir.."/apps")) do
+	if app.directory then
+		dofile(main_dir.."/apps/"..app.name.."/data.lua")
+		table.insert(my_apps,{true,app.name,app.name,app_desc,app_author,nil,true})
+	end
+end
 if build == "3DS" then
-	my_apps = {}
 	-- No access to AM service so manual CIA listing
 	tmp = System.listDirectory("/Nintendo 3DS/")
 	for i,file in pairs(tmp) do
@@ -55,7 +68,6 @@ if build == "3DS" then
 	end
 	
 else
-	my_apps = {}
 	if build == "3DSX" then
 		dir = System.listDirectory("/3ds/")
 		for i,file in pairs(dir) do
@@ -63,9 +75,9 @@ else
 				if System.doesFileExist("/3ds/"..(file.name).."/"..(file.name)..".3dsx") then
 					if System.doesFileExist("/3ds/"..(file.name).."/"..(file.name)..".smdh") then
 						app = System.extractSMDH("/3ds/"..(file.name).."/"..(file.name)..".smdh")
-						table.insert(my_apps,{true,file.name,app.title,app.desc,app.author,app.icon})
+						table.insert(my_apps,{true,file.name,app.title,app.desc,app.author,app.icon,false})
 					else
-						table.insert(my_apps,{true,file.name,file.name,"","",nil})
+						table.insert(my_apps,{true,file.name,file.name,"","",nil,false})
 					end
 				end
 			end
@@ -157,7 +169,6 @@ function AppMainCycle()
 			end
 		end
 	elseif Controls.check(pad,KEY_A) then
-		GarbageCollection()
 		for i,bg_apps_code in pairs(bg_apps) do
 			bg_apps_code[2]()
 		end
@@ -168,7 +179,17 @@ function AppMainCycle()
 		end
 		Sound.term()
 		if my_apps[p_g][1] then
-			System.launch3DSX("/3ds/"..my_apps[p_g][2].."/"..my_apps[p_g][2]..".3dsx")
+			if my_apps[p_g][7] then
+				ui_enabled = false
+				screenshots = false
+				my_exit = System.exit
+				in_game = true
+				System.exit = ExtCallMainMenu
+				dofile(main_dir.."/apps/"..my_apps[p_g][2].."/index.lua")
+			else
+				GarbageCollection()
+				System.launch3DSX("/3ds/"..my_apps[p_g][2].."/"..my_apps[p_g][2]..".3dsx")
+			end
 		else
 			if my_apps[p_g][2] == nil then
 				ShowWarning("You will be redirected to sysNand and your gamecard will be launched.")
