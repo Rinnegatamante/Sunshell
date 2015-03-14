@@ -13,6 +13,7 @@ fb = Screen.loadImage(main_dir.."/images/fb.jpg")
 game = Screen.loadImage(main_dir.."/images/game.jpg")
 photo = Screen.loadImage(main_dir.."/images/photo.jpg")
 cia = Screen.loadImage(main_dir.."/images/cia.jpg")
+extdata = Screen.loadImage(main_dir.."/images/extdata.jpg")
 calc = Screen.loadImage(main_dir.."/images/calc.jpg")
 mail = Screen.loadImage(main_dir.."/images/mail.jpg")
 clock = Screen.loadImage(main_dir.."/images/clock.jpg")
@@ -29,9 +30,10 @@ b5 = Screen.loadImage(main_dir.."/images/5.jpg")
 bg_apps = {}
 in_game = false
 Sound.init()
+app_index = 1
 black = Color.new(0,0,0)
 white = Color.new(255,255,255)
-green = Color.new(0,166,81)
+green_wifi = Color.new(0,166,81)
 selected = Color.new(255,0,0)
 selected_item = Color.new(237,28,36,128)
 version = "0.1"
@@ -96,6 +98,7 @@ table.insert(tools,{music,"/modules/music.lua","Musics"})
 table.insert(tools,{video,"/modules/video.lua","Videos"})
 table.insert(tools,{fb,"/modules/fb.lua","Filebrowser"})
 table.insert(tools,{cia,"/modules/cia.lua","CIA Manager"})
+table.insert(tools,{extdata,"/modules/extdata.lua","Extdata Manager"})
 table.insert(tools,{calc,"/modules/calc.lua","Calc"})
 table.insert(tools,{clock,"/modules/clock.lua","Clock"})
 table.insert(tools,{ftp,"/modules/ftp.lua","FTP Server"})
@@ -169,28 +172,58 @@ while true do
 		x = 4
 		y = 10
 		for i,tool in pairs(tools) do
-			if x < 300 then
-				Screen.drawImage(x,y,tool[1],BOTTOM_SCREEN)
-				if Controls.check(pad,KEY_TOUCH) and not Controls.check(oldpad,KEY_TOUCH) then
-					tx,ty = Controls.readTouch()
-					if tx >= x and tx <= x+48 and ty >= y and ty <= y+48 then
-						module = tool[3]
-						dofile(main_dir..tool[2])
-					end
-				end
-			else
+			if x > 300 then
 				x = 4
 				y = y + 58
-				Screen.drawImage(x,y,tool[1],BOTTOM_SCREEN)
-				if Controls.check(pad,KEY_TOUCH) and not Controls.check(oldpad,KEY_TOUCH) then
-					tx,ty = Controls.readTouch()
-					if tx >= x and tx <= x+48 and ty >= y and ty <= y+48 then
-						module = tool[3]
-						dofile(main_dir..tool[2])
-					end
+			end
+			if app_index == i then
+				Screen.fillRect(x-3,x+50,y-3,y+50,selected,BOTTOM_SCREEN)
+			end
+			Screen.drawImage(x,y,tool[1],BOTTOM_SCREEN)
+			if Controls.check(pad,KEY_TOUCH) and not Controls.check(oldpad,KEY_TOUCH) then
+				tx,ty = Controls.readTouch()
+				if tx >= x and tx <= x+48 and ty >= y and ty <= y+48 then
+					module = tool[3]
+					dofile(main_dir..tool[2])
 				end
 			end
 			x = x + 53
+		end
+		
+		-- Setting digital pad controls triggering
+		if Controls.check(pad,KEY_DUP) and not Controls.check(oldpad,KEY_DUP) then
+			app_index = app_index - 6
+			if app_index < 1 then
+				while (app_index + 6) < #tools do
+					app_index = app_index + 6
+				end
+			end
+		elseif Controls.check(pad,KEY_DDOWN) and not Controls.check(oldpad,KEY_DDOWN) then
+			app_index = app_index + 6
+			if app_index > #tools then
+				app_index = app_index % 6
+			end
+		elseif Controls.check(pad,KEY_DLEFT) and not Controls.check(oldpad,KEY_DLEFT) then
+			app_index = app_index - 1
+			if app_index % 6 == 0 then
+				app_index = app_index + 6
+				if app_index > #tools then
+					app_index = #tools
+				end
+			end
+		elseif Controls.check(pad,KEY_DRIGHT) and not Controls.check(oldpad,KEY_DRIGHT) then
+			app_index = app_index + 1
+			if app_index % 6 == 1 then
+				app_index = app_index - 6
+			end
+			if app_index > #tools then
+				app_index = math.floor(app_index / 6) * 6 + 1
+		end
+		
+		-- Setting app starting by pressing A button
+		if Controls.check(pad,KEY_A) and not Controls.check(oldpad,KEY_A) then
+			module = tools[app_index][3]
+			dofile(main_dir..tools[app_index][2])
 		end
 	else
 	
@@ -221,9 +254,9 @@ while true do
 			end
 		end
 		if Network.isWifiEnabled() then
-			Screen.fillRect(340,345,2,18,green,TOP_SCREEN)
-			Screen.fillRect(333,338,8,18,green,TOP_SCREEN)
-			Screen.fillRect(326,331,14,18,green,TOP_SCREEN)
+			Screen.fillRect(340,345,2,18,green_wifi,TOP_SCREEN)
+			Screen.fillRect(333,338,8,18,green_wifi,TOP_SCREEN)
+			Screen.fillRect(326,331,14,18,green_wifi,TOP_SCREEN)
 		else
 		end
 	end
