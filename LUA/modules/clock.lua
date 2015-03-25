@@ -80,15 +80,15 @@ function AppMainCycle()
 	Screen.debugPrint(9,45,"Current time: "..h..":"..m..":"..s,black,TOP_SCREEN)
 	if cronometer then
 		crono_time = Timer.getTime(crono)
-		Screen.debugPrint(9,70,"A = Resume/Pause Cronometer",black,TOP_SCREEN)
+		Screen.debugPrint(9,70,"A = Resume/Pause Chronometer",black,TOP_SCREEN)
 	else
-		Screen.debugPrint(9,70,"A = Start Cronometer",black,TOP_SCREEN)
+		Screen.debugPrint(9,70,"A = Start Chronometer",black,TOP_SCREEN)
 	end
 	Screen.debugPrint(9,85,"X = Set Countdown",black,TOP_SCREEN)
 	Screen.debugPrint(9,100,"Y = Set Alarm",black,TOP_SCREEN)
 	Screen.debugPrint(9,115,"L = Start Countdown/Alarm",black,TOP_SCREEN)
 	Screen.debugPrint(9,130,"R = Stop Countdown/Alarm",black,TOP_SCREEN)
-	Screen.debugPrint(9,145,"SELECT = Reset Cronometer",black,TOP_SCREEN)
+	Screen.debugPrint(9,145,"SELECT = Reset Chronometer",black,TOP_SCREEN)
 	Screen.debugPrint(9,160,"B = Return Main Menu",black,TOP_SCREEN)
 	
 	-- Reset x,y coordinates
