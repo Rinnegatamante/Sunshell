@@ -28,6 +28,7 @@ b5 = Screen.loadImage(main_dir.."/images/5.jpg")
 
 -- Setting some system vars, funcs, etc...
 bg_apps = {}
+old_headset = Controls.headsetStatus()
 in_game = false
 Sound.init()
 app_index = 1
@@ -36,7 +37,7 @@ white = Color.new(255,255,255)
 green_wifi = Color.new(0,166,81)
 selected = Color.new(255,0,0)
 selected_item = Color.new(237,28,36,128)
-version = "0.1"
+version = "0.2"
 ui_enabled = true
 screenshots = true
 oldpad = KEY_A
@@ -109,6 +110,34 @@ while true do
 	Screen.refresh()
 	Controls.init()
 	pad = Controls.read()
+	
+	-- Headset tracking for Music module auto-start
+	if old_headset and not Controls.headsetStatus() then -- Removing headset
+		for i,app in pairs(bg_apps) do
+			if app[3] == "Music" then
+				if Sound.isPlaying(current_song) then
+					Sound.pause(current_song)
+				end
+				break
+			end
+		end
+		old_headset = false
+	elseif not old_headset and Controls.headsetStatus() then -- Inserting headset
+		done = false
+		for i,app in pairs(bg_apps) do
+			if app[3] == "Music" then
+				if not Sound.isPlaying(current_song) then
+					Sound.resume(current_song)
+				end
+				done = true
+				break
+			end
+		end
+		if not done then
+			dofile(main_dir.."/scripts/music_api.lua")
+		end
+		old_headset = true
+	end
 	
 	-- Blit background
 	if ui_enabled then
@@ -218,6 +247,7 @@ while true do
 			end
 			if app_index > #tools then
 				app_index = math.floor(app_index / 6) * 6 + 1
+			end
 		end
 		
 		-- Setting app starting by pressing A button
