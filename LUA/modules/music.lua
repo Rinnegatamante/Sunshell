@@ -22,6 +22,8 @@ function AddSongsFromDir(dir,album)
 				table.insert(my_songs,{file.name,"WAV",album,dir})
 			elseif magic == "FORM" then
 				table.insert(my_songs,{file.name,"AIFF",album,dir})
+			elseif magic == "OggS" then
+				table.insert(my_songs,{file.name,"OGG",album,dir})
 			end
 			io.close(tmp_file)
 		else
@@ -30,11 +32,7 @@ function AddSongsFromDir(dir,album)
 	end
 end
 AddSongsFromDir("/MUSIC",nil)
-MAX_RAM_ALLOCATION = 10485760
-if #my_songs < 1 then
-	ShowError("MUSIC folder is empty.")
-	CallMainMenu()
-end
+MAX_RAM_ALLOCATION = 1048576
 
 -- Module background code
 function BackgroundMusic()
@@ -74,25 +72,11 @@ function BackgroundMusic()
 				end
 			end
 			if my_songs[song_idx][2] == "WAV" then
-				tmp = io.open(my_songs[song_idx][4].."/"..my_songs[song_idx][1],FREAD)
-				size = io.size(tmp)
-				io.close(tmp)
-				mem_blocks = 2
-				while (size * 2) > MAX_RAM_ALLOCATION do
-					mem_blocks = mem_blocks + 2
-					size = size / 2
-				end
-				current_song = Sound.openWav(my_songs[song_idx][4].."/"..my_songs[song_idx][1],mem_blocks)
+				current_song = Sound.openWav(my_songs[song_idx][4].."/"..my_songs[song_idx][1],true)
 			elseif my_songs[song_idx][2] == "AIFF" then
-				tmp = io.open(my_songs[song_idx][4].."/"..my_songs[song_idx][1],FREAD)
-				size = io.size(tmp)
-				io.close(tmp)
-				mem_blocks = 2
-				while (size * 2) > MAX_RAM_ALLOCATION do
-					mem_blocks = mem_blocks + 2
-					size = size / 2
-				end
-				current_song = Sound.openAiff(my_songs[song_idx][4].."/"..my_songs[song_idx][1],mem_blocks)
+				current_song = Sound.openAiff(my_songs[song_idx][4].."/"..my_songs[song_idx][1],true)
+			elseif my_songs[song_idx][2] == "OGG" then
+				current_song = Sound.openOgg(my_songs[song_idx][4].."/"..my_songs[song_idx][1],true)
 			end
 			Sound.play(current_song,NO_LOOP,0x08,0x09)
 			current_subfolder = my_songs[song_idx][3]
@@ -102,8 +86,11 @@ end
 
 -- Internal Module GarbageCollection
 function MusicGC()
-	Sound.pause(current_song)
-	Sound.close(current_song)
+	if current_song ~= nil then
+		Sound.pause(current_song)
+		Sound.close(current_song)
+		current_song = nil
+	end
 end
 
 -- Closing background thread if opened
@@ -156,7 +143,6 @@ function AppMainCycle()
 	
 	-- Showing Song info
 	if not not_started then
-		Sound.updateStream(current_song)
 		TopCropPrint(9,45,"Title: "..Sound.getTitle(current_song),black,TOP_SCREEN)
 		TopCropPrint(9,60,"Author: "..Sound.getAuthor(current_song),black,TOP_SCREEN)
 		if my_songs[song_idx][3] ~= nil then
@@ -170,66 +156,7 @@ function AppMainCycle()
 			TopCropPrint(9,90,"Audiotype: Stereo",black,TOP_SCREEN)
 		end
 		TopCropPrint(9,105,"Time: "..FormatTime(Sound.getTime(current_song)).." / "..FormatTime(Sound.getTotalTime(current_song)),black,TOP_SCREEN)
-		TopCropPrint(9,120,"Samplerate: "..Sound.getSrate(current_song),black,TOP_SCREEN)
-	
-		-- Cycle mode
-		if cycle_index > 1 then
-			if Sound.getTime(current_song) >= Sound.getTotalTime(current_song) then
-				MusicGC()
-				if cycle_index == 2 then
-					song_idx = song_idx + 1
-					if song_idx > #my_songs then
-						song_idx = 1
-					end
-				else
-					tmp_idx = song_idx + 1
-					found = false
-					while tmp_idx < #my_songs do
-						if my_songs[tmp_idx][3] == current_subfolder then
-							song_idx = tmp_idx
-							found = true
-							break
-						end
-						tmp_idx = tmp_idx + 1
-					end
-					if not found then
-						tmp_idx = 1
-						while tmp_idx < #my_songs do
-							if my_songs[tmp_idx][3] == current_subfolder then
-								song_idx = tmp_idx
-								found = true
-								break
-							end
-							tmp_idx = tmp_idx + 1
-						end	
-					end
-				end
-				if my_songs[song_idx][2] == "WAV" then
-					tmp = io.open(my_songs[song_idx][4].."/"..my_songs[song_idx][1],FREAD)
-					size = io.size(tmp)
-					io.close(tmp)
-					mem_blocks = 2
-					while (size * 2) > MAX_RAM_ALLOCATION do
-						mem_blocks = mem_blocks + 2
-						size = size / 2
-					end
-					current_song = Sound.openWav(my_songs[song_idx][4].."/"..my_songs[song_idx][1],mem_blocks)
-				elseif my_songs[song_idx][2] == "AIFF" then
-					tmp = io.open(my_songs[song_idx][4].."/"..my_songs[song_idx][1],FREAD)
-					size = io.size(tmp)
-					io.close(tmp)
-					mem_blocks = 2
-					while (size * 2) > MAX_RAM_ALLOCATION do
-						mem_blocks = mem_blocks + 2
-						size = size / 2
-					end
-					current_song = Sound.openAiff(my_songs[song_idx][4].."/"..my_songs[song_idx][1],mem_blocks)
-				end
-				Sound.play(current_song,NO_LOOP,0x08,0x09)
-				current_subfolder = my_songs[song_idx][3]
-			end
-		end
-		
+		TopCropPrint(9,120,"Samplerate: "..Sound.getSrate(current_song),black,TOP_SCREEN)	
 	end
 	
 	-- Sets controls triggering
@@ -262,35 +189,21 @@ function AppMainCycle()
 		end
 		not_started = false
 		if my_songs[p_m][2] == "WAV" then
-			tmp = io.open(my_songs[p_m][4].."/"..my_songs[p_m][1],FREAD)
-			size = io.size(tmp)
-			io.close(tmp)
-			mem_blocks = 2
-			while (size * 2) > MAX_RAM_ALLOCATION do
-				mem_blocks = mem_blocks + 2
-				size = size / 2
-			end
-			current_song = Sound.openWav(my_songs[p_m][4].."/"..my_songs[p_m][1],mem_blocks)
+			current_song = Sound.openWav(my_songs[p_m][4].."/"..my_songs[p_m][1],true)
 		elseif my_songs[p_m][2] == "AIFF" then
-			tmp = io.open(my_songs[p_m][4].."/"..my_songs[p_m][1],FREAD)
-			size = io.size(tmp)
-			io.close(tmp)
-			mem_blocks = 2
-			while (size * 2) > MAX_RAM_ALLOCATION do
-				mem_blocks = mem_blocks + 2
-				size = size / 2
-			end
-			current_song = Sound.openAiff(my_songs[p_m][4].."/"..my_songs[p_m][1],mem_blocks)
+			current_song = Sound.openAiff(my_songs[p_m][4].."/"..my_songs[p_m][1],true)
+		elseif my_songs[p_m][2] == "OGG" then
+			current_song = Sound.openOgg(my_songs[p_m][4].."/"..my_songs[p_m][1],true)
 		end	
 		Sound.play(current_song,NO_LOOP,0x08,0x09)
 		current_subfolder = my_songs[p_m][3]
 		song_idx = p_m
+		table.insert(bg_apps,{BackgroundMusic,MusicGC,"Music"}) -- Starting background Music module
 	elseif Controls.check(pad,KEY_B) or Controls.check(pad,KEY_START) then
 		CallMainMenu()
 		not_started = true
 		if current_song ~= nil then
-			MusicGC()
-			current_song = nil
+			CloseBGApp("Music")
 		end
 	elseif (Controls.check(pad,KEY_DUP)) and not (Controls.check(oldpad,KEY_DUP)) then
 		p_m = p_m - 1
