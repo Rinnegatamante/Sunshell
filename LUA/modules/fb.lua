@@ -117,7 +117,7 @@ function ForceOpenFile(text, size, mode)
 		Console.append(smdh_show,"Title: "..current_file.title.."\n\n")
 		Console.append(smdh_show,"Description: "..current_file.desc.."\n\n")
 		Console.append(smdh_show,"Author: "..current_file.author)
-	elseif mode == "3DSX" and not System.isGWMode() then
+	elseif mode == "3DSX" and build == "3DSX" then
 		FBGC()
 		Screen.freeImage(bg)
 		Sound.term()
@@ -142,21 +142,15 @@ function ForceOpenFile(text, size, mode)
 		magic = io.read(current_file,8,4)
 		io.close(current_file)
 		if magic == "AIFF" then
-			mem_blocks = 2
-			while (size * 2) > MAX_RAM_ALLOCATION do
-				mem_blocks = mem_blocks + 2
-				size = size / 2
-			end
-			current_file = Sound.openAiff(System.currentDirectory()..text,mem_blocks)
+			current_file = Sound.openAiff(System.currentDirectory()..text,true)
 			current_type = "WAV"
 			Sound.play(current_file,NO_LOOP,0x08,0x09)
+		elseif magic == "OggS" then
+			current_type = ""
+			current_file = Sound.openOgg(System.currentDirectory()..text,true)
+			Sound.play(current_file,NO_LOOP,0x08,0x09)
 		else
-			mem_blocks = 2
-			while (size * 2) > MAX_RAM_ALLOCATION do
-				mem_blocks = mem_blocks + 2
-				size = size / 2
-			end
-			current_file = Sound.openWav(System.currentDirectory()..text,mem_blocks)
+			current_file = Sound.openWav(System.currentDirectory()..text,true)
 			current_type = "WAV"
 			Sound.play(current_file,NO_LOOP,0x08,0x09)
 		end
@@ -285,7 +279,7 @@ function DeleteDir(dir)
 	System.deleteDirectory(dir)
 end
 function OpenFile(text, size)
-	if string.sub(text,-5) == ".smdh" or string.sub(text,-5) == ".SMDH" then
+	if string.upper(string.sub(text,-5)) == ".SMDH" then
 		FBGC()
 		current_type = "SMDH"
 		current_file = System.extractSMDH(System.currentDirectory()..text)
@@ -293,7 +287,7 @@ function OpenFile(text, size)
 		Console.append(smdh_show,"Title: "..current_file.title.."\n\n")
 		Console.append(smdh_show,"Description: "..current_file.desc.."\n\n")
 		Console.append(smdh_show,"Author: "..current_file.author)
-	elseif string.sub(text,-4) == ".zip" or string.sub(text,-4) == ".ZIP" then
+	elseif string.upper(string.sub(text,-4)) == ".ZIP" then
 		FBGC()
 		pass = System.startKeyboard("")
 		System.extractZIP(System.currentDirectory()..text,System.currentDirectory()..string.sub(text,1,-5),pass)
@@ -306,42 +300,37 @@ function OpenFile(text, size)
 			table.insert(files_table,extra)
 		end
 		files_table = SortDirectory(files_table)
-	elseif (string.sub(text,-5) == ".3dsx" or string.sub(text,-5) == ".3DSX") and not System.isGWMode() then
+	elseif (string.upper(string.sub(text,-5)) == ".3DSX") and build == "3DSX" then
 		FBGC()
 		Screen.freeImage(bg)
 		Sound.term()
 		System.launch3DSX(System.currentDirectory()..text)
-	elseif string.sub(text,-5) == ".bmpv" or string.sub(text,-5) == ".BMPV" then
+	elseif string.upper(string.sub(text,-5)) == ".BMPV" then
 		FBGC()
 		current_file = BMPV.load(System.currentDirectory()..text)
 		current_type = "BMPV"
 		BMPV.start(current_file,NO_LOOP,0x08,0x09)
-	elseif string.sub(text,-5) == ".jpgv" or string.sub(text,-5) == ".JPGV" then
+	elseif string.upper(string.sub(text,-5)) == ".JPGV" then
 		FBGC()
 		current_file = JPGV.load(System.currentDirectory()..text)
 		current_type = "JPGV"
 		JPGV.start(current_file,NO_LOOP,0x08,0x09)
-	elseif string.sub(text,-4) == ".wav" or string.sub(text,-4) == ".WAV" then
+	elseif string.upper(string.sub(text,-4)) == ".WAV" then
 		FBGC()
-		mem_blocks = 2
-		while (size * 2) > MAX_RAM_ALLOCATION do
-			mem_blocks = mem_blocks + 2
-			size = size / 2
-		end
-		current_file = Sound.openWav(System.currentDirectory()..text,mem_blocks)
+		current_file = Sound.openWav(System.currentDirectory()..text,true)
 		current_type = "WAV"
 		Sound.play(current_file,NO_LOOP,0x08,0x09)
-	elseif string.sub(text,-4) == ".aif" or string.sub(text,-4) == ".AIF" or string.sub(text,-5) == ".aiff" or string.sub(text,-5) == ".AIFF" then
+	elseif string.upper(string.sub(text,-4)) == ".OGG" then
 		FBGC()
-		mem_blocks = 2
-		while (size * 2) > MAX_RAM_ALLOCATION do
-			mem_blocks = mem_blocks + 2
-			size = size / 2
-		end
-		current_file = Sound.openAiff(System.currentDirectory()..text,mem_blocks)
+		current_file = Sound.openOgg(System.currentDirectory()..text,true)
 		current_type = "WAV"
 		Sound.play(current_file,NO_LOOP,0x08,0x09)
-	elseif string.sub(text,-4) == ".png" or string.sub(text,-4) == ".PNG" or string.sub(text,-4) == ".BMP" or string.sub(text,-4) == ".bmp" or string.sub(text,-4) == ".JPG" or string.sub(text,-4) == ".jpg" then
+	elseif string.upper(string.sub(text,-4)) == ".AIF" or string.upper(string.sub(text,-5)) == ".AIFF" then
+		FBGC()
+		current_file = Sound.openAiff(System.currentDirectory()..text,true)
+		current_type = "WAV"
+		Sound.play(current_file,NO_LOOP,0x08,0x09)
+	elseif string.upper(string.sub(text,-4)) == ".PNG" or string.upper(string.sub(text,-4)) == ".BMP" or string.upper(string.sub(text,-4)) == ".JPG" then
 		FBGC()
 		current_type = "IMG"
 		current_file = Screen.loadImage(System.currentDirectory()..text)
@@ -355,7 +344,7 @@ function OpenFile(text, size)
 			height = 240
 			big_image = true
 		end
-	elseif string.sub(text,-4) == ".lua" or string.sub(text,-4) == ".LUA" then
+	elseif string.upper(string.sub(text,-4)) == ".LUA" then
 		FBGC()
 		Screen.freeImage(bg)
 		Sound.term()
@@ -365,7 +354,7 @@ function OpenFile(text, size)
 		System.currentDirectory(reset_dir)
 		current_type = "LUA"
 		Sound.init()
-	elseif string.sub(text,-4) == ".txt" or string.sub(text,-4) == ".TXT" then
+	elseif string.upper(string.sub(text,-4)) == ".TXT" then
 		FBGC()
 		current_file = io.open(System.currentDirectory()..text,FREAD)
 		text_console = Console.new(TOP_SCREEN)
@@ -373,7 +362,7 @@ function OpenFile(text, size)
 		txt_index = 0
 		txt_words = 0
 		updateTXT = true
-	elseif string.sub(text,-4) == ".cia" or string.sub(text,-4) == ".CIA" then
+	elseif string.upper(string.sub(text,-4)) == ".CIA" then
 		FBGC()
 		sm_index = 1
 		cia_data = System.extractCIA(System.currentDirectory()..text)
