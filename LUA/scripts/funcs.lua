@@ -125,7 +125,6 @@ function ShowError(text)
 		for i,line in pairs(error_lines) do
 			Screen.debugPrint(8,line[2],line[1],black,BOTTOM_SCREEN)
 		end
-		Controls.init()
 		Screen.fillEmptyRect(147,176,max_y - 23, max_y - 8,black,BOTTOM_SCREEN)
 		Screen.debugPrint(150,max_y - 20,"OK",black,BOTTOM_SCREEN)
 		if (Controls.check(Controls.read(),KEY_TOUCH)) then
@@ -153,7 +152,6 @@ function ShowWarning(text)
 		for i,line in pairs(error_lines) do
 			Screen.debugPrint(8,line[2],line[1],black,BOTTOM_SCREEN)
 		end
-		Controls.init()
 		Screen.fillEmptyRect(147,176,max_y - 23, max_y - 8,black,BOTTOM_SCREEN)
 		Screen.debugPrint(150,max_y - 20,"OK",black,BOTTOM_SCREEN)
 		if (Controls.check(Controls.read(),KEY_TOUCH)) then
