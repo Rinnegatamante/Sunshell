@@ -2,6 +2,7 @@
 mode = "Music"
 
 -- Internal module settings
+FreeIconTopbar("Music")
 master_index_m = 0
 p_m = 1
 if not_started == nil then
@@ -93,14 +94,6 @@ function MusicGC()
 	end
 end
 
--- Closing background thread if opened
-for i, apps in pairs(bg_apps) do
-	if apps[3] == "Music" then
-		table.remove(bg_apps,i)
-		break
-	end
-end
-
 -- Module main cycle
 function AppMainCycle()
 	
@@ -109,7 +102,7 @@ function AppMainCycle()
 	Screen.fillRect(6,394,41,219,white,TOP_SCREEN)
 	
 	-- Draw Cycle Mode info
-	Screen.debugPrint(9,200,"Cycle mode: "..cycle_mode[cycle_index],black,TOP_SCREEN)
+	Font.print(ttf,9,200,"Cycle mode: "..cycle_mode[cycle_index],black,TOP_SCREEN)
 	
 	-- Showing files list
 	base_y = 0
@@ -121,18 +114,11 @@ function AppMainCycle()
 			if (l==p_m) then
 				if file[3] ~= nil then
 					if not_started then
-						Screen.debugPrint(9,45,"Subfolder: "..file[3],black,TOP_SCREEN)
+						Font.print(ttf,9,45,"Subfolder: "..file[3],black,TOP_SCREEN)
 					end
 				end
-				base_y2 = base_y
-				if (base_y) == 0 then
-					base_y = 2
-				end
-				Screen.fillRect(0,319,base_y-2,base_y2+12,selected_item,BOTTOM_SCREEN)
+				Screen.fillRect(0,319,base_y,base_y+15,selected_item,BOTTOM_SCREEN)
 				color = selected
-				if (base_y) == 2 then
-					base_y = 0
-				end
 			else
 				color = black
 			end
@@ -146,9 +132,9 @@ function AppMainCycle()
 		TopCropPrint(9,45,"Title: "..Sound.getTitle(current_song),black,TOP_SCREEN)
 		TopCropPrint(9,60,"Author: "..Sound.getAuthor(current_song),black,TOP_SCREEN)
 		if my_songs[song_idx][3] ~= nil then
-			Screen.debugPrint(9,75,"Subfolder: "..my_songs[song_idx][3],black,TOP_SCREEN)
+			Font.print(ttf,9,75,"Subfolder: "..my_songs[song_idx][3],black,TOP_SCREEN)
 		else
-			Screen.debugPrint(9,75,"Subfolder: None",black,TOP_SCREEN)
+			Font.print(ttf,9,75,"Subfolder: None",black,TOP_SCREEN)
 		end
 		if Sound.getType(current_song) == 1 then
 			TopCropPrint(9,90,"Audiotype: Mono",black,TOP_SCREEN)
@@ -162,7 +148,7 @@ function AppMainCycle()
 	-- Sets controls triggering
 	if (Controls.check(pad,KEY_SELECT)) and not (Controls.check(oldpad,KEY_SELECT)) and not (not_started) then
 		CallMainMenu()
-		table.insert(bg_apps,{BackgroundMusic,MusicGC,"Music"}) -- Adding Music module to background apps
+		AddIconTopbar(main_dir.."/images/music_icon.jpg","Music")
 	elseif (Controls.check(pad,KEY_X)) and not (Controls.check(oldpad,KEY_X)) and not (not_started) then
 		if Sound.isPlaying(current_song) then
 			Sound.pause(current_song)
@@ -171,7 +157,8 @@ function AppMainCycle()
 		end
 	elseif (Controls.check(pad,KEY_Y)) and not (Controls.check(oldpad,KEY_Y)) and not (not_started) then
 		not_started = true
-		MusicGC()
+		CloseBGApp("Music")
+		--MusicGC()
 		current_song = nil
 	elseif (Controls.check(pad,KEY_DLEFT)) and not (Controls.check(oldpad,KEY_DLEFT)) then
 		cycle_index = cycle_index - 1

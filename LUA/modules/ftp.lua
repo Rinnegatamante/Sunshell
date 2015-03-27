@@ -4,13 +4,6 @@ mode = "FTP"
 -- Module background code
 function BackgroundFTP()
 	last_shared = Network.updateFTP()
-	
-	-- Blit FTP alert on Main Menu
-		if module == "Main Menu" then
-			Screen.fillEmptyRect(255,395,45,65,black,TOP_SCREEN)
-			Screen.fillRect(256,394,46,64,white,TOP_SCREEN)
-			Screen.debugPrint(259,50,"FTP: ON",black,TOP_SCREEN)
-		end
 end
 
 function FTPGC()
@@ -19,6 +12,7 @@ function FTPGC()
 end
 
 -- Internal module settings
+FreeIconTopbar("FTP")
 if Network.isWifiEnabled() then
 	if last_shared == nil then
 		last_shared = "Waiting for connection..."
@@ -55,11 +49,14 @@ function AppMainCycle()
 	-- Sets controls triggering
 	if Controls.check(pad,KEY_A) and not Controls.check(oldpad,KEY_A) then
 		CloseBGApp("FTP Server")
+		FreeIconTopbar("FTP")
 		dofile(main_dir.."/modules/ftp.lua")
 	elseif Controls.check(pad,KEY_SELECT) and not Controls.check(oldpad,KEY_SELECT) then
+		AddIconTopbar(main_dir.."/images/ftp_icon.jpg","FTP")
 		CallMainMenu()
 	elseif Controls.check(pad,KEY_B) or Controls.check(pad,KEY_START) then
 		CloseBGApp("FTP Server")
+		FreeIconTopbar("FTP")
 		CallMainMenu()
 	end
 end
