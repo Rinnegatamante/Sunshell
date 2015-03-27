@@ -99,7 +99,7 @@ function ChangeTheme(theme)
 		io.close(out)
 	end
 end
-function CropPrint(x, y, text, color, screen)
+function DebugCropPrint(x, y, text, color, screen)
 	if string.len(text) > 25 then
 		Screen.debugPrint(x, y, string.sub(text,1,25) .. "...", color, screen)
 	else
@@ -170,7 +170,6 @@ function UpdatePreviews()
 	end
 end
 while true do
-	Controls.init()
 	pad = Controls.read()
 	Screen.refresh()
 	base_y = 0
@@ -218,7 +217,7 @@ while true do
 			else
 				color = white
 			end
-			CropPrint(0,base_y,file.name,color,BOTTOM_SCREEN)
+			DebugCropPrint(0,base_y,file.name,color,BOTTOM_SCREEN)
 			base_y = base_y + 15
 		end
 	end
