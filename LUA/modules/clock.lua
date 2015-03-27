@@ -38,7 +38,7 @@ function BackgroundClock()
 		if module == "Main Menu" then
 			Screen.fillEmptyRect(5,200,210,230,black,TOP_SCREEN)
 			Screen.fillRect(6,199,211,229,white,TOP_SCREEN)
-			Screen.debugPrint(8,214,"Alarm: "..my_alarm_time[1]..":"..my_alarm_time[2]..":"..my_alarm_time[3],black,TOP_SCREEN)
+			Font.print(ttf,8,214,"Alarm: "..my_alarm_time[1]..":"..my_alarm_time[2]..":"..my_alarm_time[3],black,TOP_SCREEN)
 		end
 		
 		h,m,s = System.getTime()
@@ -77,19 +77,19 @@ function AppMainCycle()
 	if s < 10 then
 		s = "0"..s
 	end
-	Screen.debugPrint(9,45,"Current time: "..h..":"..m..":"..s,black,TOP_SCREEN)
+	Font.print(ttf,9,45,"Current time: "..h..":"..m..":"..s,black,TOP_SCREEN)
 	if cronometer then
 		crono_time = Timer.getTime(crono)
-		Screen.debugPrint(9,70,"A = Resume/Pause Chronometer",black,TOP_SCREEN)
+		Font.print(ttf,9,70,"A = Resume/Pause Chronometer",black,TOP_SCREEN)
 	else
-		Screen.debugPrint(9,70,"A = Start Chronometer",black,TOP_SCREEN)
+		Font.print(ttf,9,70,"A = Start Chronometer",black,TOP_SCREEN)
 	end
-	Screen.debugPrint(9,85,"X = Set Countdown",black,TOP_SCREEN)
-	Screen.debugPrint(9,100,"Y = Set Alarm",black,TOP_SCREEN)
-	Screen.debugPrint(9,115,"L = Start Countdown/Alarm",black,TOP_SCREEN)
-	Screen.debugPrint(9,130,"R = Stop Countdown/Alarm",black,TOP_SCREEN)
-	Screen.debugPrint(9,145,"SELECT = Reset Chronometer",black,TOP_SCREEN)
-	Screen.debugPrint(9,160,"B = Return Main Menu",black,TOP_SCREEN)
+	Font.print(ttf,9,85,"X = Set Countdown",black,TOP_SCREEN)
+	Font.print(ttf,9,100,"Y = Set Alarm",black,TOP_SCREEN)
+	Font.print(ttf,9,115,"L = Start Countdown/Alarm",black,TOP_SCREEN)
+	Font.print(ttf,9,130,"R = Stop Countdown/Alarm",black,TOP_SCREEN)
+	Font.print(ttf,9,145,"SELECT = Reset Chronometer",black,TOP_SCREEN)
+	Font.print(ttf,9,160,"B = Return Main Menu",black,TOP_SCREEN)
 	
 	-- Reset x,y coordinates
 	y = 50
@@ -186,33 +186,33 @@ function AppMainCycle()
 				end
 				k = k + 1
 			end
-			Screen.debugPrint(9,80,my_alarm,black,BOTTOM_SCREEN)
+			Font.print(ttf,9,80,my_alarm,black,BOTTOM_SCREEN)
 		else
 			
 		end
 	end
 	
 	-- Draw numeric keyboard
-	Screen.debugPrint(x+200,y,"1",black,BOTTOM_SCREEN)
-	Screen.debugPrint(x+230,y,"2",black,BOTTOM_SCREEN)
-	Screen.debugPrint(x+260,y,"3",black,BOTTOM_SCREEN)
-	Screen.debugPrint(x+200,y+25,"4",black,BOTTOM_SCREEN)
-	Screen.debugPrint(x+230,y+25,"5",black,BOTTOM_SCREEN)
-	Screen.debugPrint(x+260,y+25,"6",black,BOTTOM_SCREEN)
-	Screen.debugPrint(x+200,y+50,"7",black,BOTTOM_SCREEN)
-	Screen.debugPrint(x+230,y+50,"8",black,BOTTOM_SCREEN)
-	Screen.debugPrint(x+260,y+50,"9",black,BOTTOM_SCREEN)
-	Screen.debugPrint(x+200,y+75,"0",black,BOTTOM_SCREEN)
-	Screen.debugPrint(x+230,y+75,"D",black,BOTTOM_SCREEN)
-	Screen.debugPrint(x+260,y+75,"C",black,BOTTOM_SCREEN)
+	Font.print(ttf,x+200,y,"1",black,BOTTOM_SCREEN)
+	Font.print(ttf,x+230,y,"2",black,BOTTOM_SCREEN)
+	Font.print(ttf,x+260,y,"3",black,BOTTOM_SCREEN)
+	Font.print(ttf,x+200,y+25,"4",black,BOTTOM_SCREEN)
+	Font.print(ttf,x+230,y+25,"5",black,BOTTOM_SCREEN)
+	Font.print(ttf,x+260,y+25,"6",black,BOTTOM_SCREEN)
+	Font.print(ttf,x+200,y+50,"7",black,BOTTOM_SCREEN)
+	Font.print(ttf,x+230,y+50,"8",black,BOTTOM_SCREEN)
+	Font.print(ttf,x+260,y+50,"9",black,BOTTOM_SCREEN)
+	Font.print(ttf,x+200,y+75,"0",black,BOTTOM_SCREEN)
+	Font.print(ttf,x+230,y+75,"D",black,BOTTOM_SCREEN)
+	Font.print(ttf,x+260,y+75,"C",black,BOTTOM_SCREEN)
 		
 	-- Draw Cronometer/Alarm stats
-	Screen.debugPrint(9,185,"Cronometer: "..Cronometer(crono_time),black,TOP_SCREEN)
+	Font.print(ttf,9,185,"Chronometer: "..Cronometer(crono_time),black,TOP_SCREEN)
 	if alarm_start ~= nil then
 		if my_alarm_time[1] == nil then
-			Screen.debugPrint(9,200,"Countdown set for: "..my_alarm_time[3].." seconds.",black,TOP_SCREEN)
+			Font.print(ttf,9,200,"Countdown set for: "..my_alarm_time[3].." seconds.",black,TOP_SCREEN)
 		else	
-			Screen.debugPrint(9,200,"Alarm set for: "..my_alarm_time[1]..":"..my_alarm_time[2]..":"..my_alarm_time[3],black,TOP_SCREEN)
+			Font.print(ttf,9,200,"Alarm set for: "..my_alarm_time[1]..":"..my_alarm_time[2]..":"..my_alarm_time[3],black,TOP_SCREEN)
 		end
 	end
 	

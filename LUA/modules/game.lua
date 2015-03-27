@@ -124,11 +124,7 @@ function AppMainCycle()
 		end
 		if (l >= master_index_g) then
 			if (l==p_g) then
-				base_y2 = base_y
-				if (base_y) == 0 then
-					base_y = 2
-				end
-				Screen.fillRect(0,319,base_y-2,base_y2+12,selected_item,BOTTOM_SCREEN)
+				Screen.fillRect(0,319,base_y,base_y+15,selected_item,BOTTOM_SCREEN)
 				TopCropPrint(9,45,file[3],selected,TOP_SCREEN)
 				TopCropPrint(9,60,file[5],black,TOP_SCREEN)
 				gw_rom = System.getGWRomID()
@@ -138,16 +134,13 @@ function AppMainCycle()
 					desc = LinesGenerator(file[4],90)
 				end
 				for i,line in pairs(desc) do
-					Screen.debugPrint(9,line[2],line[1],black,TOP_SCREEN)
+					Font.print(ttf,9,line[2],line[1],black,TOP_SCREEN)
 				end
 				if file[6] ~= nil then
 					Screen.fillEmptyRect(341,390,43,92,black,TOP_SCREEN)
 					Screen.drawImage(342,44,file[6],TOP_SCREEN)
 				end
 				color = selected
-				if (base_y) == 2 then
-					base_y = 0
-				end
 			else
 				color = black
 			end

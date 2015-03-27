@@ -168,7 +168,6 @@ function AppMainCycle()
 	Screen.refresh()
 	Screen.clear(TOP_SCREEN)
 	Screen.clear(BOTTOM_SCREEN)
-	Controls.init()
 	pad = Controls.read()
 	if (current_file == nil) then
 		Screen.debugPrint(0,0,"Basic Controls:",white,TOP_SCREEN)
@@ -215,9 +214,9 @@ function AppMainCycle()
 				color = menu_color
 			end
 			if file.name == ".." then
-				CropPrint(0,base_y,file.name,color,BOTTOM_SCREEN)
+				DebugCropPrint(0,base_y,file.name,color,BOTTOM_SCREEN)
 			else
-				CropPrint(0,base_y,file.name.." ["..string.format('%02X',file.archive).."]",color,BOTTOM_SCREEN)
+				DebugCropPrint(0,base_y,file.name.." ["..string.format('%02X',file.archive).."]",color,BOTTOM_SCREEN)
 			end
 			base_y = base_y + 15
 		end

@@ -6,7 +6,7 @@ master_index_p = 0
 p_p = 1
 update_frame = false
 ui_enabled = false
-not_started = true
+not_started_p = true
 my_photos = {}
 function AddDirPhoto(dir)
 	tmp = System.listDirectory(dir)
@@ -119,7 +119,7 @@ function AppMainCycle()
 			else
 				color = white
 			end
-			CropPrint(0,base_y,file[2],color,BOTTOM_SCREEN)
+			DebugCropPrint(0,base_y,file[2],color,BOTTOM_SCREEN)
 			base_y = base_y + 15
 		end
 	end
@@ -128,13 +128,13 @@ function AppMainCycle()
 	if Controls.check(pad,KEY_B) or Controls.check(pad,KEY_START) then
 		Screen.freeImage(current_photo)
 		CallMainMenu()
-	elseif (Controls.check(pad,KEY_DUP)) and not (Controls.check(oldpad,KEY_DUP)) and not_started then
+	elseif (Controls.check(pad,KEY_DUP)) and not (Controls.check(oldpad,KEY_DUP)) and not_started_p then
 		p_p = p_p - 1
 		if (p_p >= 16) then
 			master_index_p = p_p - 15
 		end
 		update_frame = true
-	elseif (Controls.check(pad,KEY_DDOWN)) and not (Controls.check(oldpad,KEY_DDOWN)) and not_started then
+	elseif (Controls.check(pad,KEY_DDOWN)) and not (Controls.check(oldpad,KEY_DDOWN)) and not_started_p then
 		p_p = p_p + 1
 		if (p_p >= 17) then
 			master_index_p = p_p - 15

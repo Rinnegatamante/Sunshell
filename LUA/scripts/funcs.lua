@@ -67,6 +67,26 @@ end
 -- * CropPrint
 -- Used to print long strings on BOTTOM_SCREEN, it automatically crop too long strings
 function CropPrint(x, y, text, color, screen)
+	if string.len(text) > 50 then
+		Font.print(ttf,x+2, y, string.sub(text,1,50) .. "...", color, screen)
+	else
+		Font.print(ttf,x+2, y, text, color, screen)
+	end
+end
+
+-- * TopCropPrint
+-- Used to print long strings on TOP_SCREEN, it automatically crop too long strings
+function TopCropPrint(x, y, text, color, screen)
+	if string.len(text) > 100 then
+		Font.print(ttf,x+2, y, string.sub(text,1,100) .. "...", color, screen)
+	else
+		Font.print(ttf,x+2, y, text, color, screen)
+	end
+end
+
+-- * DebugCropPrint
+-- Used to print long strings on BOTTOM_SCREEN, it automatically crop too long strings
+function DebugCropPrint(x, y, text, color, screen)
 	if string.len(text) > 25 then
 		Screen.debugPrint(x, y, string.sub(text,1,25) .. "...", color, screen)
 	else
@@ -74,9 +94,9 @@ function CropPrint(x, y, text, color, screen)
 	end
 end
 
--- * TopCropPrint
+-- * DebugTopCropPrint
 -- Used to print long strings on TOP_SCREEN, it automatically crop too long strings
-function TopCropPrint(x, y, text, color, screen)
+function DebugTopCropPrint(x, y, text, color, screen)
 	if string.len(text) > 42 then
 		Screen.debugPrint(x, y, string.sub(text,1,42) .. "...", color, screen)
 	else
@@ -100,8 +120,8 @@ end
 function ErrorGenerator(text)
 	y = 68
 	error_lines = {}
-	while string.len(text) > 30 do
-		endl = 31 + LastSpace(string.sub(text,1,30))
+	while string.len(text) > 50 do
+		endl = 51 + LastSpace(string.sub(text,1,50))
 		table.insert(error_lines,{string.sub(text,1,endl), y})
 		text = string.sub(text,endl+1,-1)
 		y = y + 15
@@ -121,12 +141,12 @@ function ShowError(text)
 		Screen.refresh()
 		Screen.fillEmptyRect(5,315,50,max_y,black,BOTTOM_SCREEN)
 		Screen.fillRect(6,314,51,max_y-1,white,BOTTOM_SCREEN)
-		Screen.debugPrint(8,53,"Error",selected,BOTTOM_SCREEN)
+		Font.print(ttf,8,53,"Error",selected,BOTTOM_SCREEN)
 		for i,line in pairs(error_lines) do
-			Screen.debugPrint(8,line[2],line[1],black,BOTTOM_SCREEN)
+			Font.print(ttf,8,line[2],line[1],black,BOTTOM_SCREEN)
 		end
 		Screen.fillEmptyRect(147,176,max_y - 23, max_y - 8,black,BOTTOM_SCREEN)
-		Screen.debugPrint(150,max_y - 20,"OK",black,BOTTOM_SCREEN)
+		Font.print(ttf,155,max_y - 23,"OK",black,BOTTOM_SCREEN)
 		if (Controls.check(Controls.read(),KEY_TOUCH)) then
 			x,y = Controls.readTouch()
 			if x >= 147 and x <= 176 and y >= max_y - 23 and y <= max_y - 8 then
@@ -148,12 +168,12 @@ function ShowWarning(text)
 		Screen.refresh()
 		Screen.fillEmptyRect(5,315,50,max_y,black,BOTTOM_SCREEN)
 		Screen.fillRect(6,314,51,max_y-1,white,BOTTOM_SCREEN)
-		Screen.debugPrint(8,53,"Warning",selected,BOTTOM_SCREEN)
+		Font.print(ttf,8,53,"Warning",selected,BOTTOM_SCREEN)
 		for i,line in pairs(error_lines) do
-			Screen.debugPrint(8,line[2],line[1],black,BOTTOM_SCREEN)
+			Font.print(ttf,8,line[2],line[1],black,BOTTOM_SCREEN)
 		end
 		Screen.fillEmptyRect(147,176,max_y - 23, max_y - 8,black,BOTTOM_SCREEN)
-		Screen.debugPrint(150,max_y - 20,"OK",black,BOTTOM_SCREEN)
+		Font.print(ttf,155,max_y - 23,"OK",black,BOTTOM_SCREEN)
 		if (Controls.check(Controls.read(),KEY_TOUCH)) then
 			x,y = Controls.readTouch()
 			if x >= 147 and x <= 176 and y >= max_y - 23 and y <= max_y - 8 then
@@ -169,6 +189,22 @@ end
 -- Similar to CropPrint but for TOP_SCREEN, you can see Applications src to know how to use it
 function LinesGenerator(text,y)
 	error_lines = {}
+	while string.len(text) > 80 do
+		endl = 81 + LastSpace(string.sub(text,1,80))
+		table.insert(error_lines,{string.sub(text,1,endl), y})
+		text = string.sub(text,endl+1,-1)
+		y = y + 15
+	end
+	if string.len(text) > 0 then
+		table.insert(error_lines,{text, y})
+	end
+	return error_lines
+end
+
+-- * DebugLinesGenerator
+-- Similar to CropPrint but for TOP_SCREEN, you can see Mail src to know how to use it
+function DebugLinesGenerator(text,y)
+	error_lines = {}
 	while string.len(text) > 40 do
 		endl = 41 + LastSpace(string.sub(text,1,40))
 		table.insert(error_lines,{string.sub(text,1,endl), y})
@@ -179,4 +215,22 @@ function LinesGenerator(text,y)
 		table.insert(error_lines,{text, y})
 	end
 	return error_lines
+end
+
+-- * AddIconTopbar
+-- Add an Icon to Topbar
+function AddIconTopbar(filename,id)
+	table.insert(topbar_icons, {Screen.loadImage(filename),id})
+end
+
+-- * FreeIconTopbar
+-- Delete an Icon from Topbar
+function FreeIconTopbar(my_app)
+	for i, icon in pairs(topbar_icons) do
+		if icon[2] == my_app then
+			Screen.freeImage(icon[1])
+			table.remove(topbar_icons,i)
+			break
+		end
+	end
 end
