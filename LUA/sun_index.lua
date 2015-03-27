@@ -25,9 +25,12 @@ b2 = Screen.loadImage(main_dir.."/images/2.jpg")
 b3 = Screen.loadImage(main_dir.."/images/3.jpg")
 b4 = Screen.loadImage(main_dir.."/images/4.jpg")
 b5 = Screen.loadImage(main_dir.."/images/5.jpg")
+ttf = Font.load(main_dir.."/fonts/main.ttf")
+Font.setPixelSizes(ttf,18)
 
 -- Setting some system vars, funcs, etc...
 bg_apps = {}
+topbar_icons = {}
 old_headset = Controls.headsetStatus()
 in_game = false
 Sound.init()
@@ -108,7 +111,6 @@ table.insert(tools,{mail,"/modules/mail.lua","Mail"})
 -- Main cycle
 while true do
 	Screen.refresh()
-	Controls.init()
 	pad = Controls.read()
 	
 	-- Headset tracking for Music module auto-start
@@ -153,41 +155,27 @@ while true do
 	-- Main menu
 	if mode == nil then
 		if widget == nil then
-		
-			-- Blit clock
-			hours,minutes,seconds = System.getTime()
-			if minutes < 10 then
-				minutes = "0"..minutes
-			end
-			if seconds < 10 then
-				seconds = "0"..seconds
-			end
-			formatted_time = hours..":"..minutes..":"..seconds
-			Screen.fillEmptyRect(255,395,85,125,black,TOP_SCREEN)
-			Screen.fillRect(256,394,86,124,white,TOP_SCREEN)
-			Screen.debugPrint(259,89,"Digital Clock",selected,TOP_SCREEN)
-			Screen.debugPrint(259,109,formatted_time,black,TOP_SCREEN)
 			
 			-- Blit calendar
 			dv,d,m,ye = System.getDate()
 			i = 1
-			x = 10
+			x = 80
 			y = 85
-			Screen.fillEmptyRect(x-5,x+240,y-45,y+115,black,TOP_SCREEN)
-			Screen.fillRect(x-4,x+239,y-44,y+114,white,TOP_SCREEN)
-			Screen.debugPrint(x+50,y-40,months[m].." "..ye,black,TOP_SCREEN)
-			Screen.debugPrint(x,y-20,"S",selected,TOP_SCREEN)
-			Screen.debugPrint(x+35,y-20,"M",selected,TOP_SCREEN)
-			Screen.debugPrint(x+70,y-20,"T",selected,TOP_SCREEN)
-			Screen.debugPrint(x+105,y-20,"W",selected,TOP_SCREEN)
-			Screen.debugPrint(x+140,y-20,"T",selected,TOP_SCREEN)
-			Screen.debugPrint(x+175,y-20,"F",selected,TOP_SCREEN)
-			Screen.debugPrint(x+210,y-20,"S",selected,TOP_SCREEN)
+			Screen.fillEmptyRect(x-10,x+240,y-45,y+115,black,TOP_SCREEN)
+			Screen.fillRect(x-9,x+239,y-44,y+114,white,TOP_SCREEN)
+			Font.print(ttf,x+85,y-40,months[m].." "..ye,black,TOP_SCREEN)
+			Font.print(ttf,x,y-20,"S",selected,TOP_SCREEN)
+			Font.print(ttf,x+35,y-20,"M",selected,TOP_SCREEN)
+			Font.print(ttf,x+70,y-20,"T",selected,TOP_SCREEN)
+			Font.print(ttf,x+105,y-20,"W",selected,TOP_SCREEN)
+			Font.print(ttf,x+140,y-20,"T",selected,TOP_SCREEN)
+			Font.print(ttf,x+175,y-20,"F",selected,TOP_SCREEN)
+			Font.print(ttf,x+210,y-20,"S",selected,TOP_SCREEN)
 			while i <= month_days[m] do
 				if i == d then
-					Screen.debugPrint(x + (days_table[i]) * 35,y,i,selected,TOP_SCREEN)
+					Font.print(ttf,x + (days_table[i]) * 35,y,i,selected,TOP_SCREEN)
 				else
-					Screen.debugPrint(x + (days_table[i]) * 35,y,i,black,TOP_SCREEN)
+					Font.print(ttf,x + (days_table[i]) * 35,y,i,black,TOP_SCREEN)
 				end
 				if days_table[i] == 6 then
 					y = y + 20
@@ -264,7 +252,24 @@ while true do
 	
 	-- Blit topbar info
 	if ui_enabled then
-		Screen.debugPrint(2,6,"Sunshell v."..version.." - "..module,white,TOP_SCREEN)
+	
+		-- Blit clock
+		hours,minutes,seconds = System.getTime()
+		if minutes < 10 then
+			minutes = "0"..minutes
+		end
+		if seconds < 10 then
+			seconds = "0"..seconds
+		end
+		formatted_time = hours..":"..minutes..":"..seconds
+		Font.print(ttf,276-#topbar_icons*21,3,formatted_time,white,TOP_SCREEN)
+			
+		-- Blit topbar icons
+		for i,icon in pairs(topbar_icons) do
+			Screen.drawImage(350-i*21,2,icon[1],TOP_SCREEN)
+		end
+		
+		Font.print(ttf,4,3,"Sunshell v."..version.." - "..module,white,TOP_SCREEN)
 		if  System.isBatteryCharging() then
 			Screen.drawImage(350,2,charge,TOP_SCREEN)
 		else
@@ -284,9 +289,9 @@ while true do
 			end
 		end
 		if Network.isWifiEnabled() then
-			Screen.fillRect(340,345,2,18,green_wifi,TOP_SCREEN)
-			Screen.fillRect(333,338,8,18,green_wifi,TOP_SCREEN)
-			Screen.fillRect(326,331,14,18,green_wifi,TOP_SCREEN)
+			Screen.fillRect(340-#topbar_icons*21,345-#topbar_icons*21,2,18,green_wifi,TOP_SCREEN)
+			Screen.fillRect(333-#topbar_icons*21,338-#topbar_icons*21,8,18,green_wifi,TOP_SCREEN)
+			Screen.fillRect(326-#topbar_icons*21,331-#topbar_icons*21,14,18,green_wifi,TOP_SCREEN)
 		else
 		end
 	end
@@ -296,6 +301,9 @@ while true do
 		GarbageCollection()
 		for i,bg_apps_code in pairs(bg_apps) do
 			bg_apps_code[2]()
+		end
+		for i,icon in pairs(topbar_icons) do
+			Screen.freeImage(icon[1])
 		end
 		Sound.term()
 		if start_dir == "/" and build == "3DSX" then -- boot.3dsx patch
