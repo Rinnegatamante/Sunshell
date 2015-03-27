@@ -9,6 +9,22 @@ if build == "3DS" or build == "3DSX" then
 	CallMainMenu()
 else
 	cia_table = System.listCIA()
+	
+	-- Game titles parsing
+	dofile(main_dir.."/scripts/title_list.lua")
+	assigned = 0
+	for i,title in pairs(title_list) do
+		if assigned >= (#cia_table - 1) then
+			break
+		end
+		for z,app in pairs(cia_table) do
+			if app.unique_id == title[3] then
+				app["title_name"] = title[1]
+				assigned = assigned + 1
+			end
+		end
+	end
+	
 	not_extracted = true
 	function TableConcat(t1,t2)
 		for i=1,#t2 do
@@ -161,7 +177,11 @@ function AppMainCycle()
 				else
 					color = black
 				end
-				CropPrint(0,base_y,file.product_id,color,BOTTOM_SCREEN)
+				if file.title_name == nil then
+					CropPrint(0,base_y,file.product_id,color,BOTTOM_SCREEN)
+				else
+					CropPrint(0,base_y,file.title_name,color,BOTTOM_SCREEN)
+				end
 				base_y = base_y + 15
 			end
 		end
