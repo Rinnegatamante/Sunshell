@@ -631,7 +631,7 @@ function AppMainCycle()
 				else
 					color = menu_color
 				end
-				CropPrint(0,base_y,file.name,color,BOTTOM_SCREEN)
+				DebugCropPrint(0,base_y,file.name,color,BOTTOM_SCREEN)
 				base_y = base_y + 15
 			end
 		end
