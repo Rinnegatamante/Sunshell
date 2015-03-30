@@ -2,7 +2,7 @@ title_list = {
 			 -- System stuffs
 			 {"TWL_FIRM","CTR-P-CTAP",0x00000102},
 			 {"NATIVE_FIRM","CTR-P-CTAP",0x00000002},
-			 {"SAFE_MOE_FIRM","CTR-P-CTAP",0x00000003},
+			 {"SAFE_MODE_FIRM","CTR-P-CTAP",0x00000003},
 			 {"AGB_FIRM","CTR-P-CTAP",0x00000202},
 			 {"Dummy File","N/A",0x00010802},
 			 {"ClCertA","N/A",0x00010002},
