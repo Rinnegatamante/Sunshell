@@ -210,9 +210,9 @@ function AppMainCycle()
 	Font.print(ttf,9,185,"Chronometer: "..Cronometer(crono_time),black,TOP_SCREEN)
 	if alarm_start ~= nil then
 		if my_alarm_time[1] == nil then
-			Font.print(ttf,9,200,"Countdown set for: "..my_alarm_time[3].." seconds.",black,TOP_SCREEN)
+			Font.print(ttf,9,198,"Countdown set for: "..my_alarm_time[3].." seconds.",black,TOP_SCREEN)
 		else	
-			Font.print(ttf,9,200,"Alarm set for: "..my_alarm_time[1]..":"..my_alarm_time[2]..":"..my_alarm_time[3],black,TOP_SCREEN)
+			Font.print(ttf,9,198,"Alarm set for: "..my_alarm_time[1]..":"..my_alarm_time[2]..":"..my_alarm_time[3],black,TOP_SCREEN)
 		end
 	end
 	
