@@ -189,8 +189,8 @@ end
 -- Similar to CropPrint but for TOP_SCREEN, you can see Applications src to know how to use it
 function LinesGenerator(text,y)
 	error_lines = {}
-	while string.len(text) > 80 do
-		endl = 81 + LastSpace(string.sub(text,1,80))
+	while string.len(text) > 60 do
+		endl = 61 + LastSpace(string.sub(text,1,60))
 		table.insert(error_lines,{string.sub(text,1,endl), y})
 		text = string.sub(text,endl+1,-1)
 		y = y + 15
