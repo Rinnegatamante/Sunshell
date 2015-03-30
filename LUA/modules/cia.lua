@@ -120,15 +120,8 @@ function AppMainCycle()
 			end
 			if (l >= master_index_cia) then
 				if (l==p_cia) then
-					base_y2 = base_y
-					if (base_y) == 0 then
-						base_y = 2
-					end
-					Screen.fillRect(0,319,base_y-2,base_y2+12,selected_item,BOTTOM_SCREEN)
+					Screen.fillRect(0,319,base_y,base_y+15,selected_item,BOTTOM_SCREEN)
 					color = selected
-					if (base_y) == 2 then
-						base_y = 0
-					end
 				else
 					color = black
 				end
@@ -166,14 +159,8 @@ function AppMainCycle()
 			if (l >= master_index_cia) then
 				if (l==p_cia) then
 					base_y2 = base_y
-					if (base_y) == 0 then
-						base_y = 2
-					end
-					Screen.fillRect(0,319,base_y-2,base_y2+12,selected_item,BOTTOM_SCREEN)
+					Screen.fillRect(0,319,base_y,base_y+15,selected_item,BOTTOM_SCREEN)
 					color = selected
-					if (base_y) == 2 then
-						base_y = 0
-					end
 				else
 					color = black
 				end
