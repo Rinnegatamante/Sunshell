@@ -2,7 +2,7 @@
 
 -- Module background code
 function BackgroundMusic()
-	Sound.updateStream(current_song)
+	Sound.updateStream()
 	
 	-- Cycle mode
 	if cycle_index > 1 then
