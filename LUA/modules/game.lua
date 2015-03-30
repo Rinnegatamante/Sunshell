@@ -180,10 +180,13 @@ function AppMainCycle()
 				System.exit = ExtCallMainMenu
 				dofile(main_dir.."/apps/"..my_apps[p_g][2].."/index.lua")
 			else
+				Font.unload(ttf)
 				GarbageCollection()
 				System.launch3DSX("/3ds/"..my_apps[p_g][2].."/"..my_apps[p_g][2]..".3dsx")
 			end
 		else
+			Font.unload(ttf)
+			GarbageCollection()
 			if my_apps[p_g][2] == nil then
 				ShowWarning("You will be redirected to sysNand and your gamecard will be launched.")
 				System.launchGamecard()
