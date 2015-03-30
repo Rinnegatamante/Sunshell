@@ -306,6 +306,7 @@ while true do
 			Screen.freeImage(icon[1])
 		end
 		Sound.term()
+		Font.unload(ttf)
 		if start_dir == "/" and build == "3DSX" then -- boot.3dsx patch
 			System.reboot()
 		else
