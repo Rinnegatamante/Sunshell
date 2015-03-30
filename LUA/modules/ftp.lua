@@ -49,14 +49,12 @@ function AppMainCycle()
 	-- Sets controls triggering
 	if Controls.check(pad,KEY_A) and not Controls.check(oldpad,KEY_A) then
 		CloseBGApp("FTP Server")
-		FreeIconTopbar("FTP")
 		dofile(main_dir.."/modules/ftp.lua")
 	elseif Controls.check(pad,KEY_SELECT) and not Controls.check(oldpad,KEY_SELECT) then
 		AddIconTopbar(main_dir.."/images/ftp_icon.jpg","FTP")
 		CallMainMenu()
 	elseif Controls.check(pad,KEY_B) or Controls.check(pad,KEY_START) then
 		CloseBGApp("FTP Server")
-		FreeIconTopbar("FTP")
 		CallMainMenu()
 	end
 end
