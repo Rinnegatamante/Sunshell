@@ -6,9 +6,10 @@ master_index_v = 0
 p_v = 1
 update_frame = false
 ui_enabled = false
-not_started = true
+not_started_v = true
 tmp = System.listDirectory("/VIDEO")
 my_videos = {}
+hide = false
 for i,file in pairs(tmp) do
 	if not file.directory then
 		tmp_file = io.open("/VIDEO/"..file.name,FREAD)
@@ -30,19 +31,20 @@ if #my_videos > 0 then
 		current_file = JPGV.load("/VIDEO/"..my_videos[1][1])
 		current_size =  JPGV.getSize(current_file)
 	end
-	frame_succession = Timer.new()
-	current_frame = 60
 else
 	ShowError("VIDEO folder is empty.")
 	CallMainMenu()
 end
+
+frame_succession = Timer.new()
+current_frame = 60
 
 -- Module main cycle
 function AppMainCycle()
 
 	-- Clear bottom screen
 	Screen.clear(BOTTOM_SCREEN)
-	if not_started then
+	if not_started_v then
 		
 		-- Update preview info
 		if update_frame then
@@ -94,81 +96,91 @@ function AppMainCycle()
 				else
 					color = white
 				end
-				CropPrint(0,base_y,file[1],color,BOTTOM_SCREEN)
+				DebugCropPrint(0,base_y,file[1],color,BOTTOM_SCREEN)
 				base_y = base_y + 15
 			end
 		end
 		
 	else
 		
-		-- Video playback (JPGV side)
+		-- Video playback
 		if current_type == "JPGV" then
 			JPGV.draw(0,0,current_file,TOP_SCREEN)
-			Screen.debugPrint(0,10,"A = Pause/Resume",white,BOTTOM_SCREEN)
-			Screen.debugPrint(0,25,"Y = Close video",white,BOTTOM_SCREEN)
-			Screen.debugPrint(0,40,"B = Return Main Menu",white,BOTTOM_SCREEN)
-			Screen.debugPrint(0,100,"Infos:",white,BOTTOM_SCREEN)
-			Screen.debugPrint(0,114,"FPS: "..JPGV.getFPS(current_file),white,BOTTOM_SCREEN)
-			cur_time_sec = math.ceil(JPGV.getFrame(current_file) / JPGV.getFPS(current_file))
-			cur_time_min = 0
-			while (cur_time_sec >= 60) do
-				cur_time_sec = cur_time_sec - 60
-				cur_time_min = cur_time_min + 1
-			end
-			if (cur_time_sec < 10) then
-				Screen.debugPrint(0,128,"Time: " .. cur_time_min .. ":0" .. cur_time_sec .. " / " .. tot_time_min .. ":" .. tot_time_sec,white,BOTTOM_SCREEN)
-			else
-				Screen.debugPrint(0,128,"Time: " .. cur_time_min .. ":" .. cur_time_sec .. " / " .. tot_time_min .. ":" .. tot_time_sec,white,BOTTOM_SCREEN)
-			end
-			Screen.debugPrint(0,142,"Samplerate: "..JPGV.getSrate(current_file),white,BOTTOM_SCREEN)
-			percentage = math.ceil((JPGV.getFrame(current_file) * 100) / JPGV.getSize(current_file))
-			Screen.debugPrint(0,200,"Percentage: " ..percentage .. "%",white,BOTTOM_SCREEN)
-			Screen.fillEmptyRect(2,318,214,234,white,BOTTOM_SCREEN)
-			move = ((314 * percentage) / 100)
-			Screen.fillRect(3,3 + math.ceil(move),215,233,white,BOTTOM_SCREEN)
-				
-		-- Video playback (BMPV side)
-		elseif current_type == "BMPV" then
+		else
 			BMPV.draw(0,0,current_file,TOP_SCREEN)
-			Screen.debugPrint(0,10,"A = Pause/Resume",white,BOTTOM_SCREEN)
-			Screen.debugPrint(0,25,"Y = Close video",white,BOTTOM_SCREEN)
-			Screen.debugPrint(0,40,"B = Return Main Menu",white,BOTTOM_SCREEN)
-			Screen.debugPrint(0,100,"Infos:",white,BOTTOM_SCREEN)
-			Screen.debugPrint(0,114,"FPS: "..BMPV.getFPS(current_file),white,BOTTOM_SCREEN)
-			cur_time_sec = math.ceil(BMPV.getFrame(current_file) / BMPV.getFPS(current_file))
-			cur_time_min = 0
-			while (cur_time_sec >= 60) do
-				cur_time_sec = cur_time_sec - 60
-				cur_time_min = cur_time_min + 1
-			end
-			if (cur_time_sec < 10) then
-				Screen.debugPrint(0,128,"Time: " .. cur_time_min .. ":0" .. cur_time_sec .. " / " .. tot_time_min .. ":" .. tot_time_sec,white,BOTTOM_SCREEN)
-			else
-				Screen.debugPrint(0,128,"Time: " .. cur_time_min .. ":" .. cur_time_sec .. " / " .. tot_time_min .. ":" .. tot_time_sec,white,BOTTOM_SCREEN)
-			end
-			Screen.debugPrint(0,142,"Samplerate: "..BMPV.getSrate(current_file),white,BOTTOM_SCREEN)
-			percentage = math.ceil((BMPV.getFrame(current_file) * 100) / BMPV.getSize(current_file))
-			Screen.debugPrint(0,200,"Percentage: " ..percentage .. "%",white,BOTTOM_SCREEN)
-			Screen.fillEmptyRect(2,318,214,234,white,BOTTOM_SCREEN)
-			move = ((314 * percentage) / 100)
-			Screen.fillRect(3,3 + math.ceil(move),215,233,white,BOTTOM_SCREEN)
 		end
-			
+		
+		if not hide then
+			-- Video playback info (JPGV side)
+			if current_type == "JPGV" then
+				Screen.debugPrint(0,10,"A = Pause/Resume",white,BOTTOM_SCREEN)
+				Screen.debugPrint(0,25,"Y = Close video",white,BOTTOM_SCREEN)
+				Screen.debugPrint(0,40,"B = Return Main Menu",white,BOTTOM_SCREEN)
+				Screen.debugPrint(0,55,"X = Hide Bottom Screen",white,BOTTOM_SCREEN)
+				Screen.debugPrint(0,100,"Infos:",white,BOTTOM_SCREEN)
+				Screen.debugPrint(0,114,"FPS: "..JPGV.getFPS(current_file),white,BOTTOM_SCREEN)
+				cur_time_sec = math.ceil(JPGV.getFrame(current_file) / JPGV.getFPS(current_file))
+				cur_time_min = 0
+				while (cur_time_sec >= 60) do
+					cur_time_sec = cur_time_sec - 60
+					cur_time_min = cur_time_min + 1
+				end
+				if (cur_time_sec < 10) then
+					Screen.debugPrint(0,128,"Time: " .. cur_time_min .. ":0" .. cur_time_sec .. " / " .. tot_time_min .. ":" .. tot_time_sec,white,BOTTOM_SCREEN)
+				else
+					Screen.debugPrint(0,128,"Time: " .. cur_time_min .. ":" .. cur_time_sec .. " / " .. tot_time_min .. ":" .. tot_time_sec,white,BOTTOM_SCREEN)
+				end
+				Screen.debugPrint(0,142,"Samplerate: "..JPGV.getSrate(current_file),white,BOTTOM_SCREEN)
+				percentage = math.ceil((JPGV.getFrame(current_file) * 100) / JPGV.getSize(current_file))
+				Screen.debugPrint(0,200,"Percentage: " ..percentage .. "%",white,BOTTOM_SCREEN)
+				Screen.fillEmptyRect(2,318,214,234,white,BOTTOM_SCREEN)
+				move = ((314 * percentage) / 100)
+				Screen.fillRect(3,3 + math.ceil(move),215,233,white,BOTTOM_SCREEN)
+				
+			-- Video playback info (BMPV side)
+			elseif current_type == "BMPV" then
+				Screen.debugPrint(0,10,"A = Pause/Resume",white,BOTTOM_SCREEN)
+				Screen.debugPrint(0,25,"Y = Close video",white,BOTTOM_SCREEN)
+				Screen.debugPrint(0,40,"B = Return Main Menu",white,BOTTOM_SCREEN)
+				Screen.debugPrint(0,55,"X = Hide Bottom Screen",white,BOTTOM_SCREEN)
+				Screen.debugPrint(0,100,"Infos:",white,BOTTOM_SCREEN)
+				Screen.debugPrint(0,114,"FPS: "..BMPV.getFPS(current_file),white,BOTTOM_SCREEN)
+				cur_time_sec = math.ceil(BMPV.getFrame(current_file) / BMPV.getFPS(current_file))
+				cur_time_min = 0
+				while (cur_time_sec >= 60) do
+					cur_time_sec = cur_time_sec - 60
+					cur_time_min = cur_time_min + 1
+				end
+				if (cur_time_sec < 10) then
+					Screen.debugPrint(0,128,"Time: " .. cur_time_min .. ":0" .. cur_time_sec .. " / " .. tot_time_min .. ":" .. tot_time_sec,white,BOTTOM_SCREEN)
+				else
+					Screen.debugPrint(0,128,"Time: " .. cur_time_min .. ":" .. cur_time_sec .. " / " .. tot_time_min .. ":" .. tot_time_sec,white,BOTTOM_SCREEN)
+				end
+				Screen.debugPrint(0,142,"Samplerate: "..BMPV.getSrate(current_file),white,BOTTOM_SCREEN)
+				percentage = math.ceil((BMPV.getFrame(current_file) * 100) / BMPV.getSize(current_file))
+				Screen.debugPrint(0,200,"Percentage: " ..percentage .. "%",white,BOTTOM_SCREEN)
+				Screen.fillEmptyRect(2,318,214,234,white,BOTTOM_SCREEN)
+				move = ((314 * percentage) / 100)
+				Screen.fillRect(3,3 + math.ceil(move),215,233,white,BOTTOM_SCREEN)
+			end
+		end
 			
 	end
 	
 	-- Sets controls triggering
-	if (Controls.check(pad,KEY_Y)) and not (Controls.check(oldpad,KEY_Y)) and not (not_started) then
+	if (Controls.check(pad,KEY_Y)) and not (Controls.check(oldpad,KEY_Y)) and not (not_started_v) then
 		Timer.reset(frame_succession)
-		not_started = true
+		not_started_v = true
 		if current_type == "JPGV" then
 			JPGV.stop(current_file)
 		else
 			BMPV.stop(current_file)
 		end
+	elseif (Controls.check(pad,KEY_X)) and not (Controls.check(oldpad,KEY_X)) and not (not_started_v) then
+		hide = not hide
 	elseif (Controls.check(pad,KEY_A)) and not (Controls.check(oldpad,KEY_A)) then
-		if not_started then
-			not_started = false
+		if not_started_v then
+			not_started_v = false
 			if current_type == "JPGV" then
 				JPGV.start(current_file,NO_LOOP,0x08,0x09)
 				tot_time_sec = math.ceil(JPGV.getSize(current_file) / JPGV.getFPS(current_file))
@@ -211,13 +223,23 @@ function AppMainCycle()
 			BMPV.stop(current_file)
 			BMPV.unload(current_file)
 		end
-	elseif (Controls.check(pad,KEY_DUP)) and not (Controls.check(oldpad,KEY_DUP)) and not_started then
+	elseif (Controls.check(pad,KEY_DUP)) and not (Controls.check(oldpad,KEY_DUP)) and not_started_v then
+		if current_type == "JPGV" then
+			JPGV.unload(current_file)
+		elseif current_type == "BMPV" then
+			BMPV.unload(current_file)
+		end
 		p_v = p_v - 1
 		if (p_v >= 16) then
 			master_index_v = p_v - 15
 		end
 		update_frame = true
-	elseif (Controls.check(pad,KEY_DDOWN)) and not (Controls.check(oldpad,KEY_DDOWN)) and not_started then
+	elseif (Controls.check(pad,KEY_DDOWN)) and not (Controls.check(oldpad,KEY_DDOWN)) and not_started_v then
+		if current_type == "JPGV" then
+			JPGV.unload(current_file)
+		elseif current_type == "BMPV" then
+			BMPV.unload(current_file)
+		end
 		p_v = p_v + 1
 		if (p_v >= 17) then
 			master_index_v = p_v - 15
