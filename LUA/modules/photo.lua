@@ -5,6 +5,7 @@ mode = "Photo"
 master_index_p = 0
 p_p = 1
 update_frame = false
+update_bottom_screen = true
 ui_enabled = false
 not_started_p = true
 my_photos = {}
@@ -41,11 +42,38 @@ else
 	CallMainMenu()
 end
 
+function UpdateBottomScreen()
+
+	-- Clear bottom screen
+		Screen.clear(BOTTOM_SCREEN)
+
+	-- Showing files list
+	base_y = 0
+	for l, file in pairs(my_photos) do
+		if (base_y > 226) then
+			break
+		end
+		if (l >= master_index_p) then
+			if (l==p_p) then
+				Screen.fillRect(0,319,base_y,base_y+15,selected_item,BOTTOM_SCREEN)
+				color = selected
+			else
+				color = white
+			end
+			CropPrint(0,base_y,file[2],color,BOTTOM_SCREEN)
+			base_y = base_y + 15
+		end
+	end
+		
+end
+
 -- Module main cycle
 function AppMainCycle()
 
-	-- Clear bottom screen
-	Screen.clear(BOTTOM_SCREEN)
+	if update_bottom_screen then
+		OneshotPrint(UpdateBottomScreen)
+		update_bottom_screen = false
+	end
 	
 	-- Update current image
 	if update_frame then
@@ -98,31 +126,6 @@ function AppMainCycle()
 	else
 		Screen.drawImage(0,0,curent_photo,TOP_SCREEN)
 	end
-			
-	-- Showing files list
-	base_y = 0
-	for l, file in pairs(my_photos) do
-		if (base_y > 226) then
-			break
-		end
-		if (l >= master_index_p) then
-			if (l==p_p) then
-				base_y2 = base_y
-				if (base_y) == 0 then
-					base_y = 2
-				end
-				Screen.fillRect(0,319,base_y-2,base_y2+12,selected_item,BOTTOM_SCREEN)
-				color = selected
-				if (base_y) == 2 then
-					base_y = 0
-				end
-			else
-				color = white
-			end
-			DebugCropPrint(0,base_y,file[2],color,BOTTOM_SCREEN)
-			base_y = base_y + 15
-		end
-	end
 	
 	-- Sets controls triggering
 	if Controls.check(pad,KEY_B) or Controls.check(pad,KEY_START) then
@@ -134,12 +137,14 @@ function AppMainCycle()
 			master_index_p = p_p - 15
 		end
 		update_frame = true
+		update_bottom_screen = true
 	elseif (Controls.check(pad,KEY_DDOWN)) and not (Controls.check(oldpad,KEY_DDOWN)) and not_started_p then
 		p_p = p_p + 1
 		if (p_p >= 17) then
 			master_index_p = p_p - 15
 		end
 		update_frame = true
+		update_bottom_screen = true
 	end
 	if (p_p < 1) then
 		p_p = #my_photos

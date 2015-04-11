@@ -3,6 +3,7 @@ mode = "FB"
 
 -- Internal module settings
 update_bottom_screen = true
+update_top_screen = true
 ui_enabled = false
 red = Color.new(255,0,0)
 green = Color.new(0,255,0)
@@ -10,6 +11,22 @@ menu_color = Color.new(255,255,255)
 selected_color = Color.new(0,255,0)
 selected_item = Color.new(0,0,200,50)
 copy_or_move = false
+function PrintControls()
+	Screen.clear(TOP_SCREEN)
+	Font.print(ttf,0,0,"Basic Controls:",white,TOP_SCREEN)
+	Font.print(ttf,0,15,"A = Open file/folder",white,TOP_SCREEN)
+	Font.print(ttf,0,30,"SELECT = Open file with...",white,TOP_SCREEN)
+	Font.print(ttf,0,45,"R = Create new folder",white,TOP_SCREEN)
+	Font.print(ttf,0,60,"X = File operations",white,TOP_SCREEN)
+	Font.print(ttf,0,75,"B = Return Main Menu",white,TOP_SCREEN)
+	Font.print(ttf,0,90,"---------------------------------",white,TOP_SCREEN)
+	Font.print(ttf,0,105,"Opened file Controls:",white,TOP_SCREEN)
+	Font.print(ttf,0,120,"X = Cancel file copy/move",white,TOP_SCREEN)
+	Font.print(ttf,0,135,"Y = Confirm file copy/move",white,TOP_SCREEN)
+	Font.print(ttf,0,150,"Left/Right = Pause/Resume",white,TOP_SCREEN)
+	Font.print(ttf,0,165,"Left/Right = Extract icon (SMDH)",white,TOP_SCREEN)
+	Font.print(ttf,0,180,"Left/Right = Scroll file",white,TOP_SCREEN)
+end
 function TableConcat(t1,t2)
     for i=1,#t2 do
         t1[#t1+1] = t2[i]
@@ -109,6 +126,7 @@ function CopyDir(input,output)
 	end
 end
 function ForceOpenFile(text, size, mode)
+	update_top_screen = true
 	if mode == "SMDH" then
 		FBGC()
 		current_type = "SMDH"
@@ -236,16 +254,16 @@ function ForceOpenFile(text, size, mode)
 			Screen.refresh()
 			Screen.waitVblankStart()
 			Screen.clear(TOP_SCREEN)
-			Screen.debugPrint(0,0,"Title: "..cia_data.title,white,TOP_SCREEN)
-			Screen.debugPrint(0,15,"Unique ID: 0x"..string.sub(string.format('%02X',cia_data.unique_id),1,-3),white,TOP_SCREEN)
+			Font.print(ttf,0,0,"Title: "..cia_data.title,white,TOP_SCREEN)
+			Font.print(ttf,0,15,"Unique ID: 0x"..string.sub(string.format('%02X',cia_data.unique_id),1,-3),white,TOP_SCREEN)
 			Controls.init()
 			pad = Controls.read()
 			Screen.fillEmptyRect(60,260,50,82,black,BOTTOM_SCREEN)
 			Screen.fillRect(61,259,51,81,white,BOTTOM_SCREEN)
 			if (sm_index == 1) then
 				Screen.fillRect(61,259,51,66,green,BOTTOM_SCREEN)
-				Screen.debugPrint(63,53,"Confirm",red,BOTTOM_SCREEN)
-				Screen.debugPrint(63,68,"Cancel",black,BOTTOM_SCREEN)
+				Font.print(ttf,63,53,"Confirm",red,BOTTOM_SCREEN)
+				Font.print(ttf,63,68,"Cancel",black,BOTTOM_SCREEN)
 				if (Controls.check(pad,KEY_DDOWN)) and not (Controls.check(oldpad,KEY_DDOWN)) then
 					sm_index = 2
 				elseif (Controls.check(pad,KEY_A)) and not (Controls.check(oldpad,KEY_A)) then
@@ -254,8 +272,8 @@ function ForceOpenFile(text, size, mode)
 				end
 			else
 				Screen.fillRect(61,259,66,81,green,BOTTOM_SCREEN)
-				Screen.debugPrint(63,53,"Confirm",black,BOTTOM_SCREEN)
-				Screen.debugPrint(63,68,"Cancel",red,BOTTOM_SCREEN)
+				Font.print(ttf,63,53,"Confirm",black,BOTTOM_SCREEN)
+				Font.print(ttf,63,68,"Cancel",red,BOTTOM_SCREEN)
 				if (Controls.check(pad,KEY_DUP)) and not (Controls.check(oldpad,KEY_DUP)) then
 					sm_index = 1
 				elseif (Controls.check(pad,KEY_A)) and not (Controls.check(oldpad,KEY_A)) then
@@ -279,6 +297,7 @@ function DeleteDir(dir)
 	System.deleteDirectory(dir)
 end
 function OpenFile(text, size)
+	update_top_screen = true
 	if string.upper(string.sub(text,-5)) == ".SMDH" then
 		FBGC()
 		current_type = "SMDH"
@@ -371,16 +390,16 @@ function OpenFile(text, size)
 			Screen.refresh()
 			Screen.waitVblankStart()
 			Screen.clear(TOP_SCREEN)
-			Screen.debugPrint(0,0,"Title: "..cia_data.title,white,TOP_SCREEN)
-			Screen.debugPrint(0,15,"Unique ID: 0x"..string.sub(string.format('%02X',cia_data.unique_id),1,-3),white,TOP_SCREEN)
+			Font.print(ttf,0,0,"Title: "..cia_data.title,white,TOP_SCREEN)
+			Font.print(ttf,0,15,"Unique ID: 0x"..string.sub(string.format('%02X',cia_data.unique_id),1,-3),white,TOP_SCREEN)
 			Controls.init()
 			pad = Controls.read()
 			Screen.fillEmptyRect(60,260,50,82,black,BOTTOM_SCREEN)
 			Screen.fillRect(61,259,51,81,white,BOTTOM_SCREEN)
 			if (sm_index == 1) then
 				Screen.fillRect(61,259,51,66,green,BOTTOM_SCREEN)
-				Screen.debugPrint(63,53,"Confirm",red,BOTTOM_SCREEN)
-				Screen.debugPrint(63,68,"Cancel",black,BOTTOM_SCREEN)
+				Font.print(ttf,63,53,"Confirm",red,BOTTOM_SCREEN)
+				Font.print(ttf,63,68,"Cancel",black,BOTTOM_SCREEN)
 				if (Controls.check(pad,KEY_DDOWN)) and not (Controls.check(oldpad,KEY_DDOWN)) then
 					sm_index = 2
 				elseif (Controls.check(pad,KEY_A)) and not (Controls.check(oldpad,KEY_A)) then
@@ -389,8 +408,8 @@ function OpenFile(text, size)
 				end
 			else
 				Screen.fillRect(61,259,66,81,green,BOTTOM_SCREEN)
-				Screen.debugPrint(63,53,"Confirm",black,BOTTOM_SCREEN)
-				Screen.debugPrint(63,68,"Cancel",red,BOTTOM_SCREEN)
+				Font.print(ttf,63,53,"Confirm",black,BOTTOM_SCREEN)
+				Font.print(ttf,63,68,"Cancel",red,BOTTOM_SCREEN)
 				if (Controls.check(pad,KEY_DUP)) and not (Controls.check(oldpad,KEY_DUP)) then
 					sm_index = 1
 				elseif (Controls.check(pad,KEY_A)) and not (Controls.check(oldpad,KEY_A)) then
@@ -463,9 +482,9 @@ function FBGC()
 end
 function ThemePrint(x, y, text, color, screen)
 	if string.len(text) > 40 then
-		Screen.debugPrint(x, y, string.sub(text,1,40) .. "...", color, screen)
+		Font.print(ttf,x, y, string.sub(text,1,40) .. "...", color, screen)
 	else
-		Screen.debugPrint(x, y, text, color, screen)
+		Font.print(ttf,x, y, text, color, screen)
 	end
 end
 function BuildLines(file, index)
@@ -523,93 +542,110 @@ function BuildHex(file, index)
 	end
 	return index
 end
-
+function PrintSMDHInfo()
+	Screen.clear(TOP_SCREEN)
+	Console.show(smdh_show)
+	Font.print(ttf,0,170,"Icon:",white,TOP_SCREEN)
+	Screen.drawImage(0,185,current_file.icon,TOP_SCREEN)
+end
+function PrintText()
+	Console.show(text_console)
+end
+function PrintHex()
+	Screen.clear(TOP_SCREEN)
+	for l, line in pairs(hex_text) do
+		Font.print(ttf,280,(l-1)*15,string.gsub(line,"\0"," "),white,TOP_SCREEN)
+		temp = 1
+		while (temp <= string.len(line)) do
+			if (temp % 2 == 0) then
+				Font.print(ttf,0+(temp-1)*30,(l-1)*15,string.format('%02X', hex_values[(l-1)*8+temp]),white,TOP_SCREEN)
+			else
+				Font.print(ttf,0+(temp-1)*30,(l-1)*15,string.format('%02X', hex_values[(l-1)*8+temp]),red,TOP_SCREEN)
+			end
+			temp = temp + 1
+		end
+	end
+	Font.print(ttf,0,225,"Offset: 0x" .. string.format('%X', old_indexes[#old_indexes]) .. " (" .. (old_indexes[#old_indexes]) .. ")",white,TOP_SCREEN)
+end
 -- Module main cycle
 function AppMainCycle()
 	base_y = 0
 	i = 1
-	Screen.clear(TOP_SCREEN)
-	if (current_type == "SMDH") then
-			Console.show(smdh_show)
-			Screen.debugPrint(0,170,"Icon:",white,TOP_SCREEN)
-			Screen.drawImage(0,185,current_file.icon,TOP_SCREEN)
-	elseif (current_type == "BMPV") then
-		BMPV.draw(0,0,current_file,TOP_SCREEN)
-	elseif (current_type == "JPGV") then
-		JPGV.draw(0,0,current_file,TOP_SCREEN)
-	elseif (current_type == "WAV") then
-		Sound.updateStream(current_file)
-		Screen.debugPrint(0,0,"Title: ",white,TOP_SCREEN)
-		ThemePrint(0,15,Sound.getTitle(current_file),white,TOP_SCREEN)
-		Screen.debugPrint(0,40,"Author: ",white,TOP_SCREEN)
-		ThemePrint(0,55,Sound.getAuthor(current_file),white,TOP_SCREEN)
-		Screen.debugPrint(0,80,"Time: "..FormatTime(Sound.getTime(current_file)).." / "..FormatTime(Sound.getTotalTime(current_file)),white,TOP_SCREEN)
-		Screen.debugPrint(0,95,"Samplerate: "..Sound.getSrate(current_file),white,TOP_SCREEN)
-		if Sound.getType(current_file) == 1 then
-			stype = "Mono"
-		else
-			stype = "Stereo"
-		end
-		Screen.debugPrint(0,110,"Audiotype: "..stype,white,TOP_SCREEN)
-	elseif (current_type == "IMG") then
-		if big_image then
-			Screen.drawPartialImage(0,0,x_print,y_print,width,height,current_file,TOP_SCREEN)
-			x,y = Controls.readCirclePad()
-			if (x < - 100) and (x_print > 0) then
-				x_print = x_print - 1
+	if update_top_screen then
+		Screen.clear(TOP_SCREEN)
+		if (current_type == "SMDH") then
+			OneshotPrint(PrintSMDHInfo)
+			update_top_screen = false
+		elseif (current_type == "BMPV") then
+			BMPV.draw(0,0,current_file,TOP_SCREEN)
+		elseif (current_type == "JPGV") then
+			JPGV.draw(0,0,current_file,TOP_SCREEN)
+		elseif (current_type == "WAV") then
+			Sound.updateStream()
+			Font.print(ttf,0,0,"Title: ",white,TOP_SCREEN)
+			ThemePrint(0,15,Sound.getTitle(current_file),white,TOP_SCREEN)
+			Font.print(ttf,0,40,"Author: ",white,TOP_SCREEN)
+			ThemePrint(0,55,Sound.getAuthor(current_file),white,TOP_SCREEN)
+			Font.print(ttf,0,80,"Time: "..FormatTime(Sound.getTime(current_file)).." / "..FormatTime(Sound.getTotalTime(current_file)),white,TOP_SCREEN)
+			Font.print(ttf,0,95,"Samplerate: "..Sound.getSrate(current_file),white,TOP_SCREEN)
+			if Sound.getType(current_file) == 1 then
+				stype = "Mono"
+			else
+				stype = "Stereo"
 			end
-			if (y > 100) and (y_print > 0) then
-				y_print = y_print - 1
-			end
-			if (x > 100) and (x_print + width < Screen.getImageWidth(current_file)) then
-				x_print = x_print + 1
-			end
-			if (y < - 100) and (y_print + height < Screen.getImageHeight(current_file)) then
-				y_print = y_print + 1
-			end
-		else
-			Screen.drawImage(0,0,current_file,TOP_SCREEN)
-		end
-	elseif (current_type == "INFO") then
-		Console.show(text_console)
-	elseif (current_type == "TXT") then
-		if (updateTXT) then
-			txt_index = BuildLines(current_file,txt_index)
-			updateTXT = false
-		end
-		Console.show(text_console)
-	elseif (current_type == "HEX") then
-		if (updateTXT) then
-			txt_index = BuildHex(current_file,txt_index)
-			updateTXT = false
-		end
-		for l, line in pairs(hex_text) do
-			Screen.debugPrint(280,(l-1)*15,string.gsub(line,"\0"," "),white,TOP_SCREEN)
-			temp = 1
-			while (temp <= string.len(line)) do
-				if (temp % 2 == 0) then
-					Screen.debugPrint(0+(temp-1)*30,(l-1)*15,string.format('%02X', hex_values[(l-1)*8+temp]),white,TOP_SCREEN)
-				else
-					Screen.debugPrint(0+(temp-1)*30,(l-1)*15,string.format('%02X', hex_values[(l-1)*8+temp]),red,TOP_SCREEN)
+			Font.print(ttf,0,110,"Audiotype: "..stype,white,TOP_SCREEN)
+		elseif (current_type == "IMG") then
+			if big_image then
+				Screen.drawPartialImage(0,0,x_print,y_print,width,height,current_file,TOP_SCREEN)
+				x,y = Controls.readCirclePad()
+				if (x < - 100) and (x_print > 0) then
+					x_print = x_print - 5
+					if x_print < 0 then
+						x_print = 0
+					end
 				end
-				temp = temp + 1
+				if (y > 100) and (y_print > 0) then
+					y_print = y_print - 5
+					if y_print < 0 then
+						y_print = 0
+					end
+				end
+				if (x > 100) and (x_print + width < Screen.getImageWidth(current_file)) then
+					x_print = x_print + 5
+				end
+				if (y < - 100) and (y_print + height < Screen.getImageHeight(current_file)) then
+					y_print = y_print + 5
+				end
+				if x_print + width > Screen.getImageWidth(current_file) then
+					x_print = Screen.getImageWidth(current_file) - width
+				end
+				if y_print + height > Screen.getImageHeight(current_file) then
+					y_print = Screen.getImageHeight(current_file) - height
+				end
+			else
+				Screen.drawImage(0,0,current_file,TOP_SCREEN)
 			end
+		elseif (current_type == "INFO") then
+			OneshotPrint(PrintText)
+			update_top_screen = false
+		elseif (current_type == "TXT") then
+			if (updateTXT) then
+				txt_index = BuildLines(current_file,txt_index)
+				updateTXT = false
+			end
+			OneshotPrint(PrintText)
+			update_top_screen = false
+		elseif (current_type == "HEX") then
+			if (updateTXT) then
+				txt_index = BuildHex(current_file,txt_index)
+				updateTXT = false
+			end
+			OneshotPrint(PrintHex)
+			update_top_screen = false
+		else
+			OneshotPrint(PrintControls)
+			update_top_screen = false
 		end
-		Screen.debugPrint(0,225,"Offset: 0x" .. string.format('%X', old_indexes[#old_indexes]) .. " (" .. (old_indexes[#old_indexes]) .. ")",white,TOP_SCREEN)
-	else
-		Screen.debugPrint(0,0,"Basic Controls:",white,TOP_SCREEN)
-		Screen.debugPrint(0,15,"A = Open file/folder",white,TOP_SCREEN)
-		Screen.debugPrint(0,30,"SELECT = Open file with...",white,TOP_SCREEN)
-		Screen.debugPrint(0,45,"R = Create new folder",white,TOP_SCREEN)
-		Screen.debugPrint(0,60,"X = File operations",white,TOP_SCREEN)
-		Screen.debugPrint(0,75,"B = Return Main Menu",white,TOP_SCREEN)
-		Screen.debugPrint(0,90,"---------------------------------",white,TOP_SCREEN)
-		Screen.debugPrint(0,105,"Opened file Controls:",white,TOP_SCREEN)
-		Screen.debugPrint(0,120,"X = Cancel file copy/move",white,TOP_SCREEN)
-		Screen.debugPrint(0,135,"Y = Confirm file copy/move",white,TOP_SCREEN)
-		Screen.debugPrint(0,150,"Left/Right = Pause/Resume",white,TOP_SCREEN)
-		Screen.debugPrint(0,165,"Left/Right = Extract icon (SMDH)",white,TOP_SCREEN)
-		Screen.debugPrint(0,180,"Left/Right = Scroll file",white,TOP_SCREEN)
 	end
 	if update_bottom_screen then
 		Screen.clear(BOTTOM_SCREEN)
@@ -619,29 +655,23 @@ function AppMainCycle()
 			end
 			if (l >= master_index) then
 				if (l==p) then
-					base_y2 = base_y
-					if (base_y) == 0 then
-						base_y = 2
-					end
-					Screen.fillRect(0,319,base_y-2,base_y2+12,selected_item,BOTTOM_SCREEN)
+					Screen.fillRect(0,319,base_y,base_y+15,selected_item,BOTTOM_SCREEN)
 					color = selected_color
-					if (base_y) == 2 then
-						base_y = 0
-					end
 				else
 					color = menu_color
 				end
-				DebugCropPrint(0,base_y,file.name,color,BOTTOM_SCREEN)
+				CropPrint(0,base_y,file.name,color,BOTTOM_SCREEN)
 				base_y = base_y + 15
 			end
 		end
 		if move_base ~= nil then
-			Screen.debugPrint(300,0,"M",selected_color,BOTTOM_SCREEN)
+			Font.print(ttf,300,0,"M",selected_color,BOTTOM_SCREEN)
 		elseif copy_base ~= nil then
-			Screen.debugPrint(300,0,"C",selected_color,BOTTOM_SCREEN)
+			Font.print(ttf,300,0,"C",selected_color,BOTTOM_SCREEN)
 		end
 		update_bottom_screen = false
 	end
+	
 	-- Select Mode Controls Functions
 	if (select_mode) then
 		Screen.fillEmptyRect(60,260,50,217,black,BOTTOM_SCREEN)
@@ -649,9 +679,9 @@ function AppMainCycle()
 		for l, voice in pairs(sm_voices) do
 			if (l == sm_index) then
 				Screen.fillRect(61,259,51+(l-1)*15,51+l*15,green,BOTTOM_SCREEN)
-				Screen.debugPrint(63,53+(l-1)*15,voice,red,BOTTOM_SCREEN)
+				Font.print(ttf,63,51+(l-1)*15,voice,red,BOTTOM_SCREEN)
 			else
-				Screen.debugPrint(63,53+(l-1)*15,voice,black,BOTTOM_SCREEN)
+				Font.print(ttf,63,51+(l-1)*15,voice,black,BOTTOM_SCREEN)
 			end
 		end
 		if (Controls.check(pad,KEY_DUP)) and not (Controls.check(oldpad,KEY_DUP)) then
@@ -710,11 +740,11 @@ function AppMainCycle()
 		colors = {black,black,black,black,black}
 		colors[sm_index] = red
 		Screen.fillRect(61,259,36+sm_index*15,51+sm_index*15,green,BOTTOM_SCREEN)
-		Screen.debugPrint(63,53,"Delete",colors[1],BOTTOM_SCREEN)
-		Screen.debugPrint(63,68,"Rename",colors[2],BOTTOM_SCREEN)
-		Screen.debugPrint(63,83,"Copy",colors[3],BOTTOM_SCREEN)
-		Screen.debugPrint(63,98,"Move",colors[4],BOTTOM_SCREEN)
-		Screen.debugPrint(63,113,"Cancel",colors[5],BOTTOM_SCREEN)
+		Font.print(ttf,63,51,"Delete",colors[1],BOTTOM_SCREEN)
+		Font.print(ttf,63,66,"Rename",colors[2],BOTTOM_SCREEN)
+		Font.print(ttf,63,81,"Copy",colors[3],BOTTOM_SCREEN)
+		Font.print(ttf,63,96,"Move",colors[4],BOTTOM_SCREEN)
+		Font.print(ttf,63,111,"Cancel",colors[5],BOTTOM_SCREEN)
 		if (Controls.check(pad,KEY_DDOWN)) and not (Controls.check(oldpad,KEY_DDOWN)) then
 			sm_index = sm_index + 1
 		elseif (Controls.check(pad,KEY_DUP)) and not (Controls.check(oldpad,KEY_DUP)) then
