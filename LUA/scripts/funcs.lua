@@ -234,3 +234,12 @@ function FreeIconTopbar(my_app)
 		end
 	end
 end
+
+-- * OneshotPrint
+-- Optimized generic print function for code which needs to be executed only one time
+function OneshotPrint(my_func)
+	my_func()
+	Screen.flip()
+	Screen.refresh()
+	my_func()
+end
