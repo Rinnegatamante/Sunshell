@@ -3,13 +3,15 @@ mode = "Music"
 
 -- Internal module settings
 FreeIconTopbar("Music")
+SetBottomRefresh(false)
 master_index_m = 0
+update_list = true
 p_m = 1
 if not_started == nil then
 	not_started = true
 end
 my_songs = {}
-cycle_mode = {"No Cycle","All","Internal"}
+cycle_mode = {"No Cycle","All","Subfolder","Song"}
 if cycle_index == nil then
 	cycle_index = 1
 end
@@ -33,7 +35,7 @@ function AddSongsFromDir(dir,album)
 	end
 end
 AddSongsFromDir("/MUSIC",nil)
-MAX_RAM_ALLOCATION = 1048576
+blue = Color.new(0,0,255)
 
 -- Module background code
 function BackgroundMusic()
@@ -42,6 +44,7 @@ function BackgroundMusic()
 	-- Cycle mode
 	if cycle_index > 1 then
 		if Sound.getTime(current_song) >= Sound.getTotalTime(current_song) then
+			update_list = true
 			Sound.pause(current_song)
 			Sound.close(current_song)
 			if cycle_index == 2 then
@@ -49,7 +52,7 @@ function BackgroundMusic()
 				if song_idx > #my_songs then
 					song_idx = 1
 				end
-			else
+			elseif cycle_index == 3 then
 				tmp_idx = song_idx + 1
 				found = false
 				while tmp_idx < #my_songs do
@@ -85,6 +88,34 @@ function BackgroundMusic()
 	end
 end
 
+function ShowFileList()
+	base_y = 0
+	for l, file in pairs(my_songs) do
+		if (base_y > 226) then
+			break
+		end
+		if (l >= master_index_m) then
+			if (l==p_m) then
+				if file[3] ~= nil then
+					if not_started then
+						text_for_top_screen = "Subfolder: "..file[3]
+					end
+				end
+				Screen.fillRect(0,319,base_y,base_y+15,selected_item,BOTTOM_SCREEN)
+				color = selected
+			else
+				if (l==song_idx) then
+					color = blue
+				else
+					color = black
+				end
+			end
+			CropPrint(0,base_y,file[1],color,BOTTOM_SCREEN)
+			base_y = base_y + 15
+		end
+	end
+end
+
 -- Internal Module GarbageCollection
 function MusicGC()
 	if current_song ~= nil then
@@ -105,26 +136,10 @@ function AppMainCycle()
 	Font.print(ttf,9,200,"Cycle mode: "..cycle_mode[cycle_index],black,TOP_SCREEN)
 	
 	-- Showing files list
-	base_y = 0
-	for l, file in pairs(my_songs) do
-		if (base_y > 226) then
-			break
-		end
-		if (l >= master_index_m) then
-			if (l==p_m) then
-				if file[3] ~= nil then
-					if not_started then
-						Font.print(ttf,9,45,"Subfolder: "..file[3],black,TOP_SCREEN)
-					end
-				end
-				Screen.fillRect(0,319,base_y,base_y+15,selected_item,BOTTOM_SCREEN)
-				color = selected
-			else
-				color = black
-			end
-			CropPrint(0,base_y,file[1],color,BOTTOM_SCREEN)
-			base_y = base_y + 15
-		end
+	if update_list then
+		BottomBGRefresh()
+		OneshotPrint(ShowFileList)
+		update_list = false
 	end
 	
 	-- Showing Song info
@@ -143,6 +158,8 @@ function AppMainCycle()
 		end
 		TopCropPrint(9,105,"Time: "..FormatTime(Sound.getTime(current_song)).." / "..FormatTime(Sound.getTotalTime(current_song)),black,TOP_SCREEN)
 		TopCropPrint(9,120,"Samplerate: "..Sound.getSrate(current_song),black,TOP_SCREEN)	
+	else
+		Font.print(ttf,9,45,text_for_top_screen,black,TOP_SCREEN)
 	end
 	
 	-- Sets controls triggering
@@ -158,16 +175,15 @@ function AppMainCycle()
 	elseif (Controls.check(pad,KEY_Y)) and not (Controls.check(oldpad,KEY_Y)) and not (not_started) then
 		not_started = true
 		CloseBGApp("Music")
-		--MusicGC()
 		current_song = nil
 	elseif (Controls.check(pad,KEY_DLEFT)) and not (Controls.check(oldpad,KEY_DLEFT)) then
 		cycle_index = cycle_index - 1
 		if cycle_index < 1 then
-			cycle_index = 3
+			cycle_index = 4
 		end
 	elseif (Controls.check(pad,KEY_DRIGHT)) and not (Controls.check(oldpad,KEY_DRIGHT)) then
 		cycle_index = cycle_index + 1
-		if cycle_index > 3 then
+		if cycle_index > 4 then
 			cycle_index = 1
 		end
 	elseif (Controls.check(pad,KEY_A)) and not (Controls.check(oldpad,KEY_A)) then
@@ -197,13 +213,13 @@ function AppMainCycle()
 		if (p_m >= 16) then
 			master_index_m = p_m - 15
 		end
-		update_frame = true
+		update_list = true
 	elseif (Controls.check(pad,KEY_DDOWN)) and not (Controls.check(oldpad,KEY_DDOWN)) then
 		p_m = p_m + 1
 		if (p_m >= 17) then
 			master_index_m = p_m - 15
 		end
-		update_frame = true
+		update_list = true
 	end
 	if (p_m < 1) then
 		p_m = #my_songs

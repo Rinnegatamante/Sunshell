@@ -14,7 +14,7 @@ function BackgroundMusic()
 				if song_idx > #my_songs then
 					song_idx = 1
 				end
-			else
+			elseif cycle_index == 3 then
 				tmp_idx = song_idx + 1
 				found = false
 				while tmp_idx < #my_songs do
