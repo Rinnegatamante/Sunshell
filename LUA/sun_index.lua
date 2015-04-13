@@ -33,13 +33,14 @@ bg_apps = {}
 topbar_icons = {}
 old_headset = Controls.headsetStatus()
 in_game = false
+refresh_screen = true
 Sound.init()
 app_index = 1
 black = Color.new(0,0,0)
 white = Color.new(255,255,255)
 green_wifi = Color.new(0,166,81)
 selected = Color.new(255,0,0)
-selected_item = Color.new(237,28,36,128)
+selected_item = Color.new(0,0,200,50)
 version = "0.2"
 ui_enabled = true
 screenshots = true
@@ -144,7 +145,9 @@ while true do
 	-- Blit background
 	if ui_enabled then
 		Screen.drawPartialImage(0,0,0,0,400,240,bg,TOP_SCREEN)
-		Screen.drawPartialImage(0,0,40,240,320,240,bg,BOTTOM_SCREEN)
+		if refresh_screen then
+			Screen.drawPartialImage(0,0,40,240,320,240,bg,BOTTOM_SCREEN)
+		end
 	end
 	
 	-- Executing background apps

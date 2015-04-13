@@ -13,7 +13,29 @@ function CallMainMenu()
 	module = "Main Menu"
 	ui_enabled = true
 	screenshots = true
+	refresh_screen = true
 	System.currentDirectory(start_dir)
+end
+
+-- * SetBottomRefresh
+-- Sets Refreshing Screen state for Bottom Screen
+function SetBottomRefresh(value)
+	refresh_screen = value
+	if value == false then
+		Screen.drawPartialImage(0,0,40,240,320,240,bg,BOTTOM_SCREEN)
+		Screen.flip()
+		Screen.refresh()
+		Screen.drawPartialImage(0,0,40,240,320,240,bg,BOTTOM_SCREEN)
+	end
+end
+
+-- * BottomBGRefresh
+-- Refresh Bottom Screen background (use it only with SetBottomRefresh = false)
+function BottomBGRefresh()
+	Screen.drawPartialImage(0,0,40,240,320,240,bg,BOTTOM_SCREEN)
+	Screen.flip()
+	Screen.refresh()
+	Screen.drawPartialImage(0,0,40,240,320,240,bg,BOTTOM_SCREEN)
 end
 
 -- * CloseBGApp
