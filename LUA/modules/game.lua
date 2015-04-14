@@ -29,85 +29,45 @@ for i,app in pairs(System.listDirectory(main_dir.."/apps")) do
 		table.insert(my_apps,{true,app.name,app.name,app_desc,app_author,nil,true})
 	end
 end
-if build == "3DS" then
-	-- No access to AM service so manual CIA listing
-	tmp = System.listDirectory("/Nintendo 3DS/")
-	for i,file in pairs(tmp) do
+
+if build == "3DSX" then
+	dir = System.listDirectory("/3ds/")
+	for i,file in pairs(dir) do
 		if file.directory then
-			for z,subfile in pairs(System.listDirectory("/Nintendo 3DS/"..file.name.."/")) do
-				if subfile.directory then
-					my_path = "/Nintendo 3DS/"..file.name.."/"..subfile.name.."/"
-					if CheckDirectory(my_path,"title") then
-						my_path = my_path .. "title/"
-						if CheckDirectory(my_path,"00040000") then
-							for j,cia_file in pairs(System.listDirectory(my_path.."00040000/")) do
-								if cia_file.directory then
-									table.insert(my_apps,{false,tonumber(cia_file.name,16),"0x"..string.upper(string.sub(cia_file.name,1,-3)),"","0x"..string.upper(string.sub(cia_file.name,1,-3)),nil})
-								end
-							end
-						end
-					end
+			if System.doesFileExist("/3ds/"..(file.name).."/"..(file.name)..".3dsx") then
+				if System.doesFileExist("/3ds/"..(file.name).."/"..(file.name)..".smdh") then
+					app = System.extractSMDH("/3ds/"..(file.name).."/"..(file.name)..".smdh")
+					table.insert(my_apps,{true,file.name,app.title,app.desc,app.author,app.icon,false})
+				else
+					table.insert(my_apps,{true,file.name,file.name,"","",nil,false})
 				end
 			end
 		end
-	end
-	
-	-- Game titles parsing
-	dofile(main_dir.."/scripts/title_list.lua")
-	assigned = 0
-	for i,title in pairs(title_list) do
-		if assigned >= (#my_apps - 1) then
-			break
-		end
-		for z,app in pairs(my_apps) do
-			if app[2] == title[3] then
-				app[3] = title[1]
-				assigned = assigned + 1
-			end
-		end
-	end
-	
-else
-	if build == "3DSX" then
-		dir = System.listDirectory("/3ds/")
-		for i,file in pairs(dir) do
-			if file.directory then
-				if System.doesFileExist("/3ds/"..(file.name).."/"..(file.name)..".3dsx") then
-					if System.doesFileExist("/3ds/"..(file.name).."/"..(file.name)..".smdh") then
-						app = System.extractSMDH("/3ds/"..(file.name).."/"..(file.name)..".smdh")
-						table.insert(my_apps,{true,file.name,app.title,app.desc,app.author,app.icon,false})
-					else
-						table.insert(my_apps,{true,file.name,file.name,"","",nil,false})
-					end
-				end
-			end
-		end
-	else
-		table.insert(my_apps,{false,nil,"Game Cartridge","","0x0",nil})-- Insert Gamecard voice
-		dir = System.listCIA()
-		for i,file in pairs(dir) do
-			if file.mediatype == SDMC then
-				table.insert(my_apps,{false,file.unique_id,file.product_id,"","0x"..string.sub(string.format('%02X',file.unique_id),1,-3),nil})
-			end
-		end
-		
-		-- Game titles parsing
-		dofile(main_dir.."/scripts/title_list.lua")
-		assigned = 0
-		for i,title in pairs(title_list) do
-			if assigned >= (#my_apps - 1) then
-				break
-			end
-			for z,app in pairs(my_apps) do
-				if app[2] == title[3] then
-					app[3] = title[1]
-					assigned = assigned + 1
-				end
-			end
-		end
-		
 	end
 end
+table.insert(my_apps,{false,nil,"Game Cartridge","","0x0",nil})-- Insert Gamecard voice
+dir = System.listCIA()
+for i,file in pairs(dir) do
+	if file.mediatype == SDMC then
+		table.insert(my_apps,{false,file.unique_id,file.product_id,"","0x"..string.sub(string.format('%02X',file.unique_id),1,-3),nil})
+	end
+end
+		
+-- Game titles parsing
+dofile(main_dir.."/scripts/title_list.lua")
+assigned = 0
+for i,title in pairs(title_list) do
+	if assigned >= (#my_apps - 1) then
+		break
+	end
+	for z,app in pairs(my_apps) do
+		if app[2] == title[3] then
+			app[3] = title[1]
+			assigned = assigned + 1
+		end
+	end
+end
+		
 
 -- Module main cycle
 function AppMainCycle()
