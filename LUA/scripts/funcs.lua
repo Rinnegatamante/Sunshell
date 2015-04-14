@@ -159,24 +159,31 @@ function ShowError(text)
 	confirm = false
 	ErrorGenerator(text)
 	max_y = error_lines[#error_lines][2] + 40
+	Screen.fillEmptyRect(5,315,50,max_y,black,BOTTOM_SCREEN)
+	Screen.fillRect(6,314,51,max_y-1,white,BOTTOM_SCREEN)
+	Font.print(ttf,8,53,"Error",selected,BOTTOM_SCREEN)
+	for i,line in pairs(error_lines) do
+		Font.print(ttf,8,line[2],line[1],black,BOTTOM_SCREEN)
+	end
+	Screen.fillEmptyRect(147,176,max_y - 23, max_y - 8,black,BOTTOM_SCREEN)
+	Font.print(ttf,155,max_y - 23,"OK",black,BOTTOM_SCREEN)
+	Screen.flip()
+	Screen.refresh()
+	Screen.fillEmptyRect(5,315,50,max_y,black,BOTTOM_SCREEN)
+	Screen.fillRect(6,314,51,max_y-1,white,BOTTOM_SCREEN)
+	Font.print(ttf,8,53,"Error",selected,BOTTOM_SCREEN)
+	for i,line in pairs(error_lines) do
+		Font.print(ttf,8,line[2],line[1],black,BOTTOM_SCREEN)
+	end
+	Screen.fillEmptyRect(147,176,max_y - 23, max_y - 8,black,BOTTOM_SCREEN)
+	Font.print(ttf,155,max_y - 23,"OK",black,BOTTOM_SCREEN)
 	while not confirm do
-		Screen.refresh()
-		Screen.fillEmptyRect(5,315,50,max_y,black,BOTTOM_SCREEN)
-		Screen.fillRect(6,314,51,max_y-1,white,BOTTOM_SCREEN)
-		Font.print(ttf,8,53,"Error",selected,BOTTOM_SCREEN)
-		for i,line in pairs(error_lines) do
-			Font.print(ttf,8,line[2],line[1],black,BOTTOM_SCREEN)
-		end
-		Screen.fillEmptyRect(147,176,max_y - 23, max_y - 8,black,BOTTOM_SCREEN)
-		Font.print(ttf,155,max_y - 23,"OK",black,BOTTOM_SCREEN)
 		if (Controls.check(Controls.read(),KEY_TOUCH)) then
 			x,y = Controls.readTouch()
 			if x >= 147 and x <= 176 and y >= max_y - 23 and y <= max_y - 8 then
 				confirm = true
 			end
 		end
-		Screen.flip()
-		Screen.waitVblankStart()
 	end
 end
 
@@ -186,24 +193,31 @@ function ShowWarning(text)
 	confirm = false
 	ErrorGenerator(text)
 	max_y = error_lines[#error_lines][2] + 40
+	Screen.fillEmptyRect(5,315,50,max_y,black,BOTTOM_SCREEN)
+	Screen.fillRect(6,314,51,max_y-1,white,BOTTOM_SCREEN)
+	Font.print(ttf,8,53,"Warning",selected,BOTTOM_SCREEN)
+	for i,line in pairs(error_lines) do
+		Font.print(ttf,8,line[2],line[1],black,BOTTOM_SCREEN)
+	end
+	Screen.fillEmptyRect(147,176,max_y - 23, max_y - 8,black,BOTTOM_SCREEN)
+	Font.print(ttf,155,max_y - 23,"OK",black,BOTTOM_SCREEN)
+	Screen.flip()
+	Screen.refresh()
+	Screen.fillEmptyRect(5,315,50,max_y,black,BOTTOM_SCREEN)
+	Screen.fillRect(6,314,51,max_y-1,white,BOTTOM_SCREEN)
+	Font.print(ttf,8,53,"Warning",selected,BOTTOM_SCREEN)
+	for i,line in pairs(error_lines) do
+		Font.print(ttf,8,line[2],line[1],black,BOTTOM_SCREEN)
+	end
+	Screen.fillEmptyRect(147,176,max_y - 23, max_y - 8,black,BOTTOM_SCREEN)
+	Font.print(ttf,155,max_y - 23,"OK",black,BOTTOM_SCREEN)
 	while not confirm do
-		Screen.refresh()
-		Screen.fillEmptyRect(5,315,50,max_y,black,BOTTOM_SCREEN)
-		Screen.fillRect(6,314,51,max_y-1,white,BOTTOM_SCREEN)
-		Font.print(ttf,8,53,"Warning",selected,BOTTOM_SCREEN)
-		for i,line in pairs(error_lines) do
-			Font.print(ttf,8,line[2],line[1],black,BOTTOM_SCREEN)
-		end
-		Screen.fillEmptyRect(147,176,max_y - 23, max_y - 8,black,BOTTOM_SCREEN)
-		Font.print(ttf,155,max_y - 23,"OK",black,BOTTOM_SCREEN)
 		if (Controls.check(Controls.read(),KEY_TOUCH)) then
 			x,y = Controls.readTouch()
 			if x >= 147 and x <= 176 and y >= max_y - 23 and y <= max_y - 8 then
 				confirm = true
 			end
 		end
-		Screen.flip()
-		Screen.waitVblankStart()
 	end
 end
 
