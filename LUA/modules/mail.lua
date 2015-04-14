@@ -19,12 +19,12 @@ function AppMainCycle()
 	Screen.fillRect(6,394,41,219,white,TOP_SCREEN)
 	
 	-- Draw mail elements
-	DebugTopCropPrint(9,45,"Obj: "..object,black,TOP_SCREEN)
-	DebugTopCropPrint(9,60,"To: "..to,black,TOP_SCREEN)
-	Screen.debugPrint(9,75,"Body:",black,TOP_SCREEN)
-	text = DebugLinesGenerator(body,90)
+	TopCropPrint(9,45,"Obj: "..object,black,TOP_SCREEN)
+	TopCropPrint(9,60,"To: "..to,black,TOP_SCREEN)
+	Font.print(ttf,9,75,"Body:",black,TOP_SCREEN)
+	text = LinesGenerator(body,90)
 	for i,line in pairs(text) do
-		Screen.debugPrint(9,line[2],line[1],black,TOP_SCREEN)
+		Font.print(ttf,9,line[2],line[1],black,TOP_SCREEN)
 	end
 	
 	-- Sets controls triggering
