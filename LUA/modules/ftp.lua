@@ -32,26 +32,26 @@ function AppMainCycle()
 	Screen.fillRect(6,394,41,219,white,TOP_SCREEN)
 	
 	-- Draw FTP info
-	Screen.debugPrint(9,45,"IP: "..Network.getIPAddress(),black,TOP_SCREEN)
-	Screen.debugPrint(9,60,"Port: 5000",black,TOP_SCREEN)
+	Font.print(ttf,9,45,"IP: "..Network.getIPAddress(),black,TOP_SCREEN)
+	Font.print(ttf,9,60,"Port: 5000",black,TOP_SCREEN)
 	ftp_cmd = LinesGenerator(last_shared,90)
 	for i,line in pairs(ftp_cmd) do
-		Screen.debugPrint(9,line[2],line[1],black,TOP_SCREEN)
+		Font.print(ttf,9,line[2],line[1],black,TOP_SCREEN)
 	end
 	
 	-- Draw bottom screen box and command info
 	Screen.fillEmptyRect(5,315,40,92,black,BOTTOM_SCREEN)
 	Screen.fillRect(6,314,41,91,white,BOTTOM_SCREEN)
-	Screen.debugPrint(9,45,"A = Restart FTP server",black,BOTTOM_SCREEN)
-	Screen.debugPrint(9,60,"SELECT = Return Main Menu",black,BOTTOM_SCREEN)
-	Screen.debugPrint(9,75,"B = Term FTP server",black,BOTTOM_SCREEN)
+	Font.print(ttf,9,45,"A = Restart FTP server",black,BOTTOM_SCREEN)
+	Font.print(ttf,9,60,"SELECT = Return Main Menu",black,BOTTOM_SCREEN)
+	Font.print(ttf,9,75,"B = Term FTP server",black,BOTTOM_SCREEN)
 	
 	-- Sets controls triggering
 	if Controls.check(pad,KEY_A) and not Controls.check(oldpad,KEY_A) then
 		CloseBGApp("FTP Server")
 		dofile(main_dir.."/modules/ftp.lua")
 	elseif Controls.check(pad,KEY_SELECT) and not Controls.check(oldpad,KEY_SELECT) then
-		AddIconTopbar(main_dir.."/images/ftp_icon.jpg","FTP")
+		AddIconTopbar(theme_dir.."/images/ftp_icon.jpg","FTP")
 		CallMainMenu()
 	elseif Controls.check(pad,KEY_B) or Controls.check(pad,KEY_START) then
 		CloseBGApp("FTP Server")
