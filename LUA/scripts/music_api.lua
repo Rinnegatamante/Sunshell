@@ -77,5 +77,5 @@ end
 Sound.play(current_song,NO_LOOP,0x08,0x09)
 current_subfolder = my_songs[1][3]
 song_idx = 1
-AddIconTopbar(main_dir.."/images/music_icon.jpg","Music")
+AddIconTopbar(theme_dir.."/images/music_icon.jpg","Music")
 table.insert(bg_apps,{BackgroundMusic,MusicGC,"Music"}) -- Starting background Music module
