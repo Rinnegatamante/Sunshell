@@ -4,98 +4,93 @@ mode = "Cia"
 -- Internal module settings
 master_index_cia = 0
 p_cia = 1
-if build == "3DS" or build == "3DSX" then
-	ShowError("This module is reserved to CIA build users.")
-	CallMainMenu()
-else
-	cia_table = System.listCIA()
+cia_table = System.listCIA()
 	
-	-- Game titles parsing
-	dofile(main_dir.."/scripts/title_list.lua")
-	assigned = 0
-	for i,title in pairs(title_list) do
-		if assigned >= (#cia_table - 1) then
-			break
-		end
-		for z,app in pairs(cia_table) do
-			if app.unique_id == title[3] then
-				app["title_name"] = title[1]
-				assigned = assigned + 1
-			end
+-- Game titles parsing
+dofile(main_dir.."/scripts/title_list.lua")
+assigned = 0
+for i,title in pairs(title_list) do
+	if assigned >= (#cia_table - 1) then
+		break
+	end
+	for z,app in pairs(cia_table) do
+		if app.unique_id == title[3] then
+			app["title_name"] = title[1]
+			assigned = assigned + 1
 		end
 	end
+end
 	
-	not_extracted = true
-	function TableConcat(t1,t2)
-		for i=1,#t2 do
-			t1[#t1+1] = t2[i]
-		end
-		return t1
+not_extracted = true
+function TableConcat(t1,t2)
+	for i=1,#t2 do
+		t1[#t1+1] = t2[i]
 	end
-	function listDirectory(dir)
-		dir = System.listDirectory(dir)
-		folders_table = {}
-		files_table = {}
-		for i,file in pairs(dir) do
-			if file.directory then
-				table.insert(folders_table,file)
-			elseif (string.sub(file.name,-4) == ".cia") or (string.sub(file.name,-4) == ".CIA") then
-				table.insert(files_table,file)
-			end
-		end
-		table.sort(files_table, function (a, b) return (a.name:lower() < b.name:lower() ) end)
-		table.sort(folders_table, function (a, b) return (a.name:lower() < b.name:lower() ) end)
-		return_table = TableConcat(folders_table,files_table)
-		return return_table
-	end
-	function UpdateSpace()
-		free_space = System.getFreeSpace()
-		f = "Bytes"
-		f_free_space = free_space
-		if free_space > 1024 then
-			f_free_space = free_space / 1024
-			f = "KBs"
-			if f_free_space > 1024 then
-				f_free_space = f_free_space / 1024
-				f = "MBs"
-			end
+	return t1
+end
+function listDirectory(dir)
+	dir = System.listDirectory(dir)
+	folders_table = {}
+	files_table = {}
+	for i,file in pairs(dir) do
+		if file.directory then
+			table.insert(folders_table,file)
+		elseif (string.sub(file.name,-4) == ".cia") or (string.sub(file.name,-4) == ".CIA") then
+			table.insert(files_table,file)
 		end
 	end
-	UpdateSpace()
-	files_table = listDirectory("/")
-	int_mode = "CIA"
-	function GetCategory(c)
-		if c==0 then
-			return "Application"
-		elseif c==1 then
-			return "System"
-		elseif c==2 then
-			return "Demo"
-		elseif c==3 then
-			return "Patch"
-		elseif c==4 then
-			return "TWL"
+	table.sort(files_table, function (a, b) return (a.name:lower() < b.name:lower() ) end)
+	table.sort(folders_table, function (a, b) return (a.name:lower() < b.name:lower() ) end)
+	return_table = TableConcat(folders_table,files_table)
+	return return_table
+end
+function UpdateSpace()
+	free_space = System.getFreeSpace()
+	f = "Bytes"
+	f_free_space = free_space
+	if free_space > 1024 then
+		f_free_space = free_space / 1024
+		f = "KBs"
+		if f_free_space > 1024 then
+			f_free_space = f_free_space / 1024
+			f = "MBs"
 		end
 	end
-	function OpenDirectory(text,archive_id)
-		i=0
-		if text == ".." then
-			j=-2
-			while string.sub(System.currentDirectory(),j,j) ~= "/" do
-				j=j-1
-			end
-			System.currentDirectory(string.sub(System.currentDirectory(),1,j))
-		else
-			System.currentDirectory(System.currentDirectory()..text.."/")
+end
+UpdateSpace()
+files_table = listDirectory("/")
+int_mode = "CIA"
+function GetCategory(c)
+	if c==0 then
+		return "Application"
+	elseif c==1 then
+		return "System"
+	elseif c==2 then
+		return "Demo"
+	elseif c==3 then
+		return "Patch"
+	elseif c==4 then
+		return "TWL"
+	end
+end
+function OpenDirectory(text,archive_id)
+	i=0
+	if text == ".." then
+		j=-2
+		while string.sub(System.currentDirectory(),j,j) ~= "/" do
+			j=j-1
 		end
-		files_table = listDirectory(System.currentDirectory())
-		if System.currentDirectory() ~= "/" then
-			local extra = {}
-			extra.name = ".."
-			extra.size = 0
-			extra.directory = true
-			table.insert(files_table,extra)
-		end
+		System.currentDirectory(string.sub(System.currentDirectory(),1,j))
+	else
+		System.currentDirectory(System.currentDirectory()..text.."/")
+	end
+	files_table = listDirectory(System.currentDirectory())
+	if System.currentDirectory() ~= "/" then
+		local extra = {}
+		extra.name = ".."
+		extra.size = 0
+		extra.directory = true
+		table.insert(files_table,extra)
 	end
 end
 
@@ -204,7 +199,6 @@ function AppMainCycle()
 					while true do
 						Screen.waitVblankStart()
 						Screen.refresh()
-						Controls.init()
 						pad = Controls.read()
 						Screen.fillEmptyRect(60,260,50,82,black,BOTTOM_SCREEN)
 						Screen.fillRect(61,259,51,81,white,BOTTOM_SCREEN)
@@ -242,7 +236,6 @@ function AppMainCycle()
 			while true do
 				Screen.waitVblankStart()
 				Screen.refresh()
-				Controls.init()
 				pad = Controls.read()
 				Screen.fillEmptyRect(60,260,50,82,black,BOTTOM_SCREEN)
 				Screen.fillRect(61,259,51,81,white,BOTTOM_SCREEN)
@@ -283,7 +276,6 @@ function AppMainCycle()
 				while true do
 					Screen.waitVblankStart()
 					Screen.refresh()
-					Controls.init()
 					pad = Controls.read()
 					Screen.fillEmptyRect(60,260,50,82,black,BOTTOM_SCREEN)
 					Screen.fillRect(61,259,51,81,white,BOTTOM_SCREEN)
