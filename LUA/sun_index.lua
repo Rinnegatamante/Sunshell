@@ -5,27 +5,35 @@ System.createDirectory("/DCIM")
 
 -- Open config file and system files
 dofile("/config.sun")
-bg = Screen.loadImage(main_dir.."/images/bg.jpg")
-music = Screen.loadImage(main_dir.."/images/music.jpg")
-video = Screen.loadImage(main_dir.."/images/video.jpg")
-info = Screen.loadImage(main_dir.."/images/info.jpg")
-fb = Screen.loadImage(main_dir.."/images/fb.jpg")
-game = Screen.loadImage(main_dir.."/images/game.jpg")
-photo = Screen.loadImage(main_dir.."/images/photo.jpg")
-cia = Screen.loadImage(main_dir.."/images/cia.jpg")
-extdata = Screen.loadImage(main_dir.."/images/extdata.jpg")
-calc = Screen.loadImage(main_dir.."/images/calc.jpg")
-mail = Screen.loadImage(main_dir.."/images/mail.jpg")
-clock = Screen.loadImage(main_dir.."/images/clock.jpg")
-ftp = Screen.loadImage(main_dir.."/images/ftp.jpg")
-charge = Screen.loadImage(main_dir.."/images/charge.jpg")
-b0 = Screen.loadImage(main_dir.."/images/0.jpg")
-b1 = Screen.loadImage(main_dir.."/images/1.jpg")
-b2 = Screen.loadImage(main_dir.."/images/2.jpg")
-b3 = Screen.loadImage(main_dir.."/images/3.jpg")
-b4 = Screen.loadImage(main_dir.."/images/4.jpg")
-b5 = Screen.loadImage(main_dir.."/images/5.jpg")
-ttf = Font.load(main_dir.."/fonts/main.ttf")
+theme_dir = main_dir.."/themes/"..theme
+bg = Screen.loadImage(theme_dir.."/images/bg.jpg")
+if System.doesFileExist(theme_dir.."/images/music.jpg") then
+	ext = ".jpg"
+else
+	ext = ".png"
+end
+music = Screen.loadImage(theme_dir.."/images/music"..ext)
+video = Screen.loadImage(theme_dir.."/images/video"..ext)
+info = Screen.loadImage(theme_dir.."/images/info"..ext)
+fb = Screen.loadImage(theme_dir.."/images/fb"..ext)
+game = Screen.loadImage(theme_dir.."/images/game"..ext)
+photo = Screen.loadImage(theme_dir.."/images/photo"..ext)
+cia = Screen.loadImage(theme_dir.."/images/cia"..ext)
+extdata = Screen.loadImage(theme_dir.."/images/extdata"..ext)
+calc = Screen.loadImage(theme_dir.."/images/calc"..ext)
+mail = Screen.loadImage(theme_dir.."/images/mail"..ext)
+themes = Screen.loadImage(theme_dir.."/images/themes"..ext)
+clock = Screen.loadImage(theme_dir.."/images/clock"..ext)
+ftp = Screen.loadImage(theme_dir.."/images/ftp"..ext)
+charge = Screen.loadImage(theme_dir.."/images/charge"..ext)
+b0 = Screen.loadImage(theme_dir.."/images/0"..ext)
+b1 = Screen.loadImage(theme_dir.."/images/1"..ext)
+b2 = Screen.loadImage(theme_dir.."/images/2"..ext)
+b3 = Screen.loadImage(theme_dir.."/images/3"..ext)
+b4 = Screen.loadImage(theme_dir.."/images/4"..ext)
+b5 = Screen.loadImage(theme_dir.."/images/5"..ext)
+ttf = Font.load(theme_dir.."/fonts/main.ttf")
+dofile(theme_dir.."/colors.lua")
 Font.setPixelSizes(ttf,18)
 
 -- Setting some system vars, funcs, etc...
@@ -36,11 +44,6 @@ in_game = false
 refresh_screen = true
 Sound.init()
 app_index = 1
-black = Color.new(0,0,0)
-white = Color.new(255,255,255)
-green_wifi = Color.new(0,166,81)
-selected = Color.new(255,0,0)
-selected_item = Color.new(0,0,200,50)
 version = "0.2"
 ui_enabled = true
 screenshots = true
@@ -89,8 +92,6 @@ build_idx = System.checkBuild()
 if build_idx == 0 then
 	build = "3DSX"
 elseif build_idx == 1 then
-	build = "3DS"
-else
 	build = "CIA"
 end
 
@@ -108,6 +109,7 @@ table.insert(tools,{calc,"/modules/calc.lua","Calc"})
 table.insert(tools,{clock,"/modules/clock.lua","Clock"})
 table.insert(tools,{ftp,"/modules/ftp.lua","FTP Server"})
 table.insert(tools,{mail,"/modules/mail.lua","Mail"})
+table.insert(tools,{themes,"/modules/themes.lua","Theme Manager"})
 
 -- Main cycle
 while true do
@@ -214,7 +216,7 @@ while true do
 		if Controls.check(pad,KEY_DUP) and not Controls.check(oldpad,KEY_DUP) then
 			app_index = app_index - 6
 			if app_index < 1 then
-				while (app_index + 6) < #tools do
+				while (app_index + 6) <= #tools do
 					app_index = app_index + 6
 				end
 			end
