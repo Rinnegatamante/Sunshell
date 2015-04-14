@@ -56,11 +56,7 @@ current_type = nil
 big_image = false
 master_index = 0
 sm_index = 1
-if build == "CIA" then
-	sm_voices = {"Video Player","Music Player","Image Viewer","Text Reader","LUA Interpreter","HEX Viewer","3DSX Launcher","SMDH Decoder","ZIP Extractor","Info Viewer","Cancel"}
-else
-	sm_voices = {"Video Player","Music Player","Image Viewer","Text Reader","LUA Interpreter","HEX Viewer","CIA Installer","SMDH Decoder","ZIP Extractor","Info Viewer","Cancel"}
-end
+sm_voices = {"Video Player","Music Player","Image Viewer","Text Reader","LUA Interpreter","HEX Viewer","3DSX Launcher","CIA Installer","SMDH Decoder","ZIP Extractor","Info Viewer","TTF Viewer","Cancel"}
 hex_values = {}
 hex_text = {}
 updateTXT = false
@@ -245,6 +241,10 @@ function ForceOpenFile(text, size, mode)
 			table.insert(files_table,extra)
 		end
 		files_table = SortDirectory(files_table)
+	elseif mode == "TTF" then
+		FBGC()
+		current_file = Font.load(System.currentDirectory()..text)
+		current_type = "TTF"
 	elseif mode == "CIA" then
 		FBGC()
 		sm_index = 1
@@ -334,6 +334,10 @@ function OpenFile(text, size)
 		current_file = JPGV.load(System.currentDirectory()..text)
 		current_type = "JPGV"
 		JPGV.start(current_file,NO_LOOP,0x08,0x09)
+	elseif string.upper(string.sub(text,-4)) == "TTF" then
+		FBGC()
+		current_file = Font.load(System.currentDirectory()..text)
+		current_type = "TTF"
 	elseif string.upper(string.sub(text,-4)) == ".WAV" then
 		FBGC()
 		current_file = Sound.openWav(System.currentDirectory()..text,true)
@@ -446,6 +450,8 @@ function FBGC()
 	if current_type == "SMDH" then
 		Console.destroy(smdh_show)
 		Screen.freeImage(current_file.icon)
+	elseif current_type == "TTF" then
+		Font.unload(current_file)
 	elseif current_type == "BMPV" then
 		if BMPV.isPlaying(current_file) then
 			BMPV.stop(current_file)
@@ -549,6 +555,7 @@ function PrintSMDHInfo()
 	Screen.drawImage(0,185,current_file.icon,TOP_SCREEN)
 end
 function PrintText()
+	Screen.clear(TOP_SCREEN)
 	Console.show(text_console)
 end
 function PrintHex()
@@ -567,20 +574,65 @@ function PrintHex()
 	end
 	Font.print(ttf,0,225,"Offset: 0x" .. string.format('%X', old_indexes[#old_indexes]) .. " (" .. (old_indexes[#old_indexes]) .. ")",white,TOP_SCREEN)
 end
+function TestFont()
+	Screen.clear(TOP_SCREEN)
+	Font.setPixelSizes(current_file,8)
+	Font.print(current_file,0,5,"8: The quick brown fox",white,TOP_SCREEN)
+	Font.print(current_file,10,13,"jumps over the lazy dog",white,TOP_SCREEN)
+	Font.setPixelSizes(current_file,12)
+	Font.print(current_file,0,25,"12: The quick brown fox",white,TOP_SCREEN)
+	Font.print(current_file,10,37,"jumps over the lazy dog",white,TOP_SCREEN)
+	Font.setPixelSizes(current_file,18)
+	Font.print(current_file,0,54,"18: The quick brown fox",white,TOP_SCREEN)
+	Font.print(current_file,10,72,"jumps over the lazy dog",white,TOP_SCREEN)
+	Font.setPixelSizes(current_file,24)
+	Font.print(current_file,0,95,"24: The quick brown fox",white,TOP_SCREEN)
+	Font.print(current_file,10,119,"jumps over the lazy dog",white,TOP_SCREEN)
+	Font.setPixelSizes(current_file,30)
+	Font.print(current_file,0,149,"30: The quick brown fox",white,TOP_SCREEN)
+	Font.print(current_file,10,179,"jumps over the lazy dog",white,TOP_SCREEN)
+end
+function ListMenu()
+	Screen.clear(BOTTOM_SCREEN)
+	for l, file in pairs(files_table) do
+		if (base_y > 226) then
+			break
+		end
+		if (l >= master_index) then
+			if (l==p) then
+				Screen.fillRect(0,319,base_y,base_y+15,selected_item,BOTTOM_SCREEN)
+				color = selected_color
+			else
+				color = menu_color
+			end
+			CropPrint(0,base_y,file.name,color,BOTTOM_SCREEN)
+			base_y = base_y + 15
+		end
+	end
+	if move_base ~= nil then
+		Font.print(ttf,300,0,"M",selected_color,BOTTOM_SCREEN)
+	elseif copy_base ~= nil then
+		Font.print(ttf,300,0,"C",selected_color,BOTTOM_SCREEN)
+	end	
+end
+
 -- Module main cycle
 function AppMainCycle()
 	base_y = 0
 	i = 1
 	if update_top_screen then
-		Screen.clear(TOP_SCREEN)
 		if (current_type == "SMDH") then
 			OneshotPrint(PrintSMDHInfo)
+			update_top_screen = false
+		elseif (current_type == "TTF") then
+			OneshotPrint(TestFont)
 			update_top_screen = false
 		elseif (current_type == "BMPV") then
 			BMPV.draw(0,0,current_file,TOP_SCREEN)
 		elseif (current_type == "JPGV") then
 			JPGV.draw(0,0,current_file,TOP_SCREEN)
 		elseif (current_type == "WAV") then
+			Screen.clear(TOP_SCREEN)
 			Sound.updateStream()
 			Font.print(ttf,0,0,"Title: ",white,TOP_SCREEN)
 			ThemePrint(0,15,Sound.getTitle(current_file),white,TOP_SCREEN)
@@ -648,40 +700,20 @@ function AppMainCycle()
 		end
 	end
 	if update_bottom_screen then
-		Screen.clear(BOTTOM_SCREEN)
-		for l, file in pairs(files_table) do
-			if (base_y > 226) then
-				break
-			end
-			if (l >= master_index) then
-				if (l==p) then
-					Screen.fillRect(0,319,base_y,base_y+15,selected_item,BOTTOM_SCREEN)
-					color = selected_color
-				else
-					color = menu_color
-				end
-				CropPrint(0,base_y,file.name,color,BOTTOM_SCREEN)
-				base_y = base_y + 15
-			end
-		end
-		if move_base ~= nil then
-			Font.print(ttf,300,0,"M",selected_color,BOTTOM_SCREEN)
-		elseif copy_base ~= nil then
-			Font.print(ttf,300,0,"C",selected_color,BOTTOM_SCREEN)
-		end
+		ListMenu()
 		update_bottom_screen = false
 	end
 	
 	-- Select Mode Controls Functions
 	if (select_mode) then
-		Screen.fillEmptyRect(60,260,50,217,black,BOTTOM_SCREEN)
-		Screen.fillRect(61,259,51,216,white,BOTTOM_SCREEN)
+		Screen.fillEmptyRect(60,260,35,232,black,BOTTOM_SCREEN)
+		Screen.fillRect(61,259,36,231,white,BOTTOM_SCREEN)
 		for l, voice in pairs(sm_voices) do
 			if (l == sm_index) then
-				Screen.fillRect(61,259,51+(l-1)*15,51+l*15,green,BOTTOM_SCREEN)
-				Font.print(ttf,63,51+(l-1)*15,voice,red,BOTTOM_SCREEN)
+				Screen.fillRect(61,259,36+(l-1)*15,36+l*15,green,BOTTOM_SCREEN)
+				Font.print(ttf,63,36+(l-1)*15,voice,red,BOTTOM_SCREEN)
 			else
-				Font.print(ttf,63,51+(l-1)*15,voice,black,BOTTOM_SCREEN)
+				Font.print(ttf,63,36+(l-1)*15,voice,black,BOTTOM_SCREEN)
 			end
 		end
 		if (Controls.check(pad,KEY_DUP)) and not (Controls.check(oldpad,KEY_DUP)) then
@@ -703,16 +735,20 @@ function AppMainCycle()
 				ForceOpenFile(files_table[p].name,files_table[p].size,"HEX")
 			elseif (sm_index == 7) then
 				if build == "CIA" then
-					ForceOpenFile(files_table[p].name,files_table[p].size,"CIA")
+					ShowError("3DSX Launcher not available on CIA and 3DS builds.")
 				else
 					ForceOpenFile(files_table[p].name,files_table[p].size,"3DSX")
 				end
 			elseif (sm_index == 8) then
-				ForceOpenFile(files_table[p].name,files_table[p].size,"SMDH")
+				ForceOpenFile(files_table[p].name,files_table[p].size,"CIA")
 			elseif (sm_index == 9) then
-				ForceOpenFile(files_table[p].name,files_table[p].size,"ZIP")
+				ForceOpenFile(files_table[p].name,files_table[p].size,"SMDH")
 			elseif (sm_index == 10) then
+				ForceOpenFile(files_table[p].name,files_table[p].size,"ZIP")
+			elseif (sm_index == 11) then
 				ForceOpenFile(files_table[p].name,files_table[p].size,"INFO")
+			elseif (sm_index == 12) then
+				ForceOpenFile(files_table[p].name,files_table[p].size,"TTF")
 			end
 			sm_index = 1
 			select_mode = false
@@ -724,8 +760,8 @@ function AppMainCycle()
 			System.exit()
 		end
 		if (sm_index < 1) then
-			sm_index = 11
-		elseif (sm_index > 11) then
+			sm_index = #sm_voices
+		elseif (sm_index > #sm_voices) then
 			sm_index = 1
 		end
 	-- Action Check
@@ -941,6 +977,7 @@ function AppMainCycle()
 				files_table = SortDirectory(files_table)
 			elseif (current_type == "TXT") or (current_type == "HEX") then
 				if (txt_i > 1) then			
+					update_top_screen = true
 					updateTXT = true
 					table.remove(old_indexes)
 					txt_index = table.remove(old_indexes)
@@ -981,6 +1018,7 @@ function AppMainCycle()
 					end
 				files_table = SortDirectory(files_table)
 			elseif (current_type == "TXT") or (current_type == "HEX") then
+				update_top_screen = true
 				updateTXT = true
 			elseif (current_type == "WAV") then
 				if (Sound.isPlaying(current_file)) then
