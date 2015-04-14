@@ -6,6 +6,7 @@ FreeIconTopbar("Music")
 SetBottomRefresh(false)
 master_index_m = 0
 update_list = true
+text_for_top_screen = ""
 p_m = 1
 if not_started == nil then
 	not_started = true
@@ -97,9 +98,9 @@ function ShowFileList()
 		if (l >= master_index_m) then
 			if (l==p_m) then
 				if file[3] ~= nil then
-					if not_started then
-						text_for_top_screen = "Subfolder: "..file[3]
-					end
+					text_for_top_screen = "Subfolder: "..file[3]
+				else
+					text_for_top_screen = "Subfolder: None"
 				end
 				Screen.fillRect(0,319,base_y,base_y+15,selected_item,BOTTOM_SCREEN)
 				color = selected
