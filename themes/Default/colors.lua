@@ -1,0 +1,5 @@
+black = Color.new(0,0,0)
+white = Color.new(255,255,255)
+green_wifi = Color.new(0,166,81)
+selected = Color.new(255,0,0)
+selected_item = Color.new(0,0,200,50)
