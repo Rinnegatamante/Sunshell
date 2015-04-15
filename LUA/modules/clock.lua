@@ -2,6 +2,7 @@
 mode = "Clock"
 
 -- Internal module settings
+FreeIconTopbar("Clock")
 screenshots = false
 function Cronometer(millisecs)
 	secs = millisecs / 1000
@@ -51,6 +52,7 @@ function BackgroundClock()
 end
 
 function ClockGC()
+	FreeIconTopbar("Clock")
 	if Sound.isPlaying(alarm_sound) then
 		Sound.pause(alarm_sound)
 	end
@@ -60,6 +62,7 @@ function ClockGC()
 	end
 	set_alarm = nil
 	alarm_start = nil
+	alarm_sound = nil
 end
 
 -- Module main cycle
@@ -220,7 +223,7 @@ function AppMainCycle()
 	if Controls.check(pad,KEY_R) and not Controls.check(oldpad,KEY_R) and alarm_start ~= nil then
 		CloseBGApp("Clock")
 	elseif Controls.check(pad,KEY_L) and not Controls.check(oldpad,KEY_L) and set_alarm ~= nil then
-		alarm_sound = Sound.openWav(main_dir.."/sounds/alarm.wav")
+		alarm_sound = Sound.openOgg(theme_dir.."/sounds/alarm.ogg")
 		if set_alarm then
 			alarm_start = false
 			hours = alarm_table[1]..alarm_table[2]
@@ -259,6 +262,9 @@ function AppMainCycle()
 	elseif Controls.check(pad,KEY_B) or Controls.check(pad,KEY_START) then
 		if cronometer then
 			Timer.destroy(crono)
+		end
+		if alarm_sound ~= nil then
+			AddIconTopbar(theme_dir.."/images/clock_icon.jpg","Clock")
 		end
 		CallMainMenu()
 	end
