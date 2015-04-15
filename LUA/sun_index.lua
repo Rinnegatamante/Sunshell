@@ -298,6 +298,9 @@ while true do
 			Screen.fillRect(333-#topbar_icons*21,338-#topbar_icons*21,8,18,green_wifi,TOP_SCREEN)
 			Screen.fillRect(326-#topbar_icons*21,331-#topbar_icons*21,14,18,green_wifi,TOP_SCREEN)
 		else
+			Screen.fillRect(340-#topbar_icons*21,345-#topbar_icons*21,16,18,red_wifi,TOP_SCREEN)
+			Screen.fillRect(333-#topbar_icons*21,338-#topbar_icons*21,16,18,red_wifi,TOP_SCREEN)
+			Screen.fillRect(326-#topbar_icons*21,331-#topbar_icons*21,16,18,red_wifi,TOP_SCREEN)
 		end
 	end
 	
