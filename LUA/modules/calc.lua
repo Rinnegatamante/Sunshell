@@ -2,12 +2,134 @@
 mode = "Calc"
 
 -- Internal module settings
+SetBottomRefresh(false)
 decimal = false
 result = 0
+digits_num = 0
 showing = 0
+printed = false
 oper_mode = false
 n_switch = true
-
+function DrawMode()
+	Screen.fillEmptyRect(x-10,x+300,y-45,y-25,black,BOTTOM_SCREEN)
+	Screen.fillRect(x-9,x+299,y-44,y-26,white,BOTTOM_SCREEN)
+	Font.print(ttf,x-5,y-44,"Mode: "..calc_mode,black,BOTTOM_SCREEN)
+end
+function DrawDevKeyboard()
+	i = 1
+	z = 1
+	x_c = x+95
+	y_c = y-5
+	while (i <= #d_table) do
+		if z < 3 then
+			Screen.fillEmptyRect(x_c,x_c+50,y_c,y_c+25,black,BOTTOM_SCREEN)
+			Screen.fillRect(x_c+1,x_c+49,y_c+1,y_c+24,white,BOTTOM_SCREEN)
+		else
+			Screen.fillEmptyRect(x_c,x_c+30,y_c,y_c+25,black,BOTTOM_SCREEN)
+			Screen.fillRect(x_c+1,x_c+29,y_c+1,y_c+24,white,BOTTOM_SCREEN)
+		end
+		i=i+1
+		z=z+1
+		if z > 3 then
+			x_c = x_c + 30
+			if z > 5 then
+				x_c = x+95
+				y_c = y_c + 25
+				z = 1
+			end
+		else
+			x_c = x_c + 50
+		end
+	end
+	Font.print(ttf,x+100,y,"+",black,BOTTOM_SCREEN)
+	Font.print(ttf,x+150,y,"-",black,BOTTOM_SCREEN)
+	Font.print(ttf,x+200,y,"7",black,BOTTOM_SCREEN)
+	Font.print(ttf,x+230,y,"8",black,BOTTOM_SCREEN)
+	Font.print(ttf,x+260,y,"9",black,BOTTOM_SCREEN)
+	Font.print(ttf,x+100,y+25,"*",black,BOTTOM_SCREEN)
+	Font.print(ttf,x+150,y+25,"/",black,BOTTOM_SCREEN)
+	Font.print(ttf,x+200,y+25,"4",black,BOTTOM_SCREEN)
+	Font.print(ttf,x+230,y+25,"5",black,BOTTOM_SCREEN)
+	Font.print(ttf,x+260,y+25,"6",black,BOTTOM_SCREEN)
+	Font.print(ttf,x+100,y+50,"A",black,BOTTOM_SCREEN)
+	Font.print(ttf,x+150,y+50,"B",black,BOTTOM_SCREEN)
+	Font.print(ttf,x+200,y+50,"1",black,BOTTOM_SCREEN)
+	Font.print(ttf,x+230,y+50,"2",black,BOTTOM_SCREEN)
+	Font.print(ttf,x+260,y+50,"3",black,BOTTOM_SCREEN)
+	Font.print(ttf,x+100,y+75,"C",black,BOTTOM_SCREEN)
+	Font.print(ttf,x+150,y+75,"D",black,BOTTOM_SCREEN)
+	Font.print(ttf,x+200,y+75,"-X",black,BOTTOM_SCREEN)
+	Font.print(ttf,x+230,y+75,"0",black,BOTTOM_SCREEN)
+	Font.print(ttf,x+260,y+75,"%",black,BOTTOM_SCREEN)
+	Font.print(ttf,x+100,y+100,"E",black,BOTTOM_SCREEN)
+	Font.print(ttf,x+150,y+100,"f",black,BOTTOM_SCREEN)
+	Font.print(ttf,x+200,y+100,"De",black,BOTTOM_SCREEN)
+	Font.print(ttf,x+230,y+100,"Ca",black,BOTTOM_SCREEN)
+	Font.print(ttf,x+260,y+100,"=",black,BOTTOM_SCREEN)
+end
+function DrawScientificKeyboard()
+	i = 1
+	z = 1
+	x_c = x-5
+	y_c = y-5
+	while (i <= #s_table) do
+		exec = false
+		if z < 5 then
+			Screen.fillEmptyRect(x_c,x_c+50,y_c,y_c+25,black,BOTTOM_SCREEN)
+			Screen.fillRect(x_c+1,x_c+49,y_c+1,y_c+24,white,BOTTOM_SCREEN)
+		else
+			Screen.fillEmptyRect(x_c,x_c+30,y_c,y_c+25,black,BOTTOM_SCREEN)
+			Screen.fillRect(x_c+1,x_c+29,y_c+1,y_c+24,white,BOTTOM_SCREEN)
+		end
+		i=i+1
+		z=z+1
+		if z > 5 then
+			x_c = x_c + 30
+			if z > 7 then
+				x_c = x-5
+				y_c = y_c + 25
+				z = 1
+			end
+		else
+			x_c = x_c + 50
+		end
+	end
+	Font.print(ttf,x,y,"10^",black,BOTTOM_SCREEN)
+	Font.print(ttf,x+50,y,"sin",black,BOTTOM_SCREEN)
+	Font.print(ttf,x+100,y,"^",black,BOTTOM_SCREEN)
+	Font.print(ttf,x+150,y,"n!",black,BOTTOM_SCREEN)
+	Font.print(ttf,x+200,y,"7",black,BOTTOM_SCREEN)
+	Font.print(ttf,x+230,y,"8",black,BOTTOM_SCREEN)
+	Font.print(ttf,x+260,y,"9",black,BOTTOM_SCREEN)
+	Font.print(ttf,x,y+25,"abs",black,BOTTOM_SCREEN)
+	Font.print(ttf,x+50,y+25,"cos",black,BOTTOM_SCREEN)
+	Font.print(ttf,x+100,y+25,"rad",black,BOTTOM_SCREEN)
+	Font.print(ttf,x+150,y+25,"radX",black,BOTTOM_SCREEN)
+	Font.print(ttf,x+200,y+25,"4",black,BOTTOM_SCREEN)
+	Font.print(ttf,x+230,y+25,"5",black,BOTTOM_SCREEN)
+	Font.print(ttf,x+260,y+25,"6",black,BOTTOM_SCREEN)
+	Font.print(ttf,x,y+50,"rad3",black,BOTTOM_SCREEN)
+	Font.print(ttf,x+50,y+50,"tan",black,BOTTOM_SCREEN)
+	Font.print(ttf,x+100,y+50,"log",black,BOTTOM_SCREEN)
+	Font.print(ttf,x+150,y+50,"ln",black,BOTTOM_SCREEN)
+	Font.print(ttf,x+200,y+50,"1",black,BOTTOM_SCREEN)
+	Font.print(ttf,x+230,y+50,"2",black,BOTTOM_SCREEN)
+	Font.print(ttf,x+260,y+50,"3",black,BOTTOM_SCREEN)
+	Font.print(ttf,x,y+75,"asin",black,BOTTOM_SCREEN)
+	Font.print(ttf,x+50,y+75,"acos",black,BOTTOM_SCREEN)
+	Font.print(ttf,x+100,y+75,"atan",black,BOTTOM_SCREEN)
+	Font.print(ttf,x+150,y+75,"e^",black,BOTTOM_SCREEN)
+	Font.print(ttf,x+200,y+75,"-X",black,BOTTOM_SCREEN)
+	Font.print(ttf,x+230,y+75,"0",black,BOTTOM_SCREEN)
+	Font.print(ttf,x+260,y+75,",",black,BOTTOM_SCREEN)
+	Font.print(ttf,x,y+100,"+",black,BOTTOM_SCREEN)
+	Font.print(ttf,x+50,y+100,"-",black,BOTTOM_SCREEN)
+	Font.print(ttf,x+100,y+100,"*",black,BOTTOM_SCREEN)
+	Font.print(ttf,x+150,y+100,"/",black,BOTTOM_SCREEN)
+	Font.print(ttf,x+200,y+100,"D",black,BOTTOM_SCREEN)
+	Font.print(ttf,x+230,y+100,"C",black,BOTTOM_SCREEN)
+	Font.print(ttf,x+260,y+100,"=",black,BOTTOM_SCREEN)
+end
 function molt(x,y)
 	return x*y
 end
@@ -54,13 +176,34 @@ function dec(x)
 	decimal = true
 end
 function del(x)
-	to_del = -2
-	if string.len(tostring(x)) < 2 then
-		x = 0
-	elseif string.sub(tostring(x),-2,-2) == "." then
-		to_del = -3
+	if digits_num == 0 then
+		if x < 0 then
+			return math.ceil(x / 10)
+		else
+			return math.floor(x / 10)
+		end		
+	else
+		val = tonumber(string.sub(tostring(x),-1))
+		val = val * (10 ^ (-digits_num))
+		digits_num = digits_num - 1
+		if digits_num == 0 then
+			if x < 0 then
+				return math.ceil(x)
+			else
+				return math.floor(x)
+			end
+		else
+			if val ~= 0 then
+				if x < 0 then
+					return x + val
+				else
+					return x - val
+				end
+			else
+				return x
+			end
+		end
 	end
-	return tonumber(string.sub(tostring(x),1,to_del))
 end
 function hex_del(x)	
 	if x <= 15 and x >= 0 then
@@ -72,9 +215,10 @@ function hex_del(x)
 	end
 end
 function free(x)
+	digits_num = 0
 	return 0
 end
-function ris(x,y) -- x,y stubs
+function ris(x,y) -- dummy x,y
 	decimal = false
 	result = 0
 	oper_mode = false
@@ -157,33 +301,25 @@ function AppMainCycle()
 	
 	-- Draw calculator display
 	if calc_mode == "Developer" then
-		Screen.debugPrint(10,45,"Hex: "..string.format('%X',math.tointeger(showing)),black,TOP_SCREEN)
-		Screen.debugPrint(10,60,"Dec: "..math.tointeger(showing),black,TOP_SCREEN)
+		Font.print(ttf,10,45,"Hex: "..string.format('%X',math.tointeger(showing)),black,TOP_SCREEN)
+		Font.print(ttf,10,60,"Dec: "..math.tointeger(showing),black,TOP_SCREEN)
 	else
-		Screen.debugPrint(10,45,showing,black,TOP_SCREEN)
+		if digits_num < 0 then
+			digits_num = 0
+		end
+		Font.print(ttf,10,45,string.format("%."..digits_num.."f",showing),black,TOP_SCREEN)
 	end
-	-- Draw calculator mode
-	Screen.fillEmptyRect(x-10,x+300,y-45,y-25,black,BOTTOM_SCREEN)
-	Screen.fillRect(x-9,x+299,y-44,y-26,white,BOTTOM_SCREEN)
-	Screen.debugPrint(x-5,y-40,"Mode: "..calc_mode,black,BOTTOM_SCREEN)
 	
 	-- Developer Mode
 	if calc_mode == "Developer" then
 	
-		-- Sets keyboard controls and draw rects for buttons
+		-- Sets keyboard controls
 		i = 1
 		z = 1
 		x_c = x+95
 		y_c = y-5
 		while (i <= #d_table) do
 			exec = false
-			if z < 3 then
-				Screen.fillEmptyRect(x_c,x_c+50,y_c,y_c+25,black,BOTTOM_SCREEN)
-				Screen.fillRect(x_c+1,x_c+49,y_c+1,y_c+24,white,BOTTOM_SCREEN)
-			else
-				Screen.fillEmptyRect(x_c,x_c+30,y_c,y_c+25,black,BOTTOM_SCREEN)
-				Screen.fillRect(x_c+1,x_c+29,y_c+1,y_c+24,white,BOTTOM_SCREEN)
-			end
 			if Controls.check(pad,KEY_TOUCH) and not Controls.check(oldpad,KEY_TOUCH) then
 				c1,c2 = Controls.readTouch()
 				if c1 >= x_c and c2 >= y_c then
@@ -250,51 +386,24 @@ function AppMainCycle()
 				x_c = x_c + 50
 			end
 		end
-	
+		
 		-- Draw calculator keyboard
-		Screen.debugPrint(x+100,y,"+",black,BOTTOM_SCREEN)
-		Screen.debugPrint(x+150,y,"-",black,BOTTOM_SCREEN)
-		Screen.debugPrint(x+200,y,"7",black,BOTTOM_SCREEN)
-		Screen.debugPrint(x+230,y,"8",black,BOTTOM_SCREEN)
-		Screen.debugPrint(x+260,y,"9",black,BOTTOM_SCREEN)
-		Screen.debugPrint(x+100,y+25,"*",black,BOTTOM_SCREEN)
-		Screen.debugPrint(x+150,y+25,"/",black,BOTTOM_SCREEN)
-		Screen.debugPrint(x+200,y+25,"4",black,BOTTOM_SCREEN)
-		Screen.debugPrint(x+230,y+25,"5",black,BOTTOM_SCREEN)
-		Screen.debugPrint(x+260,y+25,"6",black,BOTTOM_SCREEN)
-		Screen.debugPrint(x+100,y+50,"A",black,BOTTOM_SCREEN)
-		Screen.debugPrint(x+150,y+50,"B",black,BOTTOM_SCREEN)
-		Screen.debugPrint(x+200,y+50,"1",black,BOTTOM_SCREEN)
-		Screen.debugPrint(x+230,y+50,"2",black,BOTTOM_SCREEN)
-		Screen.debugPrint(x+260,y+50,"3",black,BOTTOM_SCREEN)
-		Screen.debugPrint(x+100,y+75,"C",black,BOTTOM_SCREEN)
-		Screen.debugPrint(x+150,y+75,"D",black,BOTTOM_SCREEN)
-		Screen.debugPrint(x+200,y+75,"-X",black,BOTTOM_SCREEN)
-		Screen.debugPrint(x+230,y+75,"0",black,BOTTOM_SCREEN)
-		Screen.debugPrint(x+260,y+75,"%",black,BOTTOM_SCREEN)
-		Screen.debugPrint(x+100,y+100,"E",black,BOTTOM_SCREEN)
-		Screen.debugPrint(x+150,y+100,"F",black,BOTTOM_SCREEN)
-		Screen.debugPrint(x+200,y+100,"De",black,BOTTOM_SCREEN)
-		Screen.debugPrint(x+230,y+100,"Ca",black,BOTTOM_SCREEN)
-		Screen.debugPrint(x+260,y+100,"=",black,BOTTOM_SCREEN)
-	
+		if not printed then
+			BottomBGRefresh()
+			OneshotPrint(DrawMode)
+			OneshotPrint(DrawDevKeyboard)
+			printed = true
+		end
 	-- Scientific Mode
 	elseif calc_mode == "Scientific" then
 		
-		-- Sets keyboard controls and draw rects for buttons
+		-- Sets keyboard controls
 		i = 1
 		z = 1
 		x_c = x-5
 		y_c = y-5
 		while (i <= #s_table) do
 			exec = false
-			if z < 5 then
-				Screen.fillEmptyRect(x_c,x_c+50,y_c,y_c+25,black,BOTTOM_SCREEN)
-				Screen.fillRect(x_c+1,x_c+49,y_c+1,y_c+24,white,BOTTOM_SCREEN)
-			else
-				Screen.fillEmptyRect(x_c,x_c+30,y_c,y_c+25,black,BOTTOM_SCREEN)
-				Screen.fillRect(x_c+1,x_c+29,y_c+1,y_c+24,white,BOTTOM_SCREEN)
-			end
 			if Controls.check(pad,KEY_TOUCH) and not Controls.check(oldpad,KEY_TOUCH) then
 				c1,c2 = Controls.readTouch()
 				if c1 >= x_c and c2 >= y_c then
@@ -322,9 +431,11 @@ function AppMainCycle()
 							decimal = true
 						end
 					elseif s_table[i][1] == ris then
-						showing = operator(result,showing)
-						result = 0
-						ris(0,0)
+						if operator ~= nil then
+							showing = operator(result,showing)
+							result = 0
+							ris(0,0)
+						end
 					elseif s_table[i][2] == 2 then
 						if oper_mode then
 							showing = operator(result,showing)
@@ -345,7 +456,7 @@ function AppMainCycle()
 						oper_mode = false
 					end
 				else
-					if showing == 0 then
+					if showing == 0 and not decimal then
 						showing = s_table[i][3]
 					else
 						if oper_mode and not n_switch then
@@ -359,8 +470,14 @@ function AppMainCycle()
 							if decimal then
 								showing = tonumber(tostring(showing).."."..s_table[i][3])
 								decimal = false
+								digits_num = 1
 							else
-								showing = tonumber(tostring(showing)..s_table[i][3])
+								if showing == math.floor(showing) then
+									showing = tonumber(tostring(showing)..s_table[i][3])
+								else
+									digits_num = digits_num + 1
+									showing = tonumber(tostring(string.format("%."..(digits_num-1).."f",showing))..s_table[i][3])
+								end
 							end
 						end
 					end
@@ -381,41 +498,12 @@ function AppMainCycle()
 		end
 		
 		-- Draw calculator keyboard
-		Screen.debugPrint(x,y,"10^",black,BOTTOM_SCREEN)
-		Screen.debugPrint(x+50,y,"sin",black,BOTTOM_SCREEN)
-		Screen.debugPrint(x+100,y,"^",black,BOTTOM_SCREEN)
-		Screen.debugPrint(x+150,y,"n!",black,BOTTOM_SCREEN)
-		Screen.debugPrint(x+200,y,"7",black,BOTTOM_SCREEN)
-		Screen.debugPrint(x+230,y,"8",black,BOTTOM_SCREEN)
-		Screen.debugPrint(x+260,y,"9",black,BOTTOM_SCREEN)
-		Screen.debugPrint(x,y+25,"abs",black,BOTTOM_SCREEN)
-		Screen.debugPrint(x+50,y+25,"cos",black,BOTTOM_SCREEN)
-		Screen.debugPrint(x+100,y+25,"rad",black,BOTTOM_SCREEN)
-		Screen.debugPrint(x+150,y+25,"radX",black,BOTTOM_SCREEN)
-		Screen.debugPrint(x+200,y+25,"4",black,BOTTOM_SCREEN)
-		Screen.debugPrint(x+230,y+25,"5",black,BOTTOM_SCREEN)
-		Screen.debugPrint(x+260,y+25,"6",black,BOTTOM_SCREEN)
-		Screen.debugPrint(x,y+50,"rad3",black,BOTTOM_SCREEN)
-		Screen.debugPrint(x+50,y+50,"tan",black,BOTTOM_SCREEN)
-		Screen.debugPrint(x+100,y+50,"log",black,BOTTOM_SCREEN)
-		Screen.debugPrint(x+150,y+50,"ln",black,BOTTOM_SCREEN)
-		Screen.debugPrint(x+200,y+50,"1",black,BOTTOM_SCREEN)
-		Screen.debugPrint(x+230,y+50,"2",black,BOTTOM_SCREEN)
-		Screen.debugPrint(x+260,y+50,"3",black,BOTTOM_SCREEN)
-		Screen.debugPrint(x,y+75,"asin",black,BOTTOM_SCREEN)
-		Screen.debugPrint(x+50,y+75,"acos",black,BOTTOM_SCREEN)
-		Screen.debugPrint(x+100,y+75,"atan",black,BOTTOM_SCREEN)
-		Screen.debugPrint(x+150,y+75,"e^",black,BOTTOM_SCREEN)
-		Screen.debugPrint(x+200,y+75,"-X",black,BOTTOM_SCREEN)
-		Screen.debugPrint(x+230,y+75,"0",black,BOTTOM_SCREEN)
-		Screen.debugPrint(x+260,y+75,",",black,BOTTOM_SCREEN)
-		Screen.debugPrint(x,y+100,"+",black,BOTTOM_SCREEN)
-		Screen.debugPrint(x+50,y+100,"-",black,BOTTOM_SCREEN)
-		Screen.debugPrint(x+100,y+100,"*",black,BOTTOM_SCREEN)
-		Screen.debugPrint(x+150,y+100,"/",black,BOTTOM_SCREEN)
-		Screen.debugPrint(x+200,y+100,"D",black,BOTTOM_SCREEN)
-		Screen.debugPrint(x+230,y+100,"C",black,BOTTOM_SCREEN)
-		Screen.debugPrint(x+260,y+100,"=",black,BOTTOM_SCREEN)
+		if not printed then
+			BottomBGRefresh()
+			OneshotPrint(DrawMode)
+			OneshotPrint(DrawScientificKeyboard)
+			printed = true
+		end
 	
 	end
 	
@@ -423,6 +511,7 @@ function AppMainCycle()
 	if Controls.check(pad,KEY_B) or Controls.check(pad,KEY_START) then
 		CallMainMenu()
 	elseif Controls.check(pad,KEY_SELECT) and not Controls.check(oldpad,KEY_SELECT) then
+		printed = false
 		decimal = false
 		result = 0
 		showing = 0
