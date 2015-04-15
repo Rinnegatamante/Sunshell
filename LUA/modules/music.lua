@@ -166,7 +166,7 @@ function AppMainCycle()
 	-- Sets controls triggering
 	if (Controls.check(pad,KEY_SELECT)) and not (Controls.check(oldpad,KEY_SELECT)) and not (not_started) then
 		CallMainMenu()
-		AddIconTopbar(main_dir.."/images/music_icon.jpg","Music")
+		AddIconTopbar(theme_dir.."/images/music_icon.jpg","Music")
 	elseif (Controls.check(pad,KEY_X)) and not (Controls.check(oldpad,KEY_X)) and not (not_started) then
 		if Sound.isPlaying(current_song) then
 			Sound.pause(current_song)
