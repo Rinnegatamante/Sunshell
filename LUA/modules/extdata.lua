@@ -7,6 +7,8 @@ if extdata_backup == nil then
 	files_table = System.scanExtdata()
 	extdata_backup = files_table
 end
+update_bottom_screen = true
+update_top_screen = true
 ui_enabled = false
 extdata_directory = "/"
 white = Color.new(255,255,255)
@@ -111,10 +113,12 @@ function OpenDirectory(text,archive_id)
 end
 function ExtGC()
 	if current_file ~= nil then
+		update_top_screen = true
 		io.close(current_file)
 		old_indexes = {}
 		txt_i = 0
 	end
+	current_file = nil
 end
 function DumpFolder(input,archive)
 	files = System.listExtdataDir(extdata_directory..input,archive)
@@ -160,78 +164,83 @@ function BuildHex(file, index)
 	end
 	return index
 end
-
--- Module main cycle
-function AppMainCycle()
-	base_y = 0
-	i = 1
-	Screen.refresh()
+function PrintTop()
 	Screen.clear(TOP_SCREEN)
-	Screen.clear(BOTTOM_SCREEN)
-	pad = Controls.read()
 	if (current_file == nil) then
-		Screen.debugPrint(0,0,"Basic Controls:",white,TOP_SCREEN)
-		Screen.debugPrint(0,15,"A = Open file/folder",white,TOP_SCREEN)
-		Screen.debugPrint(0,30,"X = Restore file/folder from SD card",white,TOP_SCREEN)
-		Screen.debugPrint(0,45,"Y = Dump file/folder to SD card",white,TOP_SCREEN)
-		Screen.debugPrint(0,60,"B = Return Main Menu",white,TOP_SCREEN)
-		Screen.debugPrint(0,75,"Left/Right = Scroll file",white,TOP_SCREEN)
+		Font.print(ttf,0,0,"Basic Controls:",white,TOP_SCREEN)
+		Font.print(ttf,0,15,"A = Open file/folder",white,TOP_SCREEN)
+		Font.print(ttf,0,30,"X = Restore file/folder from SD card",white,TOP_SCREEN)
+		Font.print(ttf,0,45,"Y = Dump file/folder to SD card",white,TOP_SCREEN)
+		Font.print(ttf,0,60,"B = Return Main Menu",white,TOP_SCREEN)
+		Font.print(ttf,0,75,"Left/Right = Scroll file",white,TOP_SCREEN)
 	else
-		if (updateTXT) then
-			txt_index = BuildHex(current_file,txt_index)
-			updateTXT = false
-		end
 		for l, line in pairs(hex_text) do
-			Screen.debugPrint(280,(l-1)*15,string.gsub(line,"\0"," "),white,TOP_SCREEN)
+			Font.print(ttf,280,(l-1)*15,string.gsub(line,"\0"," "),white,TOP_SCREEN)
 			temp = 1
 			while (temp <= string.len(line)) do
 				if (temp % 2 == 0) then
-					Screen.debugPrint(0+(temp-1)*30,(l-1)*15,string.format('%02X', hex_values[(l-1)*8+temp]),white,TOP_SCREEN)
+					Font.print(ttf,0+(temp-1)*30,(l-1)*15,string.format('%02X', hex_values[(l-1)*8+temp]),white,TOP_SCREEN)
 				else
-					Screen.debugPrint(0+(temp-1)*30,(l-1)*15,string.format('%02X', hex_values[(l-1)*8+temp]),red,TOP_SCREEN)
+					Font.print(ttf,0+(temp-1)*30,(l-1)*15,string.format('%02X', hex_values[(l-1)*8+temp]),red,TOP_SCREEN)
 				end
 				temp = temp + 1
 			end
 		end
-		Screen.debugPrint(0,225,"Offset: 0x" .. string.format('%X', old_indexes[#old_indexes]) .. " (" .. (old_indexes[#old_indexes]) .. ")",white,TOP_SCREEN)
+		Font.print(ttf,0,225,"Offset: 0x" .. string.format('%X', old_indexes[#old_indexes]) .. " (" .. (old_indexes[#old_indexes]) .. ")",white,TOP_SCREEN)
 	end
+end
+function PrintBottom()
+	base_y = 0
+	Screen.clear(BOTTOM_SCREEN)
 	for l, file in pairs(files_table) do
 		if (base_y > 226) then
 			break
 		end
 		if (l >= master_index) then
 			if (l==p) then
-				base_y2 = base_y
-				if (base_y) == 0 then
-					base_y = 2
-				end
-				Screen.fillRect(0,319,base_y-2,base_y2+12,selected_item,BOTTOM_SCREEN)
+				Screen.fillRect(0,319,base_y,base_y+15,selected_item,BOTTOM_SCREEN)
 				color = selected_color
-				if (base_y) == 2 then
-					base_y = 0
-				end
 			else
 				color = menu_color
 			end
 			if file.name == ".." then
-				DebugCropPrint(0,base_y,file.name,color,BOTTOM_SCREEN)
+				CropPrint(0,base_y,file.name,color,BOTTOM_SCREEN)
 			else
-				DebugCropPrint(0,base_y,file.name.." ["..string.format('%02X',file.archive).."]",color,BOTTOM_SCREEN)
+				CropPrint(0,base_y,file.name.." ["..string.format('%02X',file.archive).."]",color,BOTTOM_SCREEN)
 			end
 			base_y = base_y + 15
 		end
 	end
+end
+
+-- Module main cycle
+function AppMainCycle()
+	if update_top_screen then
+		if (updateTXT) then
+			txt_index = BuildHex(current_file,txt_index)
+			updateTXT = false
+		end
+		OneshotPrint(PrintTop)
+		update_top_screen = false
+	end
+	if update_bottom_screen then
+		OneshotPrint(PrintBottom)
+		update_bottom_screen = false
+	end
+	
 	-- Base Controls Functions
 	if (Controls.check(pad,KEY_DUP)) and not (Controls.check(oldpad,KEY_DUP)) then
 		p = p - 1
 		if (p >= 16) then
 			master_index = p - 15
 		end
+		update_bottom_screen = true
 	elseif (Controls.check(pad,KEY_DDOWN)) and not (Controls.check(oldpad,KEY_DDOWN)) then
 		p = p + 1
 		if (p >= 17) then
 			master_index = p - 15
 		end
+		update_bottom_screen = true
 	end
 	if (p < 1) then
 		p = #files_table
@@ -247,6 +256,7 @@ function AppMainCycle()
 			OpenDirectory(files_table[p].name,files_table[p].archive)
 			p=1
 			master_index=0
+			update_bottom_screen = true
 		else
 			OpenExtdataFile(files_table[p].name,files_table[p].archive)
 		end
@@ -267,6 +277,7 @@ function AppMainCycle()
 			CallMainMenu()
 	elseif (Controls.check(pad,KEY_DLEFT)) and not (Controls.check(oldpad,KEY_DLEFT)) then
 		if current_file ~= nil then
+			update_top_screen = true
 			if (txt_i > 1) then			
 				updateTXT = true
 				table.remove(old_indexes)
@@ -276,6 +287,7 @@ function AppMainCycle()
 		end
 	elseif (Controls.check(pad,KEY_DRIGHT)) and not (Controls.check(oldpad,KEY_DRIGHT)) then
 		if current_file ~= nil then
+			update_top_screen = true
 			updateTXT = true
 		end
 	elseif (Controls.check(pad,KEY_TOUCH)) then
