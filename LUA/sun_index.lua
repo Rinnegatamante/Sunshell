@@ -44,7 +44,7 @@ in_game = false
 refresh_screen = true
 Sound.init()
 app_index = 1
-version = "0.2"
+version = "0.3"
 ui_enabled = true
 screenshots = true
 oldpad = KEY_A
