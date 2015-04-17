@@ -334,7 +334,7 @@ function OpenFile(text, size)
 		current_file = JPGV.load(System.currentDirectory()..text)
 		current_type = "JPGV"
 		JPGV.start(current_file,NO_LOOP,0x08,0x09)
-	elseif string.upper(string.sub(text,-4)) == "TTF" then
+	elseif string.upper(string.sub(text,-4)) == ".TTF" then
 		FBGC()
 		current_file = Font.load(System.currentDirectory()..text)
 		current_type = "TTF"
