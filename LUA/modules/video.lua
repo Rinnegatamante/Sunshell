@@ -119,8 +119,6 @@ function AppMainCycle()
 				Screen.debugPrint(0,55,"X = Hide Bottom Screen",white,BOTTOM_SCREEN)
 				Screen.debugPrint(0,100,"Infos:",white,BOTTOM_SCREEN)
 				Screen.debugPrint(0,114,"FPS: "..JPGV.getFPS(current_file),white,BOTTOM_SCREEN)
-				Screen.debugPrint(0,157,"Vorbis package:"..JPGV.lol(current_file),white,BOTTOM_SCREEN)
-				Screen.debugPrint(0,173,"Block buffer:"..JPGV.lol2(current_file),white,BOTTOM_SCREEN)
 				cur_time_sec = math.ceil(JPGV.getFrame(current_file) / JPGV.getFPS(current_file))
 				cur_time_min = 0
 				while (cur_time_sec >= 60) do
@@ -128,13 +126,13 @@ function AppMainCycle()
 					cur_time_min = cur_time_min + 1
 				end
 				if (cur_time_sec < 10) then
-					Screen.debugPrint(0,128,"Time: " .. cur_time_min .. ":0" .. cur_time_sec .. " / " .. tot_time_min .. ":" .. tot_time_sec.."/"..FormatTime(JPGV.lol(current_file)),white,BOTTOM_SCREEN)
+					Screen.debugPrint(0,128,"Time: " .. cur_time_min .. ":0" .. cur_time_sec .. " / " .. tot_time_min .. ":" .. tot_time_sec,white,BOTTOM_SCREEN)
 				else
-					Screen.debugPrint(0,128,"Time: " .. cur_time_min .. ":0" .. cur_time_sec .. " / " .. tot_time_min .. ":" .. tot_time_sec.."/"..FormatTime(JPGV.lol(current_file)),white,BOTTOM_SCREEN)
+					Screen.debugPrint(0,128,"Time: " .. cur_time_min .. ":" .. cur_time_sec .. " / " .. tot_time_min .. ":" .. tot_time_sec,white,BOTTOM_SCREEN)
 				end
 				Screen.debugPrint(0,142,"Samplerate: "..JPGV.getSrate(current_file),white,BOTTOM_SCREEN)
-				percentage = math.ceil((JPGV.getFrame(current_file) * 100) / JPGV.getSize(current_file))
-				Screen.debugPrint(0,200,"Percentage: " ..percentage .. "%",white,BOTTOM_SCREEN)
+				percentage = ((JPGV.getFrame(current_file) * 100) / JPGV.getSize(current_file))
+				Screen.debugPrint(0,200,"Percentage: " ..math.ceil(percentage) .. "%",white,BOTTOM_SCREEN)
 				Screen.fillEmptyRect(2,318,214,234,white,BOTTOM_SCREEN)
 				move = ((314 * percentage) / 100)
 				Screen.fillRect(3,3 + math.ceil(move),215,233,white,BOTTOM_SCREEN)
