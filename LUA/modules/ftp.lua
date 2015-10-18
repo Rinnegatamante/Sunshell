@@ -14,22 +14,33 @@ end
 -- Internal module settings
 FreeIconTopbar("FTP")
 if Network.isWifiEnabled() then
-	if last_shared == nil then
-		last_shared = "Waiting for connection..."
-		Network.initFTP()
-		table.insert(bg_apps,{BackgroundFTP,FTPGC,"FTP Server"}) -- Adding FTP module to background apps
+	if build == "Ninjhax 2" then
+		ShowError("Network features currently unavailable on Ninjhax 2.")
+	else
+		if last_shared == nil then
+			last_shared = "Waiting for connection..."
+			Network.initFTP()
+			table.insert(bg_apps,{BackgroundFTP,FTPGC,"FTP Server"}) -- Adding FTP module to background apps
+		end
 	end
 else
 	ShowError("You need to be connected to an Hotspot to use FTP server.")
 	CallMainMenu()
 end
 
+-- Rendering functions
+function AppTopScreenRender()	
+	Graphics.fillRect(5,395,40,220,black)
+	Graphics.fillRect(6,394,41,219,white)
+end
+
+function AppBottomScreenRender()
+	Graphics.fillRect(5,315,40,92,black)
+	Graphics.fillRect(6,314,41,91,white)
+end
+
 -- Module main cycle
 function AppMainCycle()
-	
-	-- Draw top screen box
-	Screen.fillEmptyRect(5,395,40,220,black,TOP_SCREEN)
-	Screen.fillRect(6,394,41,219,white,TOP_SCREEN)
 	
 	-- Draw FTP info
 	Font.print(ttf,9,45,"IP: "..Network.getIPAddress(),black,TOP_SCREEN)
@@ -39,9 +50,7 @@ function AppMainCycle()
 		Font.print(ttf,9,line[2],line[1],black,TOP_SCREEN)
 	end
 	
-	-- Draw bottom screen box and command info
-	Screen.fillEmptyRect(5,315,40,92,black,BOTTOM_SCREEN)
-	Screen.fillRect(6,314,41,91,white,BOTTOM_SCREEN)
+	-- Draw bottom screen commands info	
 	Font.print(ttf,9,45,"A = Restart FTP server",black,BOTTOM_SCREEN)
 	Font.print(ttf,9,60,"SELECT = Return Main Menu",black,BOTTOM_SCREEN)
 	Font.print(ttf,9,75,"B = Term FTP server",black,BOTTOM_SCREEN)

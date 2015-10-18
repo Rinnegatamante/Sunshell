@@ -1,11 +1,9 @@
--- Set private "Photo" mode
-mode = "Photo"
+-- Set private "Themes" mode
+mode = "Themes"
 
 -- Internal module settings
 master_index_t = 0
-SetBottomRefresh(false)
 p_t = 1
-update_bottom_screen = true
 my_themes = {}
 tmp = System.listDirectory(main_dir.."/themes")
 for i,file in pairs(tmp) do
@@ -36,14 +34,17 @@ function UpdateBottomScreen()
 		
 end
 
+-- Rendering functions
+function AppTopScreenRender()	
+end
+
+function AppBottomScreenRender()
+end
+
 -- Module main cycle
 function AppMainCycle()
 
-	if update_bottom_screen then
-		BottomBGRefresh()
-		OneshotPrint(UpdateBottomScreen)
-		update_bottom_screen = false
-	end
+	UpdateBottomScreen()
 	
 	-- Sets controls triggering
 	if (Controls.check(pad,KEY_A)) and not (Controls.check(oldpad,KEY_A)) then

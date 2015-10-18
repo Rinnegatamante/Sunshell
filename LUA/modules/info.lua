@@ -3,10 +3,19 @@ mode = "Info"
 
 -- Internal module settings
 mac_addr = Network.getMacAddress()
+if Network.isWifiEnabled() then
+	oldn = true
+	ip_addr = Network.getIPAddress()
+else
+	oldn = false
+	ip_addr = "0.0.0.0"
+end
 model = System.getModel()
 region = System.getRegion()
-fw = System.getFirmware()
-kernel = System.getKernel()
+fw1,fw2,fw3 = System.getFirmware()
+fw = fw1 .. "." .. fw2 .. "-" .. fw3
+k1,k2,k3 = System.getKernel()
+kernel = k1 .. "." .. k2 .. "-" .. k3
 free_space = System.getFreeSpace()
 sorting = "Bytes"
 if free_space > 1024 then
@@ -19,12 +28,17 @@ if free_space > 1024 then
 end
 free_space = string.format("%8.2f", free_space)
 
+-- Rendering functions
+function AppTopScreenRender()	
+	Graphics.fillRect(5,395,40,220,black)
+	Graphics.fillRect(6,394,41,219,white)
+end
+
+function AppBottomScreenRender()
+end
+
 -- Module main cycle
 function AppMainCycle()
-	
-	-- Draw top screen box
-	Screen.fillEmptyRect(5,395,40,220,black,TOP_SCREEN)
-	Screen.fillRect(6,394,41,219,white,TOP_SCREEN)
 	
 	-- Draw console info
 	if model == 1 then
@@ -45,11 +59,28 @@ function AppMainCycle()
 	else
 		Font.print(ttf,9,60,"Region: JPN",black,TOP_SCREEN)
 	end
+	
+	-- Update IP Address
+	if oldn and not Network.isWifiEnabled() then
+		ip_addr = "0.0.0.0"
+		oldn = false
+	elseif Network.isWifiEnabled() and not oldn then
+		oldn = true
+		if build ~= "Ninjhax 2" then
+			Socket.init()
+			ip_addr = Network.getIPAddress()
+			Socket.term()
+		else
+			ip_addr = "0.0.0.0"
+		end
+	end
+	
+	-- Draw info
 	Font.print(ttf,9,75,"Firmware Build: " .. fw,black,TOP_SCREEN)
 	Font.print(ttf,9,90,"Kernel Build: " .. kernel,black,TOP_SCREEN)
 	Font.print(ttf,9,105,"Free Space: "..free_space.." "..sorting,black,TOP_SCREEN)
 	Font.print(ttf,9,120,"MAC Address: "..mac_addr,black,TOP_SCREEN)
-	Font.print(ttf,9,135,"IP Address: "..Network.getIPAddress(),black,TOP_SCREEN)
+	Font.print(ttf,9,135,"IP Address: "..ip_addr,black,TOP_SCREEN)
 	Font.print(ttf,9,150,"Build: "..build,black,TOP_SCREEN)
 	-- Sets controls triggering
 	if Controls.check(pad,KEY_B) or Controls.check(pad,KEY_START) then

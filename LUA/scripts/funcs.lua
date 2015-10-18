@@ -6,6 +6,19 @@
 
 start_dir = System.currentDirectory()
 
+-- * explode
+-- PHP explode porting for LUA developing
+function explode(div,str)
+	pos = 0
+	arr = {}
+	for st,sp in function() return string.find(str,div,pos,true) end do
+		table.insert(arr,string.sub(str,pos,st-1))
+		pos = sp + 1
+	end
+	table.insert(arr,string.sub(str,pos))
+	return arr
+end
+
 -- * CallMainMenu
 -- Sets SunShell to Main Menu mode, usefull to exit from a module
 function CallMainMenu()
@@ -21,21 +34,14 @@ end
 -- Sets Refreshing Screen state for Bottom Screen
 function SetBottomRefresh(value)
 	refresh_screen = value
-	if value == false then
-		Screen.drawPartialImage(0,0,40,240,320,240,bg,BOTTOM_SCREEN)
-		Screen.flip()
-		Screen.refresh()
-		Screen.drawPartialImage(0,0,40,240,320,240,bg,BOTTOM_SCREEN)
-	end
 end
 
--- * BottomBGRefresh
--- Refresh Bottom Screen background (use it only with SetBottomRefresh = false)
-function BottomBGRefresh()
-	Screen.drawPartialImage(0,0,40,240,320,240,bg,BOTTOM_SCREEN)
-	Screen.flip()
-	Screen.refresh()
-	Screen.drawPartialImage(0,0,40,240,320,240,bg,BOTTOM_SCREEN)
+-- * CustomRenderBottom
+-- Sets up a custom GPU rendering for bottom screen
+function CustomRenderBottom(func)
+	Graphics.initBlend(BOTTOM_SCREEN)
+	func()
+	Graphics.termBlend()
 end
 
 -- * CloseBGApp
@@ -73,16 +79,16 @@ end
 -- * GarbageCollection
 -- Free all allocated SunShell elements
 function GarbageCollection()
-	Screen.freeImage(bg)
-	Screen.freeImage(b0)
-	Screen.freeImage(b1)
-	Screen.freeImage(b2)
-	Screen.freeImage(b3)
-	Screen.freeImage(b4)
-	Screen.freeImage(b5)
-	Screen.freeImage(charge)
+	Graphics.freeImage(bg)
+	Graphics.freeImage(b0)
+	Graphics.freeImage(b1)
+	Graphics.freeImage(b2)
+	Graphics.freeImage(b3)
+	Graphics.freeImage(b4)
+	Graphics.freeImage(b5)
+	Graphics.freeImage(charge)
 	for i,tool in pairs(tools) do
-		Screen.freeImage(tool[1])
+		Graphics.freeImage(tool[1])
 	end
 end
 
@@ -256,7 +262,7 @@ end
 -- * AddIconTopbar
 -- Add an Icon to Topbar
 function AddIconTopbar(filename,id)
-	table.insert(topbar_icons, {Screen.loadImage(filename),id})
+	table.insert(topbar_icons, {Graphics.loadImage(filename),id})
 end
 
 -- * FreeIconTopbar
@@ -264,7 +270,7 @@ end
 function FreeIconTopbar(my_app)
 	for i, icon in pairs(topbar_icons) do
 		if icon[2] == my_app then
-			Screen.freeImage(icon[1])
+			Graphics.freeImage(icon[1])
 			table.remove(topbar_icons,i)
 			break
 		end

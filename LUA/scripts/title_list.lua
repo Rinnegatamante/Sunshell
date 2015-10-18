@@ -1887,7 +1887,7 @@ title_list = {
 			 {"Grandpa Carls Flying House 3D","CTR-MBXJ",0x00162C00},
 			 {"Sugar Rush 3D","CTR-MBTJ",0x00164900},
 			 {"Flap Flap","CTR-BFFP",0x00154900},
-			 {"Sekaiju To Fushigi no Dungeon","CTR-BFDJ",0x00118300}
+			 {"Sekaiju To Fushigi no Dungeon","CTR-BFDJ",0x00118300},
 			 {"LEGO City Undercover: The Chase Begins","CTR-AA8J",0x00154700},
 			 {"Gumman Story","CTR-JGCJ",0x000E8800},
 			 {"Gumman Story 2","CTR-JWGJ",0x00164B00},

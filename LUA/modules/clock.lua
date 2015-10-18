@@ -65,12 +65,23 @@ function ClockGC()
 	alarm_sound = nil
 end
 
+-- Rendering functions
+function AppTopScreenRender()	
+	Graphics.fillRect(5,395,40,220,black)
+	Graphics.fillRect(6,394,41,219,white)
+end
+
+function AppBottomScreenRender()
+	
+	if set_alarm ~= nil then
+		Graphics.fillRect(5,100,75,95,black)
+		Graphics.fillRect(6,99,76,94,white)
+	end
+	
+end
+
 -- Module main cycle
 function AppMainCycle()
-	
-	-- Draw top screen box
-	Screen.fillEmptyRect(5,395,40,220,black,TOP_SCREEN)
-	Screen.fillRect(6,394,41,219,white,TOP_SCREEN)
 	
 	-- Draw controls info
 	h,m,s = System.getTime()
@@ -177,8 +188,6 @@ function AppMainCycle()
 	
 	-- Draw alarm config
 	if set_alarm ~= nil then
-		Screen.fillEmptyRect(5,100,75,95,black,BOTTOM_SCREEN)
-		Screen.fillRect(6,99,76,94,white,BOTTOM_SCREEN)
 		if set_alarm then
 			k = 1
 			my_alarm = ""
@@ -190,8 +199,6 @@ function AppMainCycle()
 				k = k + 1
 			end
 			Font.print(ttf,9,80,my_alarm,black,BOTTOM_SCREEN)
-		else
-			
 		end
 	end
 	
