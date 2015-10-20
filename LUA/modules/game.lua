@@ -30,7 +30,7 @@ for i,app in pairs(System.listDirectory(main_dir.."/apps")) do
 	end
 end
 
-if build == "3DSX" then
+if build == "Ninjhax 1" then
 	dir = System.listDirectory("/3ds/")
 	for i,file in pairs(dir) do
 		if file.directory then
@@ -45,36 +45,48 @@ if build == "3DSX" then
 		end
 	end
 end
-table.insert(my_apps,{false,nil,"Game Cartridge","","0x0",nil})-- Insert Gamecard voice
-dir = System.listCIA()
-for i,file in pairs(dir) do
-	if file.mediatype == SDMC then
-		table.insert(my_apps,{false,file.unique_id,file.product_id,"","0x"..string.sub(string.format('%02X',file.unique_id),1,-3),nil})
-	end
-end
-		
--- Game titles parsing
-dofile(main_dir.."/scripts/title_list.lua")
-assigned = 0
-for i,title in pairs(title_list) do
-	if assigned >= (#my_apps - 1) then
-		break
-	end
-	for z,app in pairs(my_apps) do
-		if app[2] == title[3] then
-			app[3] = title[1]
-			assigned = assigned + 1
+if build ~= "Ninjhax 2" then
+	table.insert(my_apps,{false,nil,"Game Cartridge","","0x0",nil})-- Insert Gamecard voice
+	dir = System.listCIA()
+	for i,file in pairs(dir) do
+		if file.mediatype == SDMC then
+			table.insert(my_apps,{false,file.unique_id,file.product_id,"","0x"..string.sub(string.format('%02X',file.unique_id),1,-3),nil})
 		end
 	end
+	
+	-- Game titles parsing
+	dofile(main_dir.."/scripts/title_list.lua")
+	assigned = 0
+	for i,title in pairs(title_list) do
+		if assigned >= (#my_apps - 1) then
+			break
+		end
+		for z,app in pairs(my_apps) do
+			if app[2] == title[3] then
+				app[3] = title[1]
+				assigned = assigned + 1
+			end
+		end
+	end
+	
+end	
+
+if #my_apps <= 0 then
+	ShowError("Cannot access any launchable application.")
+	CallMainMenu()
 end
-		
+
+-- Rendering functions
+function AppTopScreenRender()	
+	Graphics.fillRect(5,395,40,220,black)
+	Graphics.fillRect(6,394,41,219,white)
+end
+
+function AppBottomScreenRender()
+end
 
 -- Module main cycle
 function AppMainCycle()
-	
-	-- Draw top screen box
-	Screen.fillEmptyRect(5,395,40,220,black,TOP_SCREEN)
-	Screen.fillRect(6,394,41,219,white,TOP_SCREEN)
 	
 	-- Draw bottom screen listmenu and top screen info
 	base_y = 0
