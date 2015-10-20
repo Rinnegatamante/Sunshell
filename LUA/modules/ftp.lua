@@ -7,7 +7,7 @@ function BackgroundFTP()
 end
 
 function FTPGC()
-	Network.termFTP()
+	Socket.term()
 	last_shared = nil
 end
 
@@ -16,10 +16,11 @@ FreeIconTopbar("FTP")
 if Network.isWifiEnabled() then
 	if build == "Ninjhax 2" then
 		ShowError("Network features currently unavailable on Ninjhax 2.")
+		CallMainMenu()
 	else
 		if last_shared == nil then
 			last_shared = "Waiting for connection..."
-			Network.initFTP()
+			Socket.init()
 			table.insert(bg_apps,{BackgroundFTP,FTPGC,"FTP Server"}) -- Adding FTP module to background apps
 		end
 	end
