@@ -25,6 +25,7 @@ function CallMainMenu()
 	mode = nil
 	module = "Main Menu"
 	ui_enabled = true
+	renderer = true
 	screenshots = true
 	refresh_screen = true
 	System.currentDirectory(start_dir)
@@ -36,10 +37,30 @@ function SetBottomRefresh(value)
 	refresh_screen = value
 end
 
+-- * SetTopRefresh
+-- Sets Refreshing Screen state for Top Screen
+function SetTopRefresh(value)
+	refresh_screen2 = value
+end
+
+-- * DisableRenderer
+-- Disable GPU renderer for both screens
+function DisableRenderer()
+	renderer = false
+end
+
 -- * CustomRenderBottom
--- Sets up a custom GPU rendering for bottom screen
+-- Sets up a custom GPU rendering scene for bottom screen
 function CustomRenderBottom(func)
 	Graphics.initBlend(BOTTOM_SCREEN)
+	func()
+	Graphics.termBlend()
+end
+
+-- * CustomRenderTop
+-- Sets up a custom GPU rendering scene for top screen
+function CustomRenderTop(func)
+	Graphics.initBlend(TOP_SCREEN)
 	func()
 	Graphics.termBlend()
 end

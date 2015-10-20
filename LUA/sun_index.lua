@@ -6,32 +6,33 @@ System.createDirectory("/DCIM")
 -- Open config file and system files
 dofile("/config.sun")
 theme_dir = main_dir.."/themes/"..theme
-bg = Screen.loadImage(theme_dir.."/images/bg.jpg")
+Graphics.init()
+bg = Graphics.loadImage(theme_dir.."/images/bg.jpg")
 if System.doesFileExist(theme_dir.."/images/music.jpg") then
 	ext = ".jpg"
 else
 	ext = ".png"
 end
-music = Screen.loadImage(theme_dir.."/images/music"..ext)
-video = Screen.loadImage(theme_dir.."/images/video"..ext)
-info = Screen.loadImage(theme_dir.."/images/info"..ext)
-fb = Screen.loadImage(theme_dir.."/images/fb"..ext)
-game = Screen.loadImage(theme_dir.."/images/game"..ext)
-photo = Screen.loadImage(theme_dir.."/images/photo"..ext)
-cia = Screen.loadImage(theme_dir.."/images/cia"..ext)
-extdata = Screen.loadImage(theme_dir.."/images/extdata"..ext)
-calc = Screen.loadImage(theme_dir.."/images/calc"..ext)
-mail = Screen.loadImage(theme_dir.."/images/mail"..ext)
-themes = Screen.loadImage(theme_dir.."/images/themes"..ext)
-clock = Screen.loadImage(theme_dir.."/images/clock"..ext)
-ftp = Screen.loadImage(theme_dir.."/images/ftp"..ext)
-charge = Screen.loadImage(theme_dir.."/images/charge"..ext)
-b0 = Screen.loadImage(theme_dir.."/images/0"..ext)
-b1 = Screen.loadImage(theme_dir.."/images/1"..ext)
-b2 = Screen.loadImage(theme_dir.."/images/2"..ext)
-b3 = Screen.loadImage(theme_dir.."/images/3"..ext)
-b4 = Screen.loadImage(theme_dir.."/images/4"..ext)
-b5 = Screen.loadImage(theme_dir.."/images/5"..ext)
+music = Graphics.loadImage(theme_dir.."/images/music"..ext)
+video = Graphics.loadImage(theme_dir.."/images/video"..ext)
+info = Graphics.loadImage(theme_dir.."/images/info"..ext)
+fb = Graphics.loadImage(theme_dir.."/images/fb"..ext)
+game = Graphics.loadImage(theme_dir.."/images/game"..ext)
+photo = Graphics.loadImage(theme_dir.."/images/photo"..ext)
+cia = Graphics.loadImage(theme_dir.."/images/cia"..ext)
+extdata = Graphics.loadImage(theme_dir.."/images/extdata"..ext)
+calc = Graphics.loadImage(theme_dir.."/images/calc"..ext)
+mail = Graphics.loadImage(theme_dir.."/images/mail"..ext)
+themes = Graphics.loadImage(theme_dir.."/images/themes"..ext)
+clock = Graphics.loadImage(theme_dir.."/images/clock"..ext)
+ftp = Graphics.loadImage(theme_dir.."/images/ftp"..ext)
+charge = Graphics.loadImage(theme_dir.."/images/charge"..ext)
+b0 = Graphics.loadImage(theme_dir.."/images/0"..ext)
+b1 = Graphics.loadImage(theme_dir.."/images/1"..ext)
+b2 = Graphics.loadImage(theme_dir.."/images/2"..ext)
+b3 = Graphics.loadImage(theme_dir.."/images/3"..ext)
+b4 = Graphics.loadImage(theme_dir.."/images/4"..ext)
+b5 = Graphics.loadImage(theme_dir.."/images/5"..ext)
 ttf = Font.load(theme_dir.."/fonts/main.ttf")
 dofile(theme_dir.."/colors.lua")
 Font.setPixelSizes(ttf,18)
@@ -41,10 +42,12 @@ bg_apps = {}
 topbar_icons = {}
 old_headset = Controls.headsetStatus()
 in_game = false
+renderer = true
 refresh_screen = true
+refresh_screen2 = true
 Sound.init()
 app_index = 1
-version = "0.3"
+version = "0.3.8"
 ui_enabled = true
 screenshots = true
 oldpad = KEY_A
@@ -90,9 +93,11 @@ dofile(main_dir.."/scripts/funcs.lua")
 -- Set detected build in use
 build_idx = System.checkBuild()
 if build_idx == 0 then
-	build = "3DSX"
+	build = "Ninjhax 1"
 elseif build_idx == 1 then
-	build = "CIA"
+	build = "Custom Firmware"
+else
+	build = "Ninjhax 2"
 end
 
 -- Setting modules as apps
@@ -110,6 +115,96 @@ table.insert(tools,{clock,"/modules/clock.lua","Clock"})
 table.insert(tools,{ftp,"/modules/ftp.lua","FTP Server"})
 table.insert(tools,{mail,"/modules/mail.lua","Mail"})
 table.insert(tools,{themes,"/modules/themes.lua","Theme Manager"})
+
+-- Top screen rendering
+function drawTopScreenUI()
+
+	-- Background
+	if ui_enabled then
+		Graphics.drawPartialImage(0,0,0,0,400,240,bg)
+	end
+	
+	-- Calendar
+	if mode == nil then
+		Graphics.fillRect(75,320,40,200,black)
+		Graphics.fillRect(76,319,41,199,white)
+	end
+	
+	if ui_enabled then
+	
+		-- Topbar icons
+		for i,icon in pairs(topbar_icons) do
+			Graphics.drawImage(350-i*21,2,icon[1],TOP_SCREEN)
+		end
+		
+		-- Battery and Wifi alert
+		if  System.isBatteryCharging() then
+			Graphics.drawImage(350,2,charge)
+		else
+			battery_lv = System.getBatteryLife()
+			if battery_lv == 0 then
+				Graphics.drawImage(350,2,b0)
+			elseif battery_lv == 1 then
+				Graphics.drawImage(350,2,b1)
+			elseif battery_lv == 2 then
+				Graphics.drawImage(350,2,b2)
+			elseif battery_lv == 3 then
+				Graphics.drawImage(350,2,b3)
+			elseif battery_lv == 4 then
+				Graphics.drawImage(350,2,b4)
+			else
+				Graphics.drawImage(350,2,b5)
+			end
+		end
+		if Network.isWifiEnabled() then
+			net_lv = Network.getWifiLevel()
+			if net_lv > 0 then
+				Graphics.fillRect(326-#topbar_icons*21,331-#topbar_icons*21,14,18,green_wifi)				
+				if net_lv > 1 then
+					Graphics.fillRect(333-#topbar_icons*21,338-#topbar_icons*21,8,18,green_wifi)
+					if net_lv > 2 then
+						Graphics.fillRect(340-#topbar_icons*21,345-#topbar_icons*21,2,18,green_wifi)
+					end
+				end
+			end
+		else
+			Graphics.fillRect(340-#topbar_icons*21,345-#topbar_icons*21,16,18,red_wifi)
+			Graphics.fillRect(333-#topbar_icons*21,338-#topbar_icons*21,16,18,red_wifi)
+			Graphics.fillRect(326-#topbar_icons*21,331-#topbar_icons*21,16,18,red_wifi)
+		end
+	end
+	
+end
+
+function drawBottomScreenUI()
+	if ui_enabled then
+		if refresh_screen then
+			Graphics.drawPartialImage(0,0,40,240,320,240,bg)
+		end
+	end
+	if mode == nil then
+		x = 4
+		y = 10
+		for i,tool in pairs(tools) do
+			if x > 300 then
+				x = 4
+				y = y + 58
+			end
+			if app_index == i then
+				Graphics.fillRect(x-3,x+50,y-3,y+50,selected)
+			end
+			Graphics.drawImage(x,y,tool[1])
+			if Controls.check(pad,KEY_TOUCH) and not Controls.check(oldpad,KEY_TOUCH) then
+				tx,ty = Controls.readTouch()
+				if tx >= x and tx <= x+48 and ty >= y and ty <= y+48 then
+					module = tool[3]
+					dofile(main_dir..tool[2])
+				end
+			end
+			x = x + 53
+		end
+	end
+end
 
 -- Main cycle
 while true do
@@ -144,12 +239,28 @@ while true do
 		old_headset = true
 	end
 	
-	-- Blit background
-	if ui_enabled then
-		Screen.drawPartialImage(0,0,0,0,400,240,bg,TOP_SCREEN)
-		if refresh_screen then
-			Screen.drawPartialImage(0,0,40,240,320,240,bg,BOTTOM_SCREEN)
+	if renderer then
+	
+		-- Top screen rendering
+		if refresh_screen2 then
+			Graphics.initBlend(TOP_SCREEN)
+			drawTopScreenUI()
+			if mode ~= nil then
+				AppTopScreenRender()
+			end
+			Graphics.termBlend()
 		end
+		
+		-- Bottom screen rendering
+		if refresh_screen then
+			Graphics.initBlend(BOTTOM_SCREEN)
+			drawBottomScreenUI()
+			if mode ~= nil then
+				AppBottomScreenRender()
+			end
+			Graphics.termBlend()
+		end
+	
 	end
 	
 	-- Executing background apps
@@ -166,8 +277,6 @@ while true do
 			i = 1
 			x = 80
 			y = 85
-			Screen.fillEmptyRect(x-10,x+240,y-45,y+115,black,TOP_SCREEN)
-			Screen.fillRect(x-9,x+239,y-44,y+114,white,TOP_SCREEN)
 			Font.print(ttf,x+85,y-40,months[m].." "..ye,black,TOP_SCREEN)
 			Font.print(ttf,x,y-20,"S",selected,TOP_SCREEN)
 			Font.print(ttf,x+35,y-20,"M",selected,TOP_SCREEN)
@@ -190,28 +299,6 @@ while true do
 			
 		end
 		
-		-- Blit app icons and sets up controls triggering
-		x = 4
-		y = 10
-		for i,tool in pairs(tools) do
-			if x > 300 then
-				x = 4
-				y = y + 58
-			end
-			if app_index == i then
-				Screen.fillRect(x-3,x+50,y-3,y+50,selected,BOTTOM_SCREEN)
-			end
-			Screen.drawImage(x,y,tool[1],BOTTOM_SCREEN)
-			if Controls.check(pad,KEY_TOUCH) and not Controls.check(oldpad,KEY_TOUCH) then
-				tx,ty = Controls.readTouch()
-				if tx >= x and tx <= x+48 and ty >= y and ty <= y+48 then
-					module = tool[3]
-					dofile(main_dir..tool[2])
-				end
-			end
-			x = x + 53
-		end
-		
 		-- Setting digital pad controls triggering
 		if Controls.check(pad,KEY_DUP) and not Controls.check(oldpad,KEY_DUP) then
 			app_index = app_index - 6
@@ -224,6 +311,9 @@ while true do
 			app_index = app_index + 6
 			if app_index > #tools then
 				app_index = app_index % 6
+				if app_index == 0 then
+					app_index = 6
+				end
 			end
 		elseif Controls.check(pad,KEY_DLEFT) and not Controls.check(oldpad,KEY_DLEFT) then
 			app_index = app_index - 1
@@ -268,40 +358,8 @@ while true do
 		end
 		formatted_time = hours..":"..minutes..":"..seconds
 		Font.print(ttf,276-#topbar_icons*21,3,formatted_time,white,TOP_SCREEN)
-			
-		-- Blit topbar icons
-		for i,icon in pairs(topbar_icons) do
-			Screen.drawImage(350-i*21,2,icon[1],TOP_SCREEN)
-		end
-		
 		Font.print(ttf,4,3,"Sunshell v."..version.." - "..module,white,TOP_SCREEN)
-		if  System.isBatteryCharging() then
-			Screen.drawImage(350,2,charge,TOP_SCREEN)
-		else
-			battery_lv = System.getBatteryLife()
-			if battery_lv == 0 then
-				Screen.drawImage(350,2,b0,TOP_SCREEN)
-			elseif battery_lv == 1 then
-				Screen.drawImage(350,2,b1,TOP_SCREEN)
-			elseif battery_lv == 2 then
-				Screen.drawImage(350,2,b2,TOP_SCREEN)
-			elseif battery_lv == 3 then
-				Screen.drawImage(350,2,b3,TOP_SCREEN)
-			elseif battery_lv == 4 then
-				Screen.drawImage(350,2,b4,TOP_SCREEN)
-			else
-				Screen.drawImage(350,2,b5,TOP_SCREEN)
-			end
-		end
-		if Network.isWifiEnabled() then
-			Screen.fillRect(340-#topbar_icons*21,345-#topbar_icons*21,2,18,green_wifi,TOP_SCREEN)
-			Screen.fillRect(333-#topbar_icons*21,338-#topbar_icons*21,8,18,green_wifi,TOP_SCREEN)
-			Screen.fillRect(326-#topbar_icons*21,331-#topbar_icons*21,14,18,green_wifi,TOP_SCREEN)
-		else
-			Screen.fillRect(340-#topbar_icons*21,345-#topbar_icons*21,16,18,red_wifi,TOP_SCREEN)
-			Screen.fillRect(333-#topbar_icons*21,338-#topbar_icons*21,16,18,red_wifi,TOP_SCREEN)
-			Screen.fillRect(326-#topbar_icons*21,331-#topbar_icons*21,16,18,red_wifi,TOP_SCREEN)
-		end
+		
 	end
 	
 	-- Sets up universal controls
@@ -311,11 +369,12 @@ while true do
 			bg_apps_code[2]()
 		end
 		for i,icon in pairs(topbar_icons) do
-			Screen.freeImage(icon[1])
+			Graphics.freeImage(icon[1])
 		end
 		Sound.term()
 		Font.unload(ttf)
-		if start_dir == "/" and build == "3DSX" then -- boot.3dsx patch
+		Graphics.term()
+		if start_dir == "/" and build ~= "Custom Firmware" then -- boot.3dsx patch
 			System.reboot()
 		else
 			System.exit()

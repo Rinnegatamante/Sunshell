@@ -4,6 +4,7 @@ mode = "FB"
 -- Internal module settings
 update_bottom_screen = true
 update_top_screen = true
+DisableRenderer()
 ui_enabled = false
 red = Color.new(255,0,0)
 green = Color.new(0,255,0)
@@ -18,14 +19,15 @@ function PrintControls()
 	Font.print(ttf,0,30,"SELECT = Open file with...",white,TOP_SCREEN)
 	Font.print(ttf,0,45,"R = Create new folder",white,TOP_SCREEN)
 	Font.print(ttf,0,60,"X = File operations",white,TOP_SCREEN)
-	Font.print(ttf,0,75,"B = Return Main Menu",white,TOP_SCREEN)
-	Font.print(ttf,0,90,"---------------------------------",white,TOP_SCREEN)
-	Font.print(ttf,0,105,"Opened file Controls:",white,TOP_SCREEN)
-	Font.print(ttf,0,120,"X = Cancel file copy/move",white,TOP_SCREEN)
-	Font.print(ttf,0,135,"Y = Confirm file copy/move",white,TOP_SCREEN)
-	Font.print(ttf,0,150,"Left/Right = Pause/Resume",white,TOP_SCREEN)
-	Font.print(ttf,0,165,"Left/Right = Extract icon (SMDH)",white,TOP_SCREEN)
-	Font.print(ttf,0,180,"Left/Right = Scroll file",white,TOP_SCREEN)
+	Font.print(ttf,0,75,"Y = Transfer file between SD cards",white,TOP_SCREEN)
+	Font.print(ttf,0,90,"B = Return Main Menu",white,TOP_SCREEN)
+	Font.print(ttf,0,105,"---------------------------------",white,TOP_SCREEN)
+	Font.print(ttf,0,120,"Opened file Controls:",white,TOP_SCREEN)
+	Font.print(ttf,0,135,"X = Cancel file copy/move",white,TOP_SCREEN)
+	Font.print(ttf,0,150,"Y = Confirm file copy/move",white,TOP_SCREEN)
+	Font.print(ttf,0,165,"Left/Right = Pause/Resume",white,TOP_SCREEN)
+	Font.print(ttf,0,180,"Left/Right = Extract icon (SMDH)",white,TOP_SCREEN)
+	Font.print(ttf,0,195,"Left/Right = Scroll file",white,TOP_SCREEN)
 end
 function TableConcat(t1,t2)
     for i=1,#t2 do
@@ -171,25 +173,35 @@ function ForceOpenFile(text, size, mode)
 	elseif mode == "IMG" then
 		FBGC()
 		current_type = "IMG"
-		current_file = Screen.loadImage(System.currentDirectory()..text)
-		if Screen.getImageWidth(current_file) > 400 then
+		current_file = Graphics.loadImage(System.currentDirectory()..text)
+		if Graphics.getImageWidth(current_file) > 400 then
 			width = 400
 			big_image = true
 		end
-		if Screen.getImageHeight(current_file) > 240 then
+		if Graphics.getImageHeight(current_file) > 240 then
 			height = 240
 			big_image = true
 		end
 	elseif mode == "LUA" then
 		FBGC()
-		Screen.freeImage(bg)
+		GarbageCollection()
+		for i,bg_apps_code in pairs(bg_apps) do
+			bg_apps_code[2]()
+		end
+		for i,icon in pairs(topbar_icons) do
+			Graphics.freeImage(icon[1])
+		end
 		Sound.term()
+		Font.unload(ttf)
+		Graphics.term()
 		reset_dir = System.currentDirectory()
 		System.currentDirectory(string.sub(System.currentDirectory(),1,-2))
 		dofile(System.currentDirectory().."/"..text)
 		System.currentDirectory(reset_dir)
 		current_type = "LUA"
+		Graphics.init()
 		Sound.init()
+		ttf = Font.load(theme_dir.."/fonts/main.ttf")
 	elseif mode == "TXT" then
 		FBGC()
 		current_file = io.open(System.currentDirectory()..text,FREAD)
@@ -319,10 +331,18 @@ function OpenFile(text, size)
 			table.insert(files_table,extra)
 		end
 		files_table = SortDirectory(files_table)
-	elseif (string.upper(string.sub(text,-5)) == ".3DSX") and build == "3DSX" then
+	elseif (string.upper(string.sub(text,-5)) == ".3DSX") and build == "Ninjhax 1" then
 		FBGC()
-		Screen.freeImage(bg)
+		GarbageCollection()
+		for i,bg_apps_code in pairs(bg_apps) do
+			bg_apps_code[2]()
+		end
+		for i,icon in pairs(topbar_icons) do
+			Graphics.freeImage(icon[1])
+		end
 		Sound.term()
+		Font.unload(ttf)
+		Graphics.term()
 		System.launch3DSX(System.currentDirectory()..text)
 	elseif string.upper(string.sub(text,-5)) == ".BMPV" then
 		FBGC()
@@ -356,9 +376,9 @@ function OpenFile(text, size)
 	elseif string.upper(string.sub(text,-4)) == ".PNG" or string.upper(string.sub(text,-4)) == ".BMP" or string.upper(string.sub(text,-4)) == ".JPG" then
 		FBGC()
 		current_type = "IMG"
-		current_file = Screen.loadImage(System.currentDirectory()..text)
-		width = Screen.getImageWidth(current_file)
-		height = Screen.getImageHeight(current_file)
+		current_file = Graphics.loadImage(System.currentDirectory()..text)
+		width = Graphics.getImageWidth(current_file)
+		height = Graphics.getImageHeight(current_file)
 		if width > 400 then
 			width = 400
 			big_image = true
@@ -369,14 +389,24 @@ function OpenFile(text, size)
 		end
 	elseif string.upper(string.sub(text,-4)) == ".LUA" then
 		FBGC()
-		Screen.freeImage(bg)
+		GarbageCollection()
+		for i,bg_apps_code in pairs(bg_apps) do
+			bg_apps_code[2]()
+		end
+		for i,icon in pairs(topbar_icons) do
+			Graphics.freeImage(icon[1])
+		end
 		Sound.term()
+		Font.unload(ttf)
+		Graphics.term()
 		reset_dir = System.currentDirectory()
 		System.currentDirectory(string.sub(System.currentDirectory(),1,-2))
 		dofile(System.currentDirectory().."/"..text)
 		System.currentDirectory(reset_dir)
 		current_type = "LUA"
 		Sound.init()
+		Graphics.init()
+		ttf = Font.load(theme_dir.."/fonts/main.ttf")
 	elseif string.upper(string.sub(text,-4)) == ".TXT" then
 		FBGC()
 		current_file = io.open(System.currentDirectory()..text,FREAD)
@@ -385,7 +415,7 @@ function OpenFile(text, size)
 		txt_index = 0
 		txt_words = 0
 		updateTXT = true
-	elseif string.upper(string.sub(text,-4)) == ".CIA" then
+	elseif string.upper(string.sub(text,-4)) == ".CIA" and build ~= "Ninjhax 2" then
 		FBGC()
 		sm_index = 1
 		cia_data = System.extractCIA(System.currentDirectory()..text)
@@ -426,6 +456,7 @@ function OpenFile(text, size)
 	end
 end
 function OpenDirectory(text,archive_id)
+	update_bottom_screen = true
 	i=0
 	if text == ".." then
 		j=-2
@@ -468,7 +499,7 @@ function FBGC()
 		end
 		Sound.close(current_file)
 	elseif current_type == "IMG" then
-		Screen.freeImage(current_file)
+		Graphics.freeImage(current_file)
 		big_image = false
 		y_print = 0
 		x_print = 0
@@ -593,6 +624,7 @@ function TestFont()
 	Font.print(current_file,10,179,"jumps over the lazy dog",white,TOP_SCREEN)
 end
 function ListMenu()
+	base_y = 0
 	Screen.clear(BOTTOM_SCREEN)
 	for l, file in pairs(files_table) do
 		if (base_y > 226) then
@@ -616,9 +648,48 @@ function ListMenu()
 	end	
 end
 
+-- Rendering functions
+function AppTopScreenRender()	
+end
+
+function AppBottomScreenRender()
+end
+
+function BlitImage()
+	if big_image then
+		Graphics.drawPartialImage(0,0,x_print,y_print,width,height,current_file)
+		x,y = Controls.readCirclePad()
+		if (x < - 100) and (x_print > 0) then
+			x_print = x_print - 5
+			if x_print < 0 then
+				x_print = 0
+			end
+		end
+		if (y > 100) and (y_print > 0) then
+			y_print = y_print - 5
+			if y_print < 0 then
+				y_print = 0
+			end
+		end
+		if (x > 100) and (x_print + width < Graphics.getImageWidth(current_file)) then
+			x_print = x_print + 5
+		end
+		if (y < - 100) and (y_print + height < Graphics.getImageHeight(current_file)) then
+			y_print = y_print + 5
+		end
+		if x_print + width > Graphics.getImageWidth(current_file) then
+			x_print = Graphics.getImageWidth(current_file) - width
+		end
+		if y_print + height > Graphics.getImageHeight(current_file) then
+			y_print = Graphics.getImageHeight(current_file) - height
+		end
+	else
+		Graphics.drawImage(0,0,current_file)
+	end
+end
+
 -- Module main cycle
 function AppMainCycle()
-	base_y = 0
 	i = 1
 	if update_top_screen then
 		if (current_type == "SMDH") then
@@ -646,37 +717,6 @@ function AppMainCycle()
 				stype = "Stereo"
 			end
 			Font.print(ttf,0,110,"Audiotype: "..stype,white,TOP_SCREEN)
-		elseif (current_type == "IMG") then
-			if big_image then
-				Screen.drawPartialImage(0,0,x_print,y_print,width,height,current_file,TOP_SCREEN)
-				x,y = Controls.readCirclePad()
-				if (x < - 100) and (x_print > 0) then
-					x_print = x_print - 5
-					if x_print < 0 then
-						x_print = 0
-					end
-				end
-				if (y > 100) and (y_print > 0) then
-					y_print = y_print - 5
-					if y_print < 0 then
-						y_print = 0
-					end
-				end
-				if (x > 100) and (x_print + width < Screen.getImageWidth(current_file)) then
-					x_print = x_print + 5
-				end
-				if (y < - 100) and (y_print + height < Screen.getImageHeight(current_file)) then
-					y_print = y_print + 5
-				end
-				if x_print + width > Screen.getImageWidth(current_file) then
-					x_print = Screen.getImageWidth(current_file) - width
-				end
-				if y_print + height > Screen.getImageHeight(current_file) then
-					y_print = Screen.getImageHeight(current_file) - height
-				end
-			else
-				Screen.drawImage(0,0,current_file,TOP_SCREEN)
-			end
 		elseif (current_type == "INFO") then
 			OneshotPrint(PrintText)
 			update_top_screen = false
@@ -699,8 +739,11 @@ function AppMainCycle()
 			update_top_screen = false
 		end
 	end
+	if current_type == "IMG" then
+		CustomRenderTop(BlitImage)
+	end
 	if update_bottom_screen then
-		ListMenu()
+		OneshotPrint(ListMenu)
 		update_bottom_screen = false
 	end
 	
@@ -734,13 +777,17 @@ function AppMainCycle()
 			elseif (sm_index == 6) then
 				ForceOpenFile(files_table[p].name,files_table[p].size,"HEX")
 			elseif (sm_index == 7) then
-				if build == "CIA" then
-					ShowError("3DSX Launcher not available on CIA and 3DS builds.")
+				if build == "Custom Firmware" or build == "Ninjhax 2" then
+					ShowError("3DSX Launcher not available on Custom Firmwares and Ninjhax 2.")
 				else
 					ForceOpenFile(files_table[p].name,files_table[p].size,"3DSX")
 				end
 			elseif (sm_index == 8) then
-				ForceOpenFile(files_table[p].name,files_table[p].size,"CIA")
+				if build == "Ninjhax 2" then
+					ShowError("CIA Installer not available on Ninjhax 2.")
+				else
+					ForceOpenFile(files_table[p].name,files_table[p].size,"CIA")
+				end
 			elseif (sm_index == 9) then
 				ForceOpenFile(files_table[p].name,files_table[p].size,"SMDH")
 			elseif (sm_index == 10) then
@@ -755,9 +802,21 @@ function AppMainCycle()
 			update_bottom_screen = true
 		elseif (Controls.check(pad,KEY_START)) then
 			FBGC()
-			Screen.freeImage(bg)
+			GarbageCollection()
+			for i,bg_apps_code in pairs(bg_apps) do
+				bg_apps_code[2]()
+			end
+			for i,icon in pairs(topbar_icons) do
+				Graphics.freeImage(icon[1])
+			end
 			Sound.term()
-			System.exit()
+			Font.unload(ttf)
+			Graphics.term()
+			if start_dir == "/" and build ~= "Custom Firmware" then -- boot.3dsx patch
+				System.reboot()
+			else
+				System.exit()
+			end
 		end
 		if (sm_index < 1) then
 			sm_index = #sm_voices
@@ -927,8 +986,7 @@ function AppMainCycle()
 					table.insert(files_table,extra)
 				end
 				files_table = SortDirectory(files_table)
-			end
-			if (copy_base ~= nil) then
+			elseif (copy_base ~= nil) then
 				copy_end = System.currentDirectory() .. copy_name
 				if copy_end == copy_base then
 					temp_copy = "Copy_" .. copy_name
@@ -956,6 +1014,39 @@ function AppMainCycle()
 				files_table = SortDirectory(files_table)
 				copy_name = nil
 				copy_base = nil
+			else
+				update_top_screen = true
+				FBGC()
+				if (files_table[p].directory == false) then
+					inp = io.open(System.currentDirectory()..files_table[p].name,FREAD)
+					filesize = io.size(inp)
+					if filesize > MAX_RAM_ALLOCATION * 2 then
+						ShowError("This file is too large for this transfer mode.")
+					else
+						file_ptr = io.read(inp,0,filesize)
+						io.close(inp)
+						ShowWarning("Insert the SD card where the file needs to be sent and then press OK.")
+						--while not System.checkSDMC() do TODO: Add this feature in public lpp-3ds
+						--	ShowError("Please insert an SD card in your console to transfer a file.")
+						--end
+						out = io.open("/"..files_table[p].name,FCREATE)
+						io.write(out,0,file_ptr,filesize)
+						io.close(out)
+						System.currentDirectory("/")
+						update_bottom_screen = true
+						files_table = System.listDirectory(System.currentDirectory())
+						if System.currentDirectory() ~= "/" then
+							local extra = {}
+							extra.name = ".."
+							extra.size = 0
+							extra.directory = true
+							table.insert(files_table,extra)
+						end
+						file_ptr = nil
+						files_table = SortDirectory(files_table)
+					end
+					oldpad = KEY_A
+				end
 			end
 		elseif (Controls.check(pad,KEY_B)) and not (Controls.check(oldpad,KEY_B)) then
 			FBGC()
@@ -1042,7 +1133,7 @@ function AppMainCycle()
 		elseif (Controls.check(pad,KEY_SELECT)) and not (Controls.check(oldpad,KEY_SELECT)) then
 			if (files_table[p].directory == false) then
 				select_mode = true
-			end
+			end	
 		elseif (Controls.check(pad,KEY_R)) and not (Controls.check(oldpad,KEY_R)) then
 			update_bottom_screen = true
 			name = System.startKeyboard("New Folder")
@@ -1070,7 +1161,7 @@ function AppMainCycle()
 			end	
 		end
 	end	
-	if not (Controls.check(pad,KEY_TOUCH)) then
+	if (Controls.check(oldpad,KEY_TOUCH)) and not (Controls.check(pad,KEY_TOUCH)) then
 		update_bottom_screen = true
 		master_index = p - 15
 	end

@@ -3,20 +3,30 @@ mode = "Mail"
 
 -- Internal module settings
 if Network.isWifiEnabled() then
-	object = "Mail Object"
-	to = "sample@gmail.com"
-	body = "This is my e-mail body."
+	if build == "Ninjhax 2" then
+		ShowError("Network features currently unavailable on Ninjhax 2.")
+		CallMainMenu()
+	else
+		object = "Mail Object"
+		to = "sample@gmail.com"
+		body = "This is my e-mail body."
+	end
 else
 	ShowError("You need to be connected on Internet to send mails.")
 	CallMainMenu()
 end
 
+-- Rendering functions
+function AppTopScreenRender()	
+	Graphics.fillRect(5,395,40,220,black)
+	Graphics.fillRect(6,394,41,219,white)
+end
+
+function AppBottomScreenRender()
+end
+
 -- Module main cycle
 function AppMainCycle()
-
-	-- Draw top screen box
-	Screen.fillEmptyRect(5,395,40,220,black,TOP_SCREEN)
-	Screen.fillRect(6,394,41,219,white,TOP_SCREEN)
 	
 	-- Draw mail elements
 	TopCropPrint(9,45,"Obj: "..object,black,TOP_SCREEN)

@@ -8,6 +8,7 @@ update_frame = false
 update_bottom_screen = true
 ui_enabled = false
 not_started_p = true
+SetBottomRefresh(false)
 my_photos = {}
 function AddDirPhoto(dir)
 	tmp = System.listDirectory(dir)
@@ -26,9 +27,9 @@ if #my_photos > 0 then
 	x_print = 0
 	y_print = 0
 	big_image = false
-	current_photo = Screen.loadImage(my_photos[1][1])
-	width = Screen.getImageWidth(current_photo)
-	height = Screen.getImageHeight(current_photo)
+	current_photo = Graphics.loadImage(my_photos[1][1])
+	width = Graphics.getImageWidth(current_photo)
+	height = Graphics.getImageHeight(current_photo)
 	if width > 400 then
 		width = 400
 		big_image = true
@@ -67,37 +68,12 @@ function UpdateBottomScreen()
 		
 end
 
--- Module main cycle
-function AppMainCycle()
+-- Rendering functions
+function AppTopScreenRender()	
 
-	if update_bottom_screen then
-		OneshotPrint(UpdateBottomScreen)
-		update_bottom_screen = false
-	end
-	
-	-- Update current image
-	if update_frame then
-		update_frame = false
-		Screen.freeImage(current_photo)
-		x_print = 0
-		y_print = 0
-		big_image = false
-		current_photo = Screen.loadImage(my_photos[p_p][1])
-		width = Screen.getImageWidth(current_photo)
-		height = Screen.getImageHeight(current_photo)
-		if width > 400 then
-			width = 400
-			big_image = true
-		end
-		if height > 240 then
-			height = 240
-			big_image = true
-		end
-	end
-		
 	-- Showing current image
 	if big_image then
-		Screen.drawPartialImage(0,0,x_print,y_print,width,height,current_photo,TOP_SCREEN)
+		Graphics.drawPartialImage(0,0,x_print,y_print,width,height,current_photo)
 		x,y = Controls.readCirclePad()
 		if (x < - 100) and (x_print > 0) then
 			x_print = x_print - 5
@@ -111,25 +87,58 @@ function AppMainCycle()
 				y_print = 0
 			end
 		end
-		if (x > 100) and (x_print + width < Screen.getImageWidth(current_photo)) then
+		if (x > 100) and (x_print + width < Graphics.getImageWidth(current_photo)) then
 			x_print = x_print + 5
 		end
-		if (y < - 100) and (y_print + height < Screen.getImageHeight(current_photo)) then
+		if (y < - 100) and (y_print + height < Graphics.getImageHeight(current_photo)) then
 			y_print = y_print + 5
 		end
-		if x_print + width > Screen.getImageWidth(current_photo) then
-			x_print = Screen.getImageWidth(current_photo) - width
+		if x_print + width > Graphics.getImageWidth(current_photo) then
+			x_print = Graphics.getImageWidth(current_photo) - width
 		end
-		if y_print + height > Screen.getImageHeight(current_photo) then
-			y_print = Screen.getImageHeight(current_photo) - height
+		if y_print + height > Graphics.getImageHeight(current_photo) then
+			y_print = Graphics.getImageHeight(current_photo) - height
 		end
 	else
-		Screen.drawImage(0,0,curent_photo,TOP_SCREEN)
+		Graphics.drawImage(0,0,curent_photo)
+	end
+	
+end
+
+function AppBottomScreenRender()
+end
+
+-- Module main cycle
+function AppMainCycle()
+
+	if update_bottom_screen then
+		OneshotPrint(UpdateBottomScreen)
+		update_bottom_screen = false
+	end
+	
+	-- Update current image
+	if update_frame then
+		update_frame = false
+		Graphics.freeImage(current_photo)
+		x_print = 0
+		y_print = 0
+		big_image = false
+		current_photo = Graphics.loadImage(my_photos[p_p][1])
+		width = Graphics.getImageWidth(current_photo)
+		height = Graphics.getImageHeight(current_photo)
+		if width > 400 then
+			width = 400
+			big_image = true
+		end
+		if height > 240 then
+			height = 240
+			big_image = true
+		end
 	end
 	
 	-- Sets controls triggering
 	if Controls.check(pad,KEY_B) or Controls.check(pad,KEY_START) then
-		Screen.freeImage(current_photo)
+		Graphics.freeImage(current_photo)
 		CallMainMenu()
 	elseif (Controls.check(pad,KEY_DUP)) and not (Controls.check(oldpad,KEY_DUP)) and not_started_p then
 		p_p = p_p - 1

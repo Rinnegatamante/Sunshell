@@ -4,19 +4,25 @@ mode = "Cia"
 -- Internal module settings
 master_index_cia = 0
 p_cia = 1
-cia_table = System.listCIA()
+if build == "Ninjhax 2" then
+	ShowError("CIA manager unavailable on Ninjhax 2.")
+	CallMainMenu()
+else
+	cia_table = System.listCIA()
+	update_list = true
 	
--- Game titles parsing
-dofile(main_dir.."/scripts/title_list.lua")
-assigned = 0
-for i,title in pairs(title_list) do
-	if assigned >= (#cia_table - 1) then
-		break
-	end
-	for z,app in pairs(cia_table) do
-		if app.unique_id == title[3] then
-			app["title_name"] = title[1]
-			assigned = assigned + 1
+	-- Game titles parsing
+	dofile(main_dir.."/scripts/title_list.lua")
+	assigned = 0
+	for i,title in pairs(title_list) do
+		if assigned >= (#cia_table - 1) then
+			break
+		end
+		for z,app in pairs(cia_table) do
+			if app.unique_id == title[3] then
+				app["title_name"] = title[1]
+				assigned = assigned + 1
+			end
 		end
 	end
 end
@@ -94,6 +100,58 @@ function OpenDirectory(text,archive_id)
 	end
 end
 
+function ShowSDMCList()
+	base_y = 0
+	for l, file in pairs(files_table) do
+		if (base_y > 226) then
+			break
+		end
+		if (l >= master_index_cia) then
+			if (l==p_cia) then
+				Screen.fillRect(0,319,base_y,base_y+15,selected_item,BOTTOM_SCREEN)
+				color = selected
+			else
+				color = black
+			end
+			CropPrint(0,base_y,file.name,color,BOTTOM_SCREEN)
+			base_y = base_y + 15
+		end
+	end
+end
+
+function ShowCIAList()
+	base_y = 0
+	for l, file in pairs(cia_table) do
+		if (base_y > 226) then
+			break
+		end
+		if (l >= master_index_cia) then
+			if (l==p_cia) then
+				base_y2 = base_y
+				Screen.fillRect(0,319,base_y,base_y+15,selected_item,BOTTOM_SCREEN)
+				color = selected
+			else
+				color = black
+			end
+			if file.title_name == nil then
+				CropPrint(0,base_y,file.product_id,color,BOTTOM_SCREEN)
+			else
+				CropPrint(0,base_y,file.title_name,color,BOTTOM_SCREEN)
+			end
+			base_y = base_y + 15
+		end
+	end
+end
+
+-- Rendering functions
+function AppTopScreenRender()	
+	Graphics.fillRect(5,395,40,220,black)
+	Graphics.fillRect(6,394,41,219,white)
+end
+
+function AppBottomScreenRender()
+end
+
 -- Module main cycle
 function AppMainCycle()
 
@@ -101,29 +159,17 @@ function AppMainCycle()
 	sm_index = 1
 	base_y = 0
 	
-	-- Draw top screen box
-	Screen.fillEmptyRect(5,395,40,220,black,TOP_SCREEN)
-	Screen.fillRect(6,394,41,219,white,TOP_SCREEN)
-	
 	-- Draw bottom screen listmenu and top screen info
 	Screen.debugPrint(9,175,"Free Space: "..f_free_space.." "..f,black,TOP_SCREEN)
-	base_y = 0
 	if int_mode == "SDMC" then
-		for l, file in pairs(files_table) do
-			if (base_y > 226) then
-				break
-			end
-			if (l >= master_index_cia) then
-				if (l==p_cia) then
-					Screen.fillRect(0,319,base_y,base_y+15,selected_item,BOTTOM_SCREEN)
-					color = selected
-				else
-					color = black
-				end
-				CropPrint(0,base_y,file.name,color,BOTTOM_SCREEN)
-				base_y = base_y + 15
-			end
-		end
+		
+		-- Showing files list
+		--if update_list then
+			--BottomBGRefresh()
+			ShowSDMCList()
+			--update_list = false
+		--end
+		
 		Screen.debugPrint(9,190,"SDMC listing",black,TOP_SCREEN)
 		if not files_table[p_cia].directory then
 			if not_extracted == true then
@@ -147,26 +193,11 @@ function AppMainCycle()
 			io.close(tmp)
 		end
 	else
-		for l, file in pairs(cia_table) do
-			if (base_y > 226) then
-				break
-			end
-			if (l >= master_index_cia) then
-				if (l==p_cia) then
-					base_y2 = base_y
-					Screen.fillRect(0,319,base_y,base_y+15,selected_item,BOTTOM_SCREEN)
-					color = selected
-				else
-					color = black
-				end
-				if file.title_name == nil then
-					CropPrint(0,base_y,file.product_id,color,BOTTOM_SCREEN)
-				else
-					CropPrint(0,base_y,file.title_name,color,BOTTOM_SCREEN)
-				end
-				base_y = base_y + 15
-			end
-		end
+		--if update_list then
+			--BottomBGRefresh()
+			ShowCIAList()
+			--update_list = false
+		--end
 		Screen.debugPrint(9,190,"Imported CIA listing",black,TOP_SCREEN)
 		Screen.debugPrint(9,45,"Unique ID: 0x"..string.sub(string.format('%02X',cia_table[p_cia].unique_id),1,-3),black,TOP_SCREEN)
 		Screen.debugPrint(9,60,"Product ID: "..cia_table[p_cia].product_id,black,TOP_SCREEN)
@@ -230,6 +261,7 @@ function AppMainCycle()
 						oldpad = pad
 						Screen.flip()
 					end
+					update_list = true
 				end
 			end
 		else
@@ -252,8 +284,8 @@ function AppMainCycle()
 					end
 				else
 					Screen.fillRect(61,259,66,81,selected_item,BOTTOM_SCREEN)
-					Screen.debugPrint(63,53,"Confirm",selected,BOTTOM_SCREEN)
-					Screen.debugPrint(63,68,"Cancel",black,BOTTOM_SCREEN)
+					Screen.debugPrint(63,53,"Confirm",black,BOTTOM_SCREEN)
+					Screen.debugPrint(63,68,"Cancel",selected,BOTTOM_SCREEN)
 					if (Controls.check(pad,KEY_DUP)) and not (Controls.check(oldpad,KEY_DUP)) then
 						sm_index = 1
 					elseif (Controls.check(pad,KEY_A)) and not (Controls.check(oldpad,KEY_A)) then
@@ -263,10 +295,26 @@ function AppMainCycle()
 				Screen.flip()
 				oldpad = pad
 			end
+			update_list = true
 			cia_table = System.listCIA()
 			if p_cia > #cia_table then
 				p_cia = p_cia - 1
 			end
+			
+			-- Game titles parsing
+			assigned = 0
+			for i,title in pairs(title_list) do
+				if assigned >= (#cia_table - 1) then
+					break
+				end
+				for z,app in pairs(cia_table) do
+					if app.unique_id == title[3] then
+						app["title_name"] = title[1]
+						assigned = assigned + 1
+					end
+				end
+			end
+			
 		end
 	elseif (Controls.check(pad,KEY_Y) and not Controls.check(oldpad,KEY_Y)) then
 		oldpad = KEY_A
@@ -319,6 +367,7 @@ function AppMainCycle()
 					oldpad = pad
 					Screen.flip()
 				end
+				update_list = true
 			end
 		else
 			System.launchCIA(cia_table[p_cia].unique_id,cia_table[p_cia].mediatype)
@@ -329,6 +378,7 @@ function AppMainCycle()
 		if (p_cia >= 16) then
 			master_index_cia = p_cia - 15
 		end
+		update_list = true
 	elseif (Controls.check(pad,KEY_DLEFT)) and not (Controls.check(oldpad,KEY_DLEFT)) then
 		not_extracted = true
 		p_cia = p_cia - 16
@@ -340,6 +390,7 @@ function AppMainCycle()
 		else
 			master_index_cia = 0
 		end
+		update_list = true
 	elseif (Controls.check(pad,KEY_DRIGHT)) and not (Controls.check(oldpad,KEY_DRIGHT)) then
 		not_extracted = true
 		p_cia = p_cia + 16
@@ -351,12 +402,14 @@ function AppMainCycle()
 		if (p_cia >= 17) then
 			master_index_cia = p_cia - 15
 		end
+		update_list = true
 	elseif (Controls.check(pad,KEY_DDOWN)) and not (Controls.check(oldpad,KEY_DDOWN)) then
 		not_extracted = true
 		p_cia = p_cia + 1
 		if (p_cia >= 17) then
 			master_index_cia = p_cia - 15
 		end
+		update_list = true
 	end
 	if (p_cia < 1) then
 		if (int_mode == "SDMC") then
@@ -372,11 +425,27 @@ function AppMainCycle()
 		p_cia = 1
 	end
 	if (Controls.check(pad,KEY_SELECT)) and not (Controls.check(oldpad,KEY_SELECT)) then
+		update_list = true
 		if int_mode=="CIA" then
 			int_mode = "SDMC"
 		else
 			int_mode = "CIA"
 			cia_table = System.listCIA()
+			
+			-- Game titles parsing
+			assigned = 0
+			for i,title in pairs(title_list) do
+				if assigned >= (#cia_table - 1) then
+					break
+				end
+				for z,app in pairs(cia_table) do
+					if app.unique_id == title[3] then
+						app["title_name"] = title[1]
+						assigned = assigned + 1
+					end
+				end
+			end
+			
 		end
 		p_cia = 1
 		master_index_cia = 0

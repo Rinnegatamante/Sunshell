@@ -2,45 +2,13 @@
 mode = "Calc"
 
 -- Internal module settings
-SetBottomRefresh(false)
 decimal = false
 result = 0
 digits_num = 0
 showing = 0
-printed = false
 oper_mode = false
 n_switch = true
-function DrawMode()
-	Screen.fillEmptyRect(x-10,x+300,y-45,y-25,black,BOTTOM_SCREEN)
-	Screen.fillRect(x-9,x+299,y-44,y-26,white,BOTTOM_SCREEN)
-	Font.print(ttf,x-5,y-44,"Mode: "..calc_mode,black,BOTTOM_SCREEN)
-end
 function DrawDevKeyboard()
-	i = 1
-	z = 1
-	x_c = x+95
-	y_c = y-5
-	while (i <= #d_table) do
-		if z < 3 then
-			Screen.fillEmptyRect(x_c,x_c+50,y_c,y_c+25,black,BOTTOM_SCREEN)
-			Screen.fillRect(x_c+1,x_c+49,y_c+1,y_c+24,white,BOTTOM_SCREEN)
-		else
-			Screen.fillEmptyRect(x_c,x_c+30,y_c,y_c+25,black,BOTTOM_SCREEN)
-			Screen.fillRect(x_c+1,x_c+29,y_c+1,y_c+24,white,BOTTOM_SCREEN)
-		end
-		i=i+1
-		z=z+1
-		if z > 3 then
-			x_c = x_c + 30
-			if z > 5 then
-				x_c = x+95
-				y_c = y_c + 25
-				z = 1
-			end
-		else
-			x_c = x_c + 50
-		end
-	end
 	Font.print(ttf,x+100,y,"+",black,BOTTOM_SCREEN)
 	Font.print(ttf,x+150,y,"-",black,BOTTOM_SCREEN)
 	Font.print(ttf,x+200,y,"7",black,BOTTOM_SCREEN)
@@ -68,32 +36,6 @@ function DrawDevKeyboard()
 	Font.print(ttf,x+260,y+100,"=",black,BOTTOM_SCREEN)
 end
 function DrawScientificKeyboard()
-	i = 1
-	z = 1
-	x_c = x-5
-	y_c = y-5
-	while (i <= #s_table) do
-		exec = false
-		if z < 5 then
-			Screen.fillEmptyRect(x_c,x_c+50,y_c,y_c+25,black,BOTTOM_SCREEN)
-			Screen.fillRect(x_c+1,x_c+49,y_c+1,y_c+24,white,BOTTOM_SCREEN)
-		else
-			Screen.fillEmptyRect(x_c,x_c+30,y_c,y_c+25,black,BOTTOM_SCREEN)
-			Screen.fillRect(x_c+1,x_c+29,y_c+1,y_c+24,white,BOTTOM_SCREEN)
-		end
-		i=i+1
-		z=z+1
-		if z > 5 then
-			x_c = x_c + 30
-			if z > 7 then
-				x_c = x-5
-				y_c = y_c + 25
-				z = 1
-			end
-		else
-			x_c = x_c + 50
-		end
-	end
 	Font.print(ttf,x,y,"10^",black,BOTTOM_SCREEN)
 	Font.print(ttf,x+50,y,"sin",black,BOTTOM_SCREEN)
 	Font.print(ttf,x+100,y,"^",black,BOTTOM_SCREEN)
@@ -288,16 +230,83 @@ d_table = {{plus,2,nil}, -- 1 = Operator, 2 = N° Arguments, 3 = Value
 		   {free,1,nil},
 		   {ris,2,nil}
 		  }
+		  
+-- Rendering functions
+function AppTopScreenRender()	
+	Graphics.fillRect(5,395,40,80,black)
+	Graphics.fillRect(6,394,41,79,white)
+end
+
+function AppBottomScreenRender()
+
+	-- Reset x,y coordinates
+	y = 50
+	x = 15
+	
+	Graphics.fillRect(x-10,x+300,y-45,y-25,black)
+	Graphics.fillRect(x-9,x+299,y-44,y-26,white)
+	if calc_mode == "Developer" then
+		i = 1
+		z = 1
+		x_c = x+95
+		y_c = y-5
+		while (i <= #d_table) do
+			if z < 3 then
+				Graphics.fillRect(x_c,x_c+50,y_c,y_c+25,black)
+				Graphics.fillRect(x_c+1,x_c+49,y_c+1,y_c+24,white)
+			else
+				Graphics.fillRect(x_c,x_c+30,y_c,y_c+25,black)
+				Graphics.fillRect(x_c+1,x_c+29,y_c+1,y_c+24,white)
+			end
+			i=i+1
+			z=z+1
+			if z > 3 then
+				x_c = x_c + 30
+				if z > 5 then
+					x_c = x+95
+					y_c = y_c + 25
+					z = 1
+				end
+			else
+				x_c = x_c + 50
+			end
+		end
+	else
+		i = 1
+		z = 1
+		x_c = x-5
+		y_c = y-5
+		while (i <= #s_table) do
+			exec = false
+			if z < 5 then
+				Graphics.fillRect(x_c,x_c+50,y_c,y_c+25,black)
+				Graphics.fillRect(x_c+1,x_c+49,y_c+1,y_c+24,white)
+			else
+				Graphics.fillRect(x_c,x_c+30,y_c,y_c+25,black)
+				Graphics.fillRect(x_c+1,x_c+29,y_c+1,y_c+24,white)
+			end
+			i=i+1
+			z=z+1
+			if z > 5 then
+				x_c = x_c + 30
+				if z > 7 then
+					x_c = x-5
+					y_c = y_c + 25
+					z = 1
+				end
+			else
+				x_c = x_c + 50
+			end
+		end
+		end
+end
+		  
 -- Module main cycle
 function AppMainCycle()
 
 	-- Reset x,y coordinates
 	y = 50
 	x = 15
-	
-	-- Draw top screen box
-	Screen.fillEmptyRect(5,395,40,80,black,TOP_SCREEN)
-	Screen.fillRect(6,394,41,79,white,TOP_SCREEN)
 	
 	-- Draw calculator display
 	if calc_mode == "Developer" then
@@ -388,12 +397,10 @@ function AppMainCycle()
 		end
 		
 		-- Draw calculator keyboard
-		if not printed then
-			BottomBGRefresh()
-			OneshotPrint(DrawMode)
-			OneshotPrint(DrawDevKeyboard)
-			printed = true
-		end
+			Font.print(ttf,x-5,y-44,"Mode: "..calc_mode,black,BOTTOM_SCREEN)
+			DrawDevKeyboard()
+
+
 	-- Scientific Mode
 	elseif calc_mode == "Scientific" then
 		
@@ -498,12 +505,8 @@ function AppMainCycle()
 		end
 		
 		-- Draw calculator keyboard
-		if not printed then
-			BottomBGRefresh()
-			OneshotPrint(DrawMode)
-			OneshotPrint(DrawScientificKeyboard)
-			printed = true
-		end
+		Font.print(ttf,x-5,y-44,"Mode: "..calc_mode,black,BOTTOM_SCREEN)
+		DrawScientificKeyboard()
 	
 	end
 	
@@ -511,7 +514,6 @@ function AppMainCycle()
 	if Controls.check(pad,KEY_B) or Controls.check(pad,KEY_START) then
 		CallMainMenu()
 	elseif Controls.check(pad,KEY_SELECT) and not Controls.check(oldpad,KEY_SELECT) then
-		printed = false
 		decimal = false
 		result = 0
 		showing = 0
