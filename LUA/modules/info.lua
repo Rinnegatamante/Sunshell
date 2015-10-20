@@ -10,6 +10,8 @@ else
 	oldn = false
 	ip_addr = "0.0.0.0"
 end
+usr = System.getUsername()
+day, mnth = System.getBirthday()
 model = System.getModel()
 region = System.getRegion()
 fw1,fw2,fw3 = System.getFirmware()
@@ -76,14 +78,18 @@ function AppMainCycle()
 	end
 	
 	-- Draw info
-	Font.print(ttf,9,75,"Firmware Build: " .. fw,black,TOP_SCREEN)
-	Font.print(ttf,9,90,"Kernel Build: " .. kernel,black,TOP_SCREEN)
-	Font.print(ttf,9,105,"Free Space: "..free_space.." "..sorting,black,TOP_SCREEN)
-	Font.print(ttf,9,120,"MAC Address: "..mac_addr,black,TOP_SCREEN)
-	Font.print(ttf,9,135,"IP Address: "..ip_addr,black,TOP_SCREEN)
-	Font.print(ttf,9,150,"Build: "..build,black,TOP_SCREEN)
+	Font.print(ttf,9,75,"Username: " .. usr,black,TOP_SCREEN)
+	Font.print(ttf,9,90,"Birthday: " .. day .. " " .. months[mnth],black,TOP_SCREEN)
+	Font.print(ttf,9,105,"Firmware Build: " .. fw,black,TOP_SCREEN)
+	Font.print(ttf,9,120,"Kernel Build: " .. kernel,black,TOP_SCREEN)
+	Font.print(ttf,9,135,"Free Space: "..free_space.." "..sorting,black,TOP_SCREEN)
+	Font.print(ttf,9,150,"MAC Address: "..mac_addr,black,TOP_SCREEN)
+	Font.print(ttf,9,165,"IP Address: "..ip_addr,black,TOP_SCREEN)
+	Font.print(ttf,9,180,"Build: "..build,black,TOP_SCREEN)
+	
 	-- Sets controls triggering
 	if Controls.check(pad,KEY_B) or Controls.check(pad,KEY_START) then
 		CallMainMenu()
 	end
+	
 end
