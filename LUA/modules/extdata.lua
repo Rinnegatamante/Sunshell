@@ -7,6 +7,7 @@ if extdata_backup == nil then
 	files_table = System.scanExtdata()
 	extdata_backup = files_table
 end
+DisableRenderer()
 update_bottom_screen = true
 update_top_screen = true
 ui_enabled = false
