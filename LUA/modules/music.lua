@@ -3,9 +3,8 @@ mode = "Music"
 
 -- Internal module settings
 FreeIconTopbar("Music")
-SetBottomRefresh(false)
+hide = false
 master_index_m = 0
-update_list = true
 text_for_top_screen = ""
 p_m = 1
 if not_started == nil then
@@ -37,6 +36,11 @@ function AddSongsFromDir(dir,album)
 end
 AddSongsFromDir("/MUSIC",nil)
 blue = Color.new(0,0,255)
+
+if #my_songs <= 0 then
+	ShowError("MUSIC folder is empty.")
+	CallMainMenu()
+end
 
 -- Module background code
 function BackgroundMusic()
@@ -126,22 +130,23 @@ function MusicGC()
 	end
 end
 
+-- Rendering functions
+function AppTopScreenRender()	
+	Graphics.fillRect(5,395,40,220,black)
+	Graphics.fillRect(6,394,41,219,white)
+end
+
+function AppBottomScreenRender()
+end
+
 -- Module main cycle
 function AppMainCycle()
-	
-	-- Draw top screen box
-	Screen.fillEmptyRect(5,395,40,220,black,TOP_SCREEN)
-	Screen.fillRect(6,394,41,219,white,TOP_SCREEN)
 	
 	-- Draw Cycle Mode info
 	Font.print(ttf,9,200,"Cycle mode: "..cycle_mode[cycle_index],black,TOP_SCREEN)
 	
 	-- Showing files list
-	if update_list then
-		BottomBGRefresh()
-		OneshotPrint(ShowFileList)
-		update_list = false
-	end
+	ShowFileList()
 	
 	-- Showing Song info
 	if not not_started then
@@ -163,10 +168,25 @@ function AppMainCycle()
 		Font.print(ttf,9,45,text_for_top_screen,black,TOP_SCREEN)
 	end
 	
+	-- Power-on screens triggering
+	if hide then
+		if pad ~= 0x00 then
+			hide = false
+			Controls.enableScreen(TOP_SCREEN)
+			Controls.enableScreen(BOTTOM_SCREEN)
+		end
+	end
+	
 	-- Sets controls triggering
 	if (Controls.check(pad,KEY_SELECT)) and not (Controls.check(oldpad,KEY_SELECT)) and not (not_started) then
 		CallMainMenu()
 		AddIconTopbar(theme_dir.."/images/music_icon.jpg","Music")
+	elseif (Controls.check(pad,KEY_R)) and not (Controls.check(oldpad,KEY_R)) and not (not_started) then
+		if not hide then
+			Controls.disableScreen(TOP_SCREEN)
+			Controls.disableScreen(BOTTOM_SCREEN)
+			hide = true
+		end
 	elseif (Controls.check(pad,KEY_X)) and not (Controls.check(oldpad,KEY_X)) and not (not_started) then
 		if Sound.isPlaying(current_song) then
 			Sound.pause(current_song)

@@ -3,9 +3,14 @@ mode = "Video"
 
 -- Internal module settings
 master_index_v = 0
+if Screen.get3DLevel() > 0 then
+	Screen.enable3D()
+end
+old_3d = Screen.get3DLevel()
 p_v = 1
 update_frame = false
 ui_enabled = false
+DisableRenderer()
 not_started_v = true
 tmp = System.listDirectory("/VIDEO")
 my_videos = {}
@@ -39,9 +44,19 @@ end
 frame_succession = Timer.new()
 current_frame = 60
 
+-- Rendering functions
+function AppTopScreenRender()	
+	Graphics.fillRect(5,395,40,220,black)
+	Graphics.fillRect(6,394,41,219,white)
+end
+
+function AppBottomScreenRender()
+end
+
 -- Module main cycle
 function AppMainCycle()
-
+	slide_status = Screen.get3DLevel()
+	
 	-- Clear bottom screen
 	Screen.clear(BOTTOM_SCREEN)
 	if not_started_v then
@@ -66,7 +81,11 @@ function AppMainCycle()
 		if current_type == "BMPV" then
 			BMPV.showFrame(0,0,current_file,current_frame,TOP_SCREEN)
 		elseif current_type == "JPGV" then
-			JPGV.showFrame(0,0,current_file,current_frame,TOP_SCREEN)
+			if (slide_status == 0) then
+				JPGV.showFrame(0,0,current_file,current_frame,TOP_SCREEN,false)
+			else
+				JPGV.showFrame(0,0,current_file,current_frame,TOP_SCREEN,true)
+			end
 		end
 		if Timer.getTime(frame_succession) > 5000 then
 			current_frame = math.ceil(current_frame + (current_size / 10))
@@ -105,7 +124,11 @@ function AppMainCycle()
 		
 		-- Video playback
 		if current_type == "JPGV" then
-			JPGV.draw(0,0,current_file,TOP_SCREEN)
+			if (slide_status == 0) then
+				JPGV.draw(0,0,current_file,TOP_SCREEN,false)
+			else
+				JPGV.draw(0,0,current_file,TOP_SCREEN,true)
+			end
 		else
 			BMPV.draw(0,0,current_file,TOP_SCREEN)
 		end
@@ -142,7 +165,7 @@ function AppMainCycle()
 				Screen.debugPrint(0,10,"A = Pause/Resume",white,BOTTOM_SCREEN)
 				Screen.debugPrint(0,25,"Y = Close video",white,BOTTOM_SCREEN)
 				Screen.debugPrint(0,40,"B = Return Main Menu",white,BOTTOM_SCREEN)
-				Screen.debugPrint(0,55,"X = Hide Bottom Screen",white,BOTTOM_SCREEN)
+				Screen.debugPrint(0,55,"X = Power off Bottom Screen",white,BOTTOM_SCREEN)
 				Screen.debugPrint(0,100,"Infos:",white,BOTTOM_SCREEN)
 				Screen.debugPrint(0,114,"FPS: "..BMPV.getFPS(current_file),white,BOTTOM_SCREEN)
 				cur_time_sec = math.ceil(BMPV.getFrame(current_file) / BMPV.getFPS(current_file))
@@ -167,16 +190,32 @@ function AppMainCycle()
 			
 	end
 	
+	-- 3D effect support
+	if slide_status == 0 and old_3d ~= 0 then
+		Screen.disable3D()
+	elseif slide_status > 0 and old_3d == 0 then
+		Screen.enable3D()
+	end
+	
 	-- Sets controls triggering
 	if (Controls.check(pad,KEY_Y)) and not (Controls.check(oldpad,KEY_Y)) and not (not_started_v) then
 		Timer.reset(frame_succession)
 		not_started_v = true
+		if hide then
+			Controls.enableScreen(BOTTOM_SCREEN)
+			hide = false
+		end
 		if current_type == "JPGV" then
 			JPGV.stop(current_file)
 		else
 			BMPV.stop(current_file)
 		end
 	elseif (Controls.check(pad,KEY_X)) and not (Controls.check(oldpad,KEY_X)) and not (not_started_v) then
+		if hide then
+			Controls.enableScreen(BOTTOM_SCREEN)
+		else
+			Controls.disableScreen(BOTTOM_SCREEN)
+		end
 		hide = not hide
 	elseif (Controls.check(pad,KEY_A)) and not (Controls.check(oldpad,KEY_A)) then
 		if not_started_v then
@@ -214,6 +253,12 @@ function AppMainCycle()
 			end
 		end
 	elseif Controls.check(pad,KEY_B) or Controls.check(pad,KEY_START) then
+		if (slide_status > 0) then
+			Screen.disable3D()
+		end
+		if hide then
+			Controls.enableScreen(BOTTOM_SCREEN)
+		end
 		CallMainMenu()
 		Timer.destroy(frame_succession)
 		if current_type == "JPGV" then
@@ -255,4 +300,5 @@ function AppMainCycle()
 		master_index_v = 0
 		p_v = 1
 	end
+	old_3d = slide_status
 end
