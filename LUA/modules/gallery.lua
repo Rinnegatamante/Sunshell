@@ -1,5 +1,5 @@
--- Set private "Photo" mode
-mode = "Photo"
+-- Set private "Gallery" mode
+mode = "Gallery"
 
 -- Internal module settings
 master_index_p = 0
@@ -100,7 +100,7 @@ function AppTopScreenRender()
 			y_print = Graphics.getImageHeight(current_photo) - height
 		end
 	else
-		Graphics.drawImage(0,0,curent_photo)
+		Graphics.drawImage(0,0,current_photo)
 	end
 	
 end

@@ -18,7 +18,8 @@ video = Graphics.loadImage(theme_dir.."/images/video"..ext)
 info = Graphics.loadImage(theme_dir.."/images/info"..ext)
 fb = Graphics.loadImage(theme_dir.."/images/fb"..ext)
 game = Graphics.loadImage(theme_dir.."/images/game"..ext)
-photo = Graphics.loadImage(theme_dir.."/images/photo"..ext)
+camera = Graphics.loadImage(theme_dir.."/images/camera"..ext)
+gallery = Graphics.loadImage(theme_dir.."/images/gallery"..ext)
 cia = Graphics.loadImage(theme_dir.."/images/cia"..ext)
 extdata = Graphics.loadImage(theme_dir.."/images/extdata"..ext)
 calc = Graphics.loadImage(theme_dir.."/images/calc"..ext)
@@ -47,7 +48,7 @@ refresh_screen = true
 refresh_screen2 = true
 Sound.init()
 app_index = 1
-version = "0.3.8"
+version = "0.5 PRO"
 ui_enabled = true
 screenshots = true
 oldpad = KEY_A
@@ -104,7 +105,8 @@ end
 tools = {}
 table.insert(tools,{game,"/modules/game.lua","Applications"})
 table.insert(tools,{info,"/modules/info.lua","Console Info"})
-table.insert(tools,{photo,"/modules/photo.lua","Photos"})
+table.insert(tools,{camera,"/modules/camera.lua","Camera"})
+table.insert(tools,{gallery,"/modules/gallery.lua","Gallery"})
 table.insert(tools,{music,"/modules/music.lua","Musics"})
 table.insert(tools,{video,"/modules/video.lua","Videos"})
 table.insert(tools,{fb,"/modules/fb.lua","Filebrowser"})
