@@ -87,7 +87,7 @@ function BackgroundMusic()
 			elseif my_songs[song_idx][2] == "OGG" then
 				current_song = Sound.openOgg(my_songs[song_idx][4].."/"..my_songs[song_idx][1],true)
 			end
-			Sound.play(current_song,NO_LOOP,0x08,0x09)
+			Sound.play(current_song,NO_LOOP)
 			current_subfolder = my_songs[song_idx][3]
 		end
 	end
@@ -219,7 +219,7 @@ function AppMainCycle()
 		elseif my_songs[p_m][2] == "OGG" then
 			current_song = Sound.openOgg(my_songs[p_m][4].."/"..my_songs[p_m][1],true)
 		end	
-		Sound.play(current_song,NO_LOOP,0x08,0x09)
+		Sound.play(current_song,NO_LOOP)
 		current_subfolder = my_songs[p_m][3]
 		song_idx = p_m
 		table.insert(bg_apps,{BackgroundMusic,MusicGC,"Music"}) -- Starting background Music module
