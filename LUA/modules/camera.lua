@@ -57,7 +57,7 @@ function UpdateBottomScreen()
 	Screen.debugPrint(0,70, "A = Change Photo Resolution", white, BOTTOM_SCREEN)
 	
 	-- Show Photo settings
-	Screen.debugPrint(0,100, "Settings:", selected, BOTTOM_SCREEN)
+	Screen.debugPrint(0,100, "Settings: ", selected, BOTTOM_SCREEN)
 	Screen.debugPrint(0,125, "Photo Mode: " .. GetPhotoMode(photo_mode), white, BOTTOM_SCREEN)
 	Screen.debugPrint(0,140, "Resolution: " .. GetResolution(resolution), white, BOTTOM_SCREEN)
 	
@@ -84,13 +84,13 @@ function AppMainCycle()
 	-- Sets controls triggering
 	if Controls.check(pad, KEY_L) then
 		h,m,s = System.getTime()
-		Camera.takePhoto("/DCIM/"..h.."-"..m.."-"..s.."-"..".jpg", resolution, true)
+		Camera.takePhoto("/DCIM/"..h.."-"..m.."-"..s..".jpg", resolution, true)
 	elseif Controls.check(pad, KEY_Y) and not Controls.check(oldpad, KEY_Y) then
 		photo_mode = photo_mode + 1
 		if photo_mode > PHOTO_MODE_LETTER then
 			photo_mode = PHOTO_MODE_NORMAL
 		end
-		Camera.init(TOP_SCREEN, OUTER_CAM, PHOTO_MODE_NORMAL, false)
+		Camera.init(TOP_SCREEN, scene, photo_mode, false)
 		update_bottom_screen = true
 	elseif Controls.check(pad, KEY_A) and not Controls.check(oldpad, KEY_A) then
 		resolution = resolution + 1
